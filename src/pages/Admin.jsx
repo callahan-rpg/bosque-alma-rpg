@@ -958,8 +958,22 @@ export default function Admin() {
                 </div>
 
                 {compendiumGlobalBg && (
-                  <div className="admin-preview-img-box" style={{ maxHeight: '140px' }}>
-                    <img src={compendiumGlobalBg} alt="Preview Fundo Compêndio" />
+                  <div className="admin-bg-preview-wrapper">
+                    <div className="admin-bg-preview-label">
+                      <span>Pré-visualização do Fundo:</span>
+                      <button
+                        type="button"
+                        className="admin-bg-preview-clear"
+                        onClick={() => setCompendiumGlobalBg('')}
+                        title="Remover imagem de fundo"
+                      >
+                        ✕ Limpar Fundo
+                      </button>
+                    </div>
+                    <div className="admin-bg-preview-frame">
+                      <img src={compendiumGlobalBg} alt="Preview Fundo Compêndio" />
+                      <span className="admin-bg-preview-tag">📖 Fundo do Compêndio</span>
+                    </div>
                   </div>
                 )}
 
