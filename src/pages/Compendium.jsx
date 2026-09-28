@@ -107,6 +107,8 @@ export default function Compendium() {
   const [uploadingBg, setUploadingBg] = useState(false)
   const [bgSaveStatus, setBgSaveStatus] = useState('')
 
+  const [searchFilter, setSearchFilter] = useState('')
+
   const isMaster = sessionStorage.getItem('jardim_master_auth') === 'true'
 
   // Escuta configuração global de fundo do Compêndio
