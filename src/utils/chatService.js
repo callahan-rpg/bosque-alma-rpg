@@ -1,0 +1,332 @@
+import {
+  ref,
+  push,
+  set,
+  remove,
+  onValue,
+  off,
+  query,
+  limitToLast,
+  onDisconnect,
+  get,
+  serverTimestamp
+} from 'firebase/database'
+import { rtdb } from '../firebase/config'
+
+// Sincronização de offset temporal com o relógio oficial do Firebase RTDB
+let serverTimeOffset = 0
+if (rtdb) {
+  try {
+    const offsetRef = ref(rtdb, '.info/serverTimeOffset')
+    onValue(offsetRef, (snap) => {
+      serverTimeOffset = Number(snap.val()) || 0
+    })
+  } catch {}
+}
+
+export function getEstimatedServerTime() {
+  return Date.now() + serverTimeOffset
+}
+
+/**
+ * Gera a chave simétrica de sala privada entre dois usuários (DM)
+ */
+export function getPrivateRoomId(uid1, uid2) {
+  if (!uid1 || !uid2) return null
+  return [uid1, uid2].sort().join('_')
+}
+
+/**
+ * Envia mensagem para o canal da locação/zona
+ */
+export async function sendZoneMessage(zoneSlug, userObj, text, type = 'normal') {
+  if (!rtdb || !zoneSlug || !userObj?.uid || !text?.trim()) return
+
+  const cleanText = text.trim().slice(0, 280)
+  const messagesRef = ref(rtdb, `chat/zones/${zoneSlug}/messages`)
+  const newMsgRef = push(messagesRef)
+
+  const payload = {
+    uid: userObj.uid,
+    characterName: userObj.characterName || 'Visitante',
+    avatarUrl: userObj.avatarUrl || null,
+    role: userObj.role || 'player',
+    text: cleanText,
+    type,
+    timestamp: serverTimestamp()
+  }
+
+  await set(newMsgRef, payload)
+}
+
+/**
+ * Envia mensagem privada (DM) e atualiza a inbox do destinatário para notificação instantânea
+ */
+export async function sendPrivateMessage(senderUid, targetUid, userObj, text) {
+  if (!rtdb || !senderUid || !targetUid || !text?.trim()) return
+
+  const roomId = getPrivateRoomId(senderUid, targetUid)
+  if (!roomId) return
+
+  const cleanText = text.trim().slice(0, 500)
+  const messagesRef = ref(rtdb, `chat/private/${roomId}/messages`)
+  const newMsgRef = push(messagesRef)
+
+  const payload = {
+    uid: senderUid,
+    targetUid,
+    characterName: userObj?.characterName || 'Visitante',
+    avatarUrl: userObj?.avatarUrl || null,
+    text: cleanText,
+    type: 'private',
+    timestamp: serverTimestamp()
+  }
+
+  await set(newMsgRef, payload)
+
+  // Notifica o inbox do destinatário
+  try {
+    const inboxRef = ref(rtdb, `chat/inbox/${targetUid}/${senderUid}`)
+    await set(inboxRef, {
+      senderUid,
+      characterName: userObj?.characterName || 'Visitante',
+      avatarUrl: userObj?.avatarUrl || null,
+      lastText: cleanText.slice(0, 40),
+      timestamp: serverTimestamp()
+    })
+  } catch (err) {
+    console.warn('[chatService] Falha ao notificar inbox do destinatário:', err)
+  }
+}
+
+/**
+ * Escuta notificações de mensagens privadas recebidas pelo usuário
+ */
+export function subscribeUserInbox(uid, callback) {
+  if (!rtdb || !uid) return () => {}
+
+  const inboxRef = ref(rtdb, `chat/inbox/${uid}`)
+  const handleValue = (snapshot) => {
+    if (!snapshot.exists()) {
+      callback({})
+      return
+    }
+    callback(snapshot.val() || {})
+  }
+
+  onValue(inboxRef, handleValue)
+  return () => off(inboxRef, 'value', handleValue)
+}
+
+/**
+ * Limpa a notificação de inbox de um remetente específico
+ */
+export async function clearUserInboxItem(myUid, senderUid) {
+  if (!rtdb || !myUid || !senderUid) return
+  try {
+    const inboxItemRef = ref(rtdb, `chat/inbox/${myUid}/${senderUid}`)
+    await remove(inboxItemRef)
+  } catch {}
+}
+
+/**
+ * Escuta mensagens da locação em tempo real
+ */
+export function subscribeZoneChat(zoneSlug, callback, sessionStartTime, maxCount = 50) {
+  if (!rtdb || !zoneSlug) return () => {}
+
+  const startTime = typeof sessionStartTime === 'number' ? sessionStartTime : getEstimatedServerTime()
+  const messagesRef = query(ref(rtdb, `chat/zones/${zoneSlug}/messages`), limitToLast(maxCount))
+
+  const handleValue = (snapshot) => {
+    if (!snapshot.exists()) {
+      callback([])
+      return
+    }
+
+    const raw = snapshot.val()
+    const list = Object.entries(raw)
+      .map(([id, val]) => ({ id, ...val }))
+      .filter((msg) => {
+        // Exibe mensagens recentes
+        const ts = msg.timestamp || 0
+        return ts >= startTime - 3600000 // últimas 1h de sessão
+      })
+      .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0))
+
+    callback(list)
+  }
+
+  onValue(messagesRef, handleValue)
+  return () => off(messagesRef, 'value', handleValue)
+}
+
+/**
+ * Escuta mensagens de uma sala privada (DM)
+ */
+export function subscribePrivateChat(roomId, callback, maxCount = 50) {
+  if (!rtdb || !roomId) return () => {}
+
+  const messagesRef = query(ref(rtdb, `chat/private/${roomId}/messages`), limitToLast(maxCount))
+  const handleValue = (snapshot) => {
+    if (!snapshot.exists()) {
+      callback([])
+      return
+    }
+
+    const raw = snapshot.val()
+    const list = Object.entries(raw)
+      .map(([id, val]) => ({ id, ...val }))
+      .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0))
+
+    callback(list)
+  }
+
+  onValue(messagesRef, handleValue)
+  return () => off(messagesRef, 'value', handleValue)
+}
+
+/**
+ * Deleta uma mensagem do chat de zona
+ */
+export async function deleteZoneMessage(zoneSlug, messageId) {
+  if (!rtdb || !zoneSlug || !messageId) return
+  const msgRef = ref(rtdb, `chat/zones/${zoneSlug}/messages/${messageId}`)
+  await remove(msgRef)
+}
+
+/**
+ * Fixa uma mensagem na locação
+ */
+export async function pinZoneMessage(zoneSlug, messageObj) {
+  if (!rtdb || !zoneSlug || !messageObj) return
+  const pinRef = ref(rtdb, `chat/zones/${zoneSlug}/pinned`)
+  await set(pinRef, {
+    ...messageObj,
+    pinnedAt: serverTimestamp()
+  })
+}
+
+/**
+ * Desafixa a mensagem da locação
+ */
+export async function unpinZoneMessage(zoneSlug) {
+  if (!rtdb || !zoneSlug) return
+  const pinRef = ref(rtdb, `chat/zones/${zoneSlug}/pinned`)
+  await remove(pinRef)
+}
+
+/**
+ * Escuta a mensagem fixada da locação
+ */
+export function subscribePinnedMessage(zoneSlug, callback) {
+  if (!rtdb || !zoneSlug) return () => {}
+  const pinRef = ref(rtdb, `chat/zones/${zoneSlug}/pinned`)
+  const handleValue = (snap) => {
+    callback(snap.exists() ? snap.val() : null)
+  }
+  onValue(pinRef, handleValue)
+  return () => off(pinRef, 'value', handleValue)
+}
+
+/**
+ * Alterna reação de emoji em uma mensagem
+ */
+export async function toggleReaction(zoneSlug, messageId, emoji, userUid) {
+  if (!rtdb || !zoneSlug || !messageId || !emoji || !userUid) return
+  const rxRef = ref(rtdb, `chat/zones/${zoneSlug}/messages/${messageId}/reactions/${emoji}/${userUid}`)
+  const snap = await get(rxRef)
+  if (snap.exists()) {
+    await remove(rxRef)
+  } else {
+    await set(rxRef, true)
+  }
+}
+
+/**
+ * Gerencia presença online no RTDB
+ */
+export function setPresence(uid, characterObj, locationObj, role = 'player') {
+  if (!rtdb || !uid) return () => {}
+
+  const userPresenceRef = ref(rtdb, `chat/presence/${uid}`)
+  const connectedRef = ref(rtdb, '.info/connected')
+
+  const handleConnect = (snap) => {
+    if (snap.val() === true) {
+      onDisconnect(userPresenceRef).remove()
+      set(userPresenceRef, {
+        uid,
+        characterName: characterObj?.name || 'Visitante',
+        avatarUrl: characterObj?.avatarUrl || null,
+        locationSlug: locationObj?.slug || 'crepusculo',
+        locationName: locationObj?.name || 'Jardim do Crepúsculo',
+        role,
+        lastSeen: serverTimestamp()
+      })
+    }
+  }
+
+  onValue(connectedRef, handleConnect)
+
+  return () => {
+    off(connectedRef, 'value', handleConnect)
+    remove(userPresenceRef).catch(() => {})
+  }
+}
+
+/**
+ * Remove presença
+ */
+export function clearPresence(uid) {
+  if (!rtdb || !uid) return
+  const userPresenceRef = ref(rtdb, `chat/presence/${uid}`)
+  remove(userPresenceRef).catch(() => {})
+}
+
+/**
+ * Escuta presença de todos os usuários online
+ */
+export function subscribeOnlinePresence(callback) {
+  if (!rtdb) return () => {}
+  const presenceRef = ref(rtdb, 'chat/presence')
+
+  const handleValue = (snapshot) => {
+    if (!snapshot.exists()) {
+      callback([])
+      return
+    }
+    const raw = snapshot.val()
+    const list = Object.values(raw).filter(Boolean)
+    callback(list)
+  }
+
+  onValue(presenceRef, handleValue)
+  return () => off(presenceRef, 'value', handleValue)
+}
+
+/**
+ * Atualiza status (away, disconnect, etc)
+ */
+export function updatePresenceStatus(uid, status) {
+  if (!rtdb || !uid) return
+  const statusRef = ref(rtdb, `chat/presence/${uid}/status`)
+  if (status) {
+    set(statusRef, status).catch(() => {})
+  } else {
+    remove(statusRef).catch(() => {})
+  }
+}
+
+/**
+ * Atualiza humor (mood)
+ */
+export function updateMood(uid, moodId) {
+  if (!rtdb || !uid) return
+  const moodRef = ref(rtdb, `chat/presence/${uid}/mood`)
+  if (moodId) {
+    set(moodRef, moodId).catch(() => {})
+  } else {
+    remove(moodRef).catch(() => {})
+  }
+}
