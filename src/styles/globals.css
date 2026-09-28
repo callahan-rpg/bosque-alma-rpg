@@ -651,28 +651,56 @@ html, body, #root {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   padding: 4px 8px;
   background: rgba(12, 9, 18, 0.7);
 }
 
 .chat-emoji-scroll {
   display: flex;
-  gap: 4px;
+  align-items: center;
+  gap: 6px;
   overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 2px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-emoji-scroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 .chat-emoji-btn {
   background: transparent;
   border: none;
-  font-size: 1.1rem;
+  font-size: 16px;
   cursor: pointer;
   padding: 2px 4px;
   border-radius: 4px;
-  transition: transform 0.15s ease;
+  transition: transform 0.12s ease, background 0.12s ease;
+  user-select: none;
+  line-height: 1;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .chat-emoji-btn:hover {
-  transform: scale(1.2);
+  transform: scale(1.22);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.chat-emoji-bar-actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: 4px;
 }
 
 .chat-settings-inline-btn {
