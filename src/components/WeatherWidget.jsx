@@ -1,28 +1,37 @@
 import { useState, useEffect } from 'react'
+import { doc, onSnapshot } from 'firebase/firestore'
+import { db } from '../firebase/config'
 import { calculateGameTime, resolveLocationWeather } from '../utils/timeSystem'
 
 /**
  * Widget de Clima, Horário e Fase da Lua para o HUD do Bosque de Alma RPG.
- * Portado do Zona Zero RPG.
+ * Lê a configuração de tempo em tempo real do Firestore (settings/game_config).
  *
  * Props:
- *   weatherCondition {string} - Condição de clima da localidade atual (ex: 'rainy', 'foggy', 'none').
- *                               Vem do campo weatherCondition do documento Firestore da localidade.
+ *   weatherCondition {string} - Condição de clima da localidade atual (ex: 'rainy', 'foggy').
  */
 export default function WeatherWidget({ weatherCondition }) {
-  // Tick para atualização do relógio em tempo real
+  const [gameConfig, setGameConfig] = useState(null)
   const [tick, setTick] = useState(0)
+
+  // Escuta configuração de tempo do Firestore
+  useEffect(() => {
+    const unsub = onSnapshot(
+      doc(db, 'settings', 'game_config'),
+      (snap) => { if (snap.exists()) setGameConfig(snap.data()) },
+      () => {} // ignora erros silenciosamente
+    )
+    return () => unsub()
+  }, [])
+
+  // Tick para atualização do relógio em tempo real (modo dinâmico)
   useEffect(() => {
     const id = setInterval(() => setTick(t => t + 1), 1000)
     return () => clearInterval(id)
   }, [])
 
-  const gameTime = calculateGameTime(null) // null = usa defaults dinâmicos
+  const gameTime = calculateGameTime(gameConfig)
   const weather  = resolveLocationWeather(weatherCondition, gameTime)
-
-  const isDay = gameTime.period === 'day'
-  const periodIcon  = isDay ? '🌤️' : '🌙'
-  const periodLabel = isDay ? 'Dia'  : 'Noite'
 
   return (
     <div

@@ -46,8 +46,17 @@ export default function Admin() {
   const [pinInput, setPinInput] = useState('')
   const [authError, setAuthError] = useState('')
 
-  // Aba ativa no Admin: 'locations' ou 'compendium'
+  // Aba ativa no Admin: 'locations', 'compendium' ou 'tempo'
   const [adminTab, setAdminTab] = useState('locations')
+
+  // ==========================================
+  // ESTADOS DE TEMPO & ESTAÇÃO
+  // ==========================================
+  const [timeMode, setTimeMode] = useState('dynamic')       // 'dynamic' | 'manual'
+  const [timeValue, setTimeValue] = useState('10:00')       // HH:MM para modo manual
+  const [timeSeason, setTimeSeason] = useState('autumn')    // override de estação
+  const [timeMoon, setTimeMoon]     = useState('full')      // override de fase da lua
+  const [saveTimeStatus, setSaveTimeStatus] = useState('')
 
   // ==========================================
   // ESTADOS DE LOCALIDADES
@@ -120,9 +129,20 @@ export default function Admin() {
         setCompendiumGlobalBg(snap.data().backgroundImage)
       }
     })
+    // Escuta configurações de tempo/estação
+    const unsubTime = onSnapshot(doc(db, 'settings', 'game_config'), (snap) => {
+      if (snap.exists()) {
+        const d = snap.data()
+        if (d.time?.mode)     setTimeMode(d.time.mode)
+        if (d.time?.value)    setTimeValue(d.time.value)
+        if (d.time?.seasonOverride) setTimeSeason(d.time.seasonOverride)
+        if (d.time?.moonOverride)   setTimeMoon(d.time.moonOverride)
+      }
+    })
     return () => {
       unsubComp()
       unsubConfig()
+      unsubTime()
     }
   }, [isAuthenticated])
 
@@ -375,6 +395,31 @@ export default function Admin() {
     return item.category === compCategoryFilter
   })
 
+  // ==========================================
+  // FUNÇÕES DE TEMPO & ESTAÇÃO
+  // ==========================================
+  const handleSaveTimeConfig = async (e) => {
+    e.preventDefault()
+    setSaveTimeStatus('Salvando...')
+    try {
+      const payload = {
+        time: {
+          mode: timeMode,
+          ...(timeMode === 'manual' ? { value: timeValue, period: parseInt(timeValue.split(':')[0] || '10', 10) >= 6 && parseInt(timeValue.split(':')[0] || '10', 10) < 19 ? 'day' : 'night' } : {}),
+          seasonOverride: timeSeason,
+          moonOverride: timeMoon,
+        },
+        updatedAt: serverTimestamp()
+      }
+      await setDoc(doc(db, 'settings', 'game_config'), payload, { merge: true })
+      setSaveTimeStatus('✅ Configuração de tempo salva!')
+      setTimeout(() => setSaveTimeStatus(''), 3000)
+    } catch (err) {
+      console.error(err)
+      setSaveTimeStatus('❌ Erro ao salvar configuração de tempo.')
+    }
+  }
+
   if (!isAuthenticated) {
     return (
       <div className="admin-login-screen">
@@ -433,6 +478,13 @@ export default function Admin() {
             onClick={() => setAdminTab('compendium')}
           >
             📖 Compêndio ({compendiumList.length})
+          </button>
+          <button
+            type="button"
+            className={`admin-tab-nav-btn ${adminTab === 'tempo' ? 'active' : ''}`}
+            onClick={() => setAdminTab('tempo')}
+          >
+            ⏱️ Tempo & Estação
           </button>
         </div>
 
@@ -981,6 +1033,130 @@ export default function Admin() {
                 </div>
               </form>
             </div>
+          </main>
+        </div>
+      )}
+
+      {/* =========================================================================
+          ABA 3: TEMPO & ESTAÇÃO DO ANO
+          ========================================================================= */}
+      {adminTab === 'tempo' && (
+        <div className="admin-main-grid" style={{ gridTemplateColumns: '1fr' }}>
+          <main className="admin-form-panel" style={{ maxWidth: 680, margin: '0 auto', width: '100%' }}>
+            <div className="admin-form-header">
+              <h2>⏱️ Controle de Tempo & Estação</h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: '13px', marginTop: 4 }}>
+                Defina o horário e a estação do ano exibidos no widget do menu. O horário do mundo é o mesmo para todas as localidades.
+              </p>
+            </div>
+
+            <form onSubmit={handleSaveTimeConfig} className="admin-loc-form">
+
+              {/* Modo do Relógio */}
+              <div className="profile-form-group">
+                <label className="profile-form-label">Modo do Relógio</label>
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <button
+                    type="button"
+                    className={`admin-tab-nav-btn ${timeMode === 'dynamic' ? 'active' : ''}`}
+                    onClick={() => setTimeMode('dynamic')}
+                  >
+                    🔄 Dinâmico (tempo real × 2)
+                  </button>
+                  <button
+                    type="button"
+                    className={`admin-tab-nav-btn ${timeMode === 'manual' ? 'active' : ''}`}
+                    onClick={() => setTimeMode('manual')}
+                  >
+                    🔒 Manual (hora fixa)
+                  </button>
+                </div>
+                {timeMode === 'dynamic' && (
+                  <small style={{ color: 'var(--text-muted)', marginTop: 6, display: 'block' }}>
+                    O relógio avança automaticamente: 1 dia in-game = 12 horas reais.
+                  </small>
+                )}
+              </div>
+
+              {/* Hora Manual */}
+              {timeMode === 'manual' && (
+                <div className="profile-form-group">
+                  <label className="profile-form-label">Horário Fixo (HH:MM)</label>
+                  <input
+                    type="time"
+                    className="profile-form-input"
+                    value={timeValue}
+                    onChange={e => setTimeValue(e.target.value)}
+                    style={{ maxWidth: 160 }}
+                  />
+                </div>
+              )}
+
+              {/* Estação do Ano */}
+              <div className="profile-form-group">
+                <label className="profile-form-label">Estação do Ano</label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+                  {[
+                    { id: 'spring', label: 'Primavera', icon: '🌸' },
+                    { id: 'summer', label: 'Verão',    icon: '☀️' },
+                    { id: 'autumn', label: 'Outono',   icon: '🍂' },
+                    { id: 'winter', label: 'Inverno',  icon: '❄️' },
+                  ].map(s => (
+                    <button
+                      key={s.id}
+                      type="button"
+                      className={`admin-tab-nav-btn ${timeSeason === s.id ? 'active' : ''}`}
+                      style={{ flexDirection: 'column', gap: 4, padding: '10px 8px' }}
+                      onClick={() => setTimeSeason(s.id)}
+                    >
+                      <span style={{ fontSize: 22 }}>{s.icon}</span>
+                      <span style={{ fontSize: 11 }}>{s.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Fase da Lua */}
+              <div className="profile-form-group">
+                <label className="profile-form-label">Fase da Lua (override manual)</label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+                  {[
+                    { id: 'new',             label: 'Nova',       icon: '🌑' },
+                    { id: 'waxing_crescent', label: 'Crescente',  icon: '🌒' },
+                    { id: 'first_quarter',   label: 'Qrt. Cresc.',icon: '🌓' },
+                    { id: 'waxing_gibbous',  label: 'Gib. Cresc.',icon: '🌔' },
+                    { id: 'full',            label: 'Cheia',      icon: '🌕' },
+                    { id: 'waning_gibbous',  label: 'Gib. Ming.', icon: '🌖' },
+                    { id: 'last_quarter',    label: 'Qrt. Ming.', icon: '🌗' },
+                    { id: 'waning_crescent', label: 'Minguante',  icon: '🌘' },
+                  ].map(m => (
+                    <button
+                      key={m.id}
+                      type="button"
+                      className={`admin-tab-nav-btn ${timeMoon === m.id ? 'active' : ''}`}
+                      style={{ flexDirection: 'column', gap: 3, padding: '8px 4px' }}
+                      onClick={() => setTimeMoon(m.id)}
+                    >
+                      <span style={{ fontSize: 20 }}>{m.icon}</span>
+                      <span style={{ fontSize: 10, lineHeight: 1.2 }}>{m.label}</span>
+                    </button>
+                  ))}
+                </div>
+                <small style={{ color: 'var(--text-muted)', marginTop: 6, display: 'block' }}>
+                  Em modo dinâmico, a lua avança automaticamente pelo ciclo sinódico (~29.5 dias). Selecione uma fase aqui para forçar um override fixo.
+                </small>
+              </div>
+
+              {saveTimeStatus && (
+                <div className="admin-save-feedback">{saveTimeStatus}</div>
+              )}
+
+              <div className="admin-form-actions">
+                <button type="submit" className="admin-save-btn">
+                  💾 Salvar Configuração de Tempo
+                </button>
+              </div>
+            </form>
           </main>
         </div>
       )}
