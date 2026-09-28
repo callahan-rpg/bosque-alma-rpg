@@ -85,7 +85,7 @@ html, body, #root {
 .location-chat-root {
   position: relative;
   width: 100%;
-  max-width: 920px;
+  max-width: 800px;
   margin: 0 auto;
   z-index: 10;
 }
@@ -1323,14 +1323,14 @@ html, body, #root {
 .location-main {
   flex: 1 0 auto;
   display: grid;
-  grid-template-columns: 1fr 780px 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(auto, 800px) minmax(0, 1fr);
   align-items: center;
   justify-content: center;
   padding: 8px 20px 16px;
-  gap: 20px;
+  gap: 24px;
   width: 100%;
-  max-width: 1380px;
-  margin: auto auto;
+  max-width: 1440px;
+  margin: 0 auto;
 }
 
 @media (max-width: 1024px) {
@@ -1364,6 +1364,7 @@ html, body, #root {
   justify-content: center;
   min-height: 480px;
   gap: 12px;
+  width: 100%;
 }
 
 .nav-buttons-right {
@@ -1373,6 +1374,7 @@ html, body, #root {
   justify-content: center;
   min-height: 480px;
   gap: 12px;
+  width: 100%;
 }
 
 .nav-btn {
@@ -1404,9 +1406,11 @@ html, body, #root {
 
 .chat-container {
   width: 100%;
-  max-width: 680px;
+  max-width: 800px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 12px;
   grid-column: 2;
 }
