@@ -36,7 +36,6 @@ export default function ChatSidebar({
   onOpenMyProfile
 }) {
   const [activeTab, setActiveTab] = useState('visitors') // 'visitors' | 'friends'
-  const [searchQuery, setSearchQuery] = useState('')
   const [showMoodPicker, setShowMoodPicker] = useState(false)
   const [myMood, setMyMood] = useState(() => localStorage.getItem('jardim_chat_mood') || null)
 
@@ -98,18 +97,6 @@ export default function ChatSidebar({
     })
   }, [friendsList, onlineMap])
 
-  const filteredVisitors = useMemo(() => {
-    if (!searchQuery.trim()) return visitors
-    const q = searchQuery.toLowerCase()
-    return visitors.filter(u => (u.characterName || '').toLowerCase().includes(q))
-  }, [visitors, searchQuery])
-
-  const filteredFriends = useMemo(() => {
-    if (!searchQuery.trim()) return friendsWithStatus
-    const q = searchQuery.toLowerCase()
-    return friendsWithStatus.filter(f => (f.characterName || '').toLowerCase().includes(q))
-  }, [friendsWithStatus, searchQuery])
-
   const handleSelectMood = async (moodId) => {
     setMyMood(moodId)
     localStorage.setItem('jardim_chat_mood', moodId)
@@ -144,27 +131,6 @@ export default function ChatSidebar({
           </button>
         </div>
       )}
-
-      {/* Barra de Busca Superior */}
-      <div className="chat-sidebar-search">
-        <span className="chat-search-icon">🔍</span>
-        <input
-          type="text"
-          className="chat-search-input"
-          placeholder="Buscar..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        {searchQuery && (
-          <button
-            type="button"
-            className="chat-search-clear"
-            onClick={() => setSearchQuery('')}
-          >
-            ×
-          </button>
-        )}
-      </div>
 
       {/* Barra de Ações Rápidas (Ausente / Desconectar) */}
       <div className="chat-sidebar-actions">
@@ -274,12 +240,12 @@ export default function ChatSidebar({
       {/* Lista de Usuários */}
       <div className="chat-sidebar-list">
         {activeTab === 'visitors' ? (
-          filteredVisitors.length === 0 ? (
+          visitors.length === 0 ? (
             <div className="chat-sidebar-empty">
               <span>Nenhum visitante aqui.</span>
             </div>
           ) : (
-            filteredVisitors.map(u => {
+            visitors.map(u => {
               const isMe = u.uid === currentUserId
               const isFriend = friendsList.some(f => (f.friendUid || f.id) === u.uid)
               const isNpc = u.role === 'npc' || u.isNpc || u.uid?.startsWith('npc_')
@@ -328,12 +294,12 @@ export default function ChatSidebar({
             })
           )
         ) : (
-          filteredFriends.length === 0 ? (
+          friendsWithStatus.length === 0 ? (
             <div className="chat-sidebar-empty">
               <span>Nenhum amigo adicionado ainda.</span>
             </div>
           ) : (
-            filteredFriends.map(friend => {
+            friendsWithStatus.map(friend => {
               const friendMoodDisplay = getMoodDisplay(friend.mood)
               return (
                 <div key={friend.uid} className="chat-user-item-wrapper">

@@ -130,7 +130,7 @@ export async function clearUserInboxItem(myUid, senderUid) {
 }
 
 /**
- * Escuta mensagens da locação em tempo real
+ * Escuta mensagens da locação em tempo real (apenas da sessão atual / sem histórico em F5)
  */
 export function subscribeZoneChat(zoneSlug, callback, sessionStartTime, maxCount = 50) {
   if (!rtdb || !zoneSlug) return () => {}
@@ -148,9 +148,9 @@ export function subscribeZoneChat(zoneSlug, callback, sessionStartTime, maxCount
     const list = Object.entries(raw)
       .map(([id, val]) => ({ id, ...val }))
       .filter((msg) => {
-        // Exibe mensagens recentes
+        // Exibe apenas mensagens enviadas a partir do momento em que a página foi aberta/carregada
         const ts = msg.timestamp || 0
-        return ts >= startTime - 3600000 // últimas 1h de sessão
+        return ts >= startTime - 1000
       })
       .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0))
 
@@ -164,10 +164,12 @@ export function subscribeZoneChat(zoneSlug, callback, sessionStartTime, maxCount
 /**
  * Escuta mensagens de uma sala privada (DM)
  */
-export function subscribePrivateChat(roomId, callback, maxCount = 50) {
+export function subscribePrivateChat(roomId, callback, sessionStartTime, maxCount = 50) {
   if (!rtdb || !roomId) return () => {}
 
+  const startTime = typeof sessionStartTime === 'number' ? sessionStartTime : getEstimatedServerTime()
   const messagesRef = query(ref(rtdb, `chat/private/${roomId}/messages`), limitToLast(maxCount))
+
   const handleValue = (snapshot) => {
     if (!snapshot.exists()) {
       callback([])
@@ -177,6 +179,10 @@ export function subscribePrivateChat(roomId, callback, maxCount = 50) {
     const raw = snapshot.val()
     const list = Object.entries(raw)
       .map(([id, val]) => ({ id, ...val }))
+      .filter((msg) => {
+        const ts = msg.timestamp || 0
+        return ts >= startTime - 1000
+      })
       .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0))
 
     callback(list)
