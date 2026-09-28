@@ -600,23 +600,42 @@ html, body, #root {
   line-height: 1;
 }
 
-/* Abas na sidebar (Local / Amigos) — posição relativa para badge */
+/* Abas Inferiores da Sidebar (Local vs Amigos) */
+.chat-sidebar-tabs {
+  display: flex;
+  background: transparent;
+  border-top: 1px solid var(--accent-border);
+  width: 100%;
+}
+
 .chat-sidebar-tab-btn {
   flex: 1;
-  position: relative;
+  padding: 8px 4px;
   background: transparent;
   border: none;
+  border-bottom: 2px solid transparent;
   color: var(--text-muted);
-  padding: 8px 4px;
-  font-size: 0.78rem;
+  font-size: 11.5px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  text-align: center;
+  transition: all 0.15s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.chat-sidebar-tab-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .chat-sidebar-tab-btn.active {
-  color: var(--accent-purple-light);
-  background: rgba(139, 92, 246, 0.15);
-  font-weight: 600;
+  color: #fff;
+  border-bottom-color: var(--accent-purple-light);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 /* Edit Profile Trigger */
@@ -1046,49 +1065,247 @@ html, body, #root {
   cursor: not-allowed;
 }
 
-/* Modais e Popovers */
+/* ==============================================
+   MODAIS DO CHAT (AÇÕES DE USUÁRIO & PERFIL)
+   ============================================== */
 .chat-user-modal-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 999;
+  z-index: 1000;
+  padding: 16px;
+  animation: modalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .chat-user-modal-card {
-  width: 90%;
+  width: 100%;
   max-width: 380px;
-  background: var(--bg-secondary);
+  background: rgba(18, 13, 26, 0.96);
   border: 1px solid var(--accent-border);
-  border-radius: var(--radius-lg);
-  padding: 16px;
-  box-shadow: var(--glass-shadow);
+  border-radius: var(--radius-md);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .chat-user-modal-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 14px;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.04);
   border-bottom: 1px solid var(--accent-border);
-  padding-bottom: 8px;
 }
 
 .chat-user-modal-title {
-  font-family: var(--font-gothic);
-  font-weight: bold;
-  color: var(--accent-purple-light);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chat-user-header-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.chat-user-status-dot.online {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
 }
 
 .chat-user-modal-close {
   background: transparent;
   border: none;
   color: var(--text-muted);
-  font-size: 1.2rem;
   cursor: pointer;
+  font-size: 16px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.chat-user-modal-close:hover {
+  color: #f87171;
+}
+
+/* Corpo do Modal de Usuário */
+.chat-user-modal-body {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--accent-border);
+}
+
+.chat-user-avatar-wrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(139, 92, 246, 0.35);
+  flex-shrink: 0;
+  background: #191322;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-user-modal-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.chat-user-modal-avatar.placeholder {
+  font-size: 28px;
+}
+
+.chat-user-modal-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.chat-user-info-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.chat-user-info-loc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.chat-role-badge.admin {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 10px;
+  font-weight: 800;
+  background: rgba(139, 92, 246, 0.18);
+  color: var(--accent-purple-light);
+  border: 1px solid var(--accent-border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+
+.chat-friend-status-feedback {
+  font-size: 11px;
+  color: #4ade80;
+  margin-top: 4px;
+}
+
+.chat-user-modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 20px;
+}
+
+.chat-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+}
+
+.chat-action-btn.primary {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: var(--accent-purple-light);
+  color: #fff;
+}
+
+.chat-action-btn.primary:hover {
+  background: rgba(139, 92, 246, 0.35);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.35);
+}
+
+.chat-action-btn.secondary {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.chat-action-btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.chat-action-btn.danger {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+}
+
+.chat-action-btn.danger:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: #ef4444;
+}
+
+.chat-action-btn.active-warning {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #f59e0b;
+}
+
+.chat-admin-actions-section {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chat-admin-divider {
+  display: flex;
+  align-items: center;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  margin: 4px 0;
+}
+
+.chat-admin-divider::before,
+.chat-admin-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 0 8px;
+}
+
+/* Edit Profile Modal */
+.profile-edit-card {
+  padding: 0;
+}
+
+.profile-edit-form {
+  padding: 16px 20px;
 }
 
 .profile-avatar-preview-section {
@@ -1102,7 +1319,7 @@ html, body, #root {
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  border: 2px solid var(--accent-purple);
+  border: 2px solid var(--accent-purple-light);
   overflow: hidden;
   background: #191322;
   display: flex;
@@ -1177,47 +1394,14 @@ html, body, #root {
   border-color: var(--accent-purple-light);
 }
 
-.chat-user-modal-actions {
+.profile-modal-footer-btns {
   display: flex;
-  flex-direction: column;
   gap: 8px;
   margin-top: 14px;
 }
 
-.chat-action-btn {
-  width: 100%;
-  padding: 9px;
-  border-radius: var(--radius-sm);
-  font-weight: 500;
-  font-size: 0.85rem;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s ease;
-}
-
-.chat-action-btn.primary {
-  background: var(--accent-purple);
-  color: #fff;
-}
-
-.chat-action-btn.primary:hover {
-  background: var(--accent-purple-light);
-}
-
-.chat-action-btn.secondary {
-  background: rgba(168, 85, 247, 0.12);
-  border: 1px solid var(--accent-border);
-  color: var(--text-primary);
-}
-
-.chat-action-btn.secondary:hover {
-  background: rgba(168, 85, 247, 0.25);
-}
-
-.chat-action-btn.danger {
-  background: rgba(239, 68, 68, 0.2);
-  border: 1px solid rgba(239, 68, 68, 0.4);
-  color: #fca5a5;
+.profile-modal-footer-btns .chat-action-btn {
+  flex: 1;
 }
 
 /* ==============================================
