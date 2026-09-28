@@ -26,6 +26,18 @@ const COMPENDIUM_CATEGORIES = [
   { id: 'pocoes', label: 'Poções (Alquimia)', icon: '🧪' },
 ]
 
+function slugify(text) {
+  return text
+    .toString()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/[\s_]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
 export default function Admin() {
   const navigate = useNavigate()
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -424,14 +436,27 @@ export default function Admin() {
                       <strong>{loc.name || loc.id}</strong>
                       <small>/{loc.id}</small>
                     </div>
-                    <button
-                      type="button"
-                      className="admin-loc-delete-btn"
-                      onClick={(e) => { e.stopPropagation(); handleDeleteLocation(loc.id); }}
-                      title="Excluir"
-                    >
-                      🗑️
-                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <button
+                        type="button"
+                        className="admin-loc-visit-btn"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          window.open(`/location/${loc.id || loc.slug}`, '_blank')
+                        }}
+                        title="Visitar Localidade (Abrir em nova aba)"
+                      >
+                        ↗️
+                      </button>
+                      <button
+                        type="button"
+                        className="admin-loc-delete-btn"
+                        onClick={(e) => { e.stopPropagation(); handleDeleteLocation(loc.id); }}
+                        title="Excluir"
+                      >
+                        🗑️
+                      </button>
+                    </div>
                   </div>
                 ))
               )}
@@ -440,12 +465,36 @@ export default function Admin() {
 
           <main className="admin-editor-panel">
             <div className="admin-editor-card">
-              <h2>{selectedLoc ? `Editando: ${selectedLoc.name}` : 'Criar Nova Localidade'}</h2>
+              <div className="admin-editor-header-row">
+                <h2>{selectedLoc ? `Editando: ${selectedLoc.name}` : 'Criar Nova Localidade'}</h2>
+                {formSlug && (
+                  <button
+                    type="button"
+                    className="admin-visit-loc-action-btn"
+                    onClick={() => window.open(`/location/${formSlug}`, '_blank')}
+                    title="Abrir este local diretamente em uma nova aba"
+                  >
+                    🔗 Visitar Localidade ({formSlug})
+                  </button>
+                )}
+              </div>
 
               <form onSubmit={handleSaveLocation} className="admin-form">
                 <div className="admin-form-row">
                   <div className="admin-form-group">
-                    <label>Identificador da URL (Slug único):</label>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                      <label style={{ margin: 0 }}>Identificador da URL (Slug único):</label>
+                      {formName && (
+                        <button
+                          type="button"
+                          className="admin-slug-gen-btn"
+                          onClick={() => setFormSlug(slugify(formName))}
+                          title="Recriar slug a partir do Nome"
+                        >
+                          ⚡ Auto-Slug
+                        </button>
+                      )}
+                    </div>
                     <input
                       type="text"
                       value={formSlug}
@@ -461,7 +510,13 @@ export default function Admin() {
                     <input
                       type="text"
                       value={formName}
-                      onChange={(e) => setFormName(e.target.value)}
+                      onChange={(e) => {
+                        const newName = e.target.value
+                        setFormName(newName)
+                        if (!selectedLoc) {
+                          setFormSlug(slugify(newName))
+                        }
+                      }}
                       placeholder="ex: Chalés e Estufas de Koskovic"
                       required
                     />

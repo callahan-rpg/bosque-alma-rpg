@@ -6,7 +6,7 @@ import { extractYouTubeId } from '../utils/audioSystem'
  */
 export default function AmbientSoundPlayer({ locationSoundUrl = '' }) {
   const [ambientAudioEnabled, setAmbientAudioEnabled] = useState(() => {
-    return localStorage.getItem('jardim_ambient_audio') === 'true'
+    return localStorage.getItem('jardim_ambient_audio') !== 'false'
   })
   const [userVolume, setUserVolume] = useState(() => {
     const saved = localStorage.getItem('jardim_audio_volume')
@@ -24,7 +24,7 @@ export default function AmbientSoundPlayer({ locationSoundUrl = '' }) {
 
   useEffect(() => {
     const handleToggle = (e) => {
-      const isEnabled = e.detail !== undefined ? e.detail : localStorage.getItem('jardim_ambient_audio') === 'true'
+      const isEnabled = e.detail !== undefined ? e.detail : localStorage.getItem('jardim_ambient_audio') !== 'false'
       setAmbientAudioEnabled(isEnabled)
     }
 

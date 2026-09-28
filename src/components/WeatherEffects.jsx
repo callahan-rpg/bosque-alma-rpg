@@ -8,12 +8,22 @@ import { useEffect, useRef, useState } from 'react'
  */
 export default function WeatherEffects({ condition = 'none', enabled = true }) {
   const canvasRef = useRef(null)
+  const [fxEnabled, setFxEnabled] = useState(() => {
+    return localStorage.getItem('jardim_weather_fx') !== 'false'
+  })
   const [opacity, setOpacity] = useState(() => {
     const saved = localStorage.getItem('jardim_weather_opacity')
     return saved ? Number(saved) : 100
   })
 
   useEffect(() => {
+    const handleToggle = (e) => {
+      if (e.detail !== undefined) {
+        setFxEnabled(e.detail)
+      } else {
+        setFxEnabled(localStorage.getItem('jardim_weather_fx') !== 'false')
+      }
+    }
     const handleOpacityChange = (e) => {
       if (e.detail !== undefined) {
         setOpacity(e.detail)
@@ -22,12 +32,16 @@ export default function WeatherEffects({ condition = 'none', enabled = true }) {
         setOpacity(saved ? Number(saved) : 100)
       }
     }
+    window.addEventListener('weather_fx_toggle', handleToggle)
     window.addEventListener('weather_opacity_change', handleOpacityChange)
-    return () => window.removeEventListener('weather_opacity_change', handleOpacityChange)
+    return () => {
+      window.removeEventListener('weather_fx_toggle', handleToggle)
+      window.removeEventListener('weather_opacity_change', handleOpacityChange)
+    }
   }, [])
 
   useEffect(() => {
-    if (!enabled || !condition || condition === 'none' || condition === 'sunny') return
+    if (!enabled || !fxEnabled || !condition || condition === 'none' || condition === 'sunny') return
 
     const canvas = canvasRef.current
     if (!canvas) return
@@ -185,9 +199,9 @@ export default function WeatherEffects({ condition = 'none', enabled = true }) {
       window.removeEventListener('resize', handleResize)
       cancelAnimationFrame(animationFrameId)
     }
-  }, [condition, enabled])
+  }, [condition, enabled, fxEnabled])
 
-  if (!enabled || !['rainy', 'storm', 'foggy', 'snowy', 'cloudy'].includes(condition)) {
+  if (!enabled || !fxEnabled || !['rainy', 'storm', 'foggy', 'snowy', 'cloudy'].includes(condition)) {
     return null
   }
 

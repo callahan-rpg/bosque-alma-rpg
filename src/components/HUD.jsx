@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import DiceRoller from './DiceRoller.jsx'
 import EditProfileModal from './chat/EditProfileModal.jsx'
+import SettingsModal from './SettingsModal.jsx'
 import { useGuest } from '../contexts/GuestContext.jsx'
 import { useNavigate } from 'react-router-dom'
 
@@ -9,9 +10,22 @@ export default function HUD({ locationName }) {
   const navigate = useNavigate()
   const [showDice, setShowDice] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
   const [audioEnabled, setAudioEnabled] = useState(() => {
-    return localStorage.getItem('jardim_ambient_audio') === 'true'
+    return localStorage.getItem('jardim_ambient_audio') !== 'false'
   })
+
+  useEffect(() => {
+    const handleAudioToggle = (e) => {
+      if (e.detail !== undefined) {
+        setAudioEnabled(e.detail)
+      } else {
+        setAudioEnabled(localStorage.getItem('jardim_ambient_audio') !== 'false')
+      }
+    }
+    window.addEventListener('ambient_audio_toggle', handleAudioToggle)
+    return () => window.removeEventListener('ambient_audio_toggle', handleAudioToggle)
+  }, [])
 
   const toggleAudio = () => {
     const next = !audioEnabled
@@ -48,6 +62,15 @@ export default function HUD({ locationName }) {
             title={audioEnabled ? 'Desativar Trilha Sonora' : 'Ativar Trilha Sonora'}
           >
             {audioEnabled ? '🎵' : '🔇'}
+          </button>
+
+          <button
+            type="button"
+            className={`hud-icon-btn ${showSettings ? 'active' : ''}`}
+            onClick={() => setShowSettings(p => !p)}
+            title="Configurações de Áudio e Efeitos Ambientais"
+          >
+            ⚙️
           </button>
 
           <button
@@ -94,6 +117,8 @@ export default function HUD({ locationName }) {
       </header>
 
       {showDice && <DiceRoller onClose={() => setShowDice(false)} />}
+
+      {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
 
       {showProfile && (
         <EditProfileModal
