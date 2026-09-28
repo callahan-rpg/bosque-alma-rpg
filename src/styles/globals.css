@@ -922,197 +922,411 @@ html, body, #root {
 }
 
 /* ==============================================
-   ESTILOS DO ORÁCULO DE DADOS (DICE ROLLER)
+   ESTILOS DO ORÁCULO DE DADOS (DICE ROLLER IGUAL ZOMBIE RPG)
    ============================================== */
 .dice-float-panel {
   position: fixed;
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
+  z-index: 200;
+  width: 300px;
+  background: rgba(14, 10, 20, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--accent-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--glass-shadow);
-  z-index: 1000;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.9), 0 0 20px rgba(168, 85, 247, 0.15);
+  overflow: hidden;
+  animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
 }
 
+/* Header: Área de arrasto */
 .dice-float-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
-  background: rgba(147, 51, 234, 0.15);
+  justify-content: space-between;
+  padding: 10px 14px;
   border-bottom: 1px solid var(--accent-border);
   cursor: move;
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .dice-float-title {
-  font-family: var(--font-gothic);
-  font-weight: bold;
-  font-size: 0.85rem;
-  color: var(--accent-purple-light);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-primary);
 }
 
+/* Botão fechar */
 .dice-close {
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--accent-border);
+  border-radius: 50%;
   background: transparent;
-  border: none;
   color: var(--text-muted);
-  font-size: 1.2rem;
+  font-size: 15px;
   cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
+.dice-close:hover {
+  color: #f87171;
+  border-color: #f87171;
+}
+
+/* Seleção de tipos de dado */
 .dice-float-types {
   display: flex;
-  gap: 4px;
-  padding: 10px;
+  gap: 6px;
   justify-content: center;
+  padding: 12px 12px 8px;
 }
 
 .dice-type-btn {
-  background: rgba(22, 17, 31, 0.7);
-  border: 1px solid var(--accent-border);
-  color: var(--text-secondary);
-  border-radius: var(--radius-sm);
-  padding: 6px 8px;
-  cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: var(--text-secondary);
   position: relative;
-  transition: all 0.2s ease;
+}
+
+.dice-type-btn:hover {
+  border-color: var(--accent-purple-light);
+  color: var(--accent-purple-light);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(168, 85, 247, 0.15);
 }
 
 .dice-type-btn.selected {
-  background: var(--accent-purple);
-  color: #fff;
+  background: rgba(147, 51, 234, 0.25);
   border-color: var(--accent-purple-light);
-  box-shadow: var(--accent-purple-glow);
+  color: #fff;
+  box-shadow: 0 0 14px rgba(168, 85, 247, 0.35);
 }
 
 .dice-count-badge {
   position: absolute;
-  top: -4px;
-  right: -4px;
-  background: #ec4899;
+  top: -5px;
+  right: -5px;
+  background: var(--accent-purple);
   color: #fff;
-  font-size: 0.65rem;
-  padding: 1px 4px;
-  border-radius: 8px;
-  font-weight: bold;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 9999px;
+  line-height: 1.1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  animation: resultAppear 0.2s ease;
 }
 
+.dice-face-icon {
+  font-size: 18px;
+}
+
+.dice-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+/* Linha de controle de quantidade (+ / -) */
 .dice-qty-row {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  margin-bottom: 6px;
+  gap: 12px;
+  padding: 4px 12px 6px;
 }
 
 .dice-qty-btn {
-  background: rgba(168, 85, 247, 0.2);
+  width: 26px;
+  height: 26px;
+  background: rgba(255, 255, 255, 0.06);
   border: 1px solid var(--accent-border);
-  color: #fff;
-  width: 22px;
-  height: 22px;
-  border-radius: 4px;
+  border-radius: 50%;
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: bold;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+
+.dice-qty-btn:hover:not(:disabled) {
+  background: rgba(147, 51, 234, 0.2);
+  border-color: var(--accent-purple-light);
+  color: var(--accent-purple-light);
+  transform: scale(1.1);
+}
+
+.dice-qty-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 .dice-qty-label {
-  font-size: 0.85rem;
-  font-weight: bold;
+  font-size: 13px;
+  font-weight: 700;
   color: var(--accent-purple-light);
+  letter-spacing: 1px;
 }
 
+/* Área de resultado */
 .dice-float-result {
-  text-align: center;
-  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-height: 72px;
+  padding: 8px 12px;
+  justify-content: center;
 }
 
 .dice-result-number {
-  font-family: var(--font-gothic);
-  font-size: 2.4rem;
-  font-weight: 900;
-  color: #f5f3f7;
-  text-shadow: 0 0 16px rgba(168, 85, 247, 0.6);
-}
-
-.dice-result-number.crit-success {
-  color: #4ade80;
-  text-shadow: 0 0 16px rgba(74, 222, 128, 0.6);
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+  line-height: 1;
+  animation: resultAppear 0.3s ease;
 }
 
 .dice-result-number.crit-fail {
-  color: #f87171;
-  text-shadow: 0 0 16px rgba(248, 113, 113, 0.6);
+  color: #ef4444 !important;
+  text-shadow: 0 0 24px rgba(239, 68, 68, 0.6) !important;
 }
 
+.dice-result-number.crit-success {
+  color: #22c55e !important;
+  text-shadow: 0 0 24px rgba(34, 197, 94, 0.6) !important;
+}
+
+.dice-breakdown {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.dice-val-tag {
+  color: var(--text-secondary);
+}
+
+.dice-val-tag.crit-fail {
+  color: #ef4444 !important;
+  font-weight: bold;
+}
+
+.dice-val-tag.crit-success {
+  color: #22c55e !important;
+  font-weight: bold;
+}
+
+.dice-result-label {
+  font-size: 10.5px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Animação de rolagem */
+.dice-rolling {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.dice-roll-icon {
+  font-size: 30px;
+  animation: diceRoll 0.3s linear infinite;
+}
+
+@keyframes diceRoll {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.dice-roll-label {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--accent-purple-light);
+}
+
+/* Botão rolar */
 .dice-roll-btn {
   width: 100%;
-  background: var(--accent-purple);
-  border: none;
-  color: #fff;
-  font-family: var(--font-gothic);
-  font-weight: bold;
-  padding: 8px;
-  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--accent-border);
+  border-radius: 9999px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
   cursor: pointer;
-  letter-spacing: 0.05em;
   transition: all 0.2s ease;
 }
 
 .dice-roll-btn:hover:not(:disabled) {
-  background: var(--accent-purple-light);
-  box-shadow: var(--accent-purple-glow);
+  background: rgba(147, 51, 234, 0.25);
+  border-color: var(--accent-purple-light);
+  color: #fff;
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.3);
 }
 
+.dice-roll-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Histórico */
 .dice-float-history {
   border-top: 1px solid var(--accent-border);
-  padding: 8px 10px;
-  max-height: 140px;
+  padding: 8px 12px 12px;
+  max-height: 200px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.dice-float-history.expanded {
+  max-height: none !important;
+  flex: 1 1 auto;
+  min-height: 80px;
 }
 
 .dice-float-history-title {
-  font-size: 0.72rem;
-  color: var(--text-muted);
+  font-size: 10px;
+  letter-spacing: 2px;
   text-transform: uppercase;
-  margin-bottom: 4px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+
+.dice-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
 }
 
 .dice-history-item {
-  font-size: 0.78rem;
-  padding: 3px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  animation: fadeIn 0.3s ease;
 }
 
 .dice-history-main-row {
   display: flex;
-  gap: 6px;
   align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.dice-history-breakdown {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px;
+  padding: 0 2px;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.dice-breakdown-sep {
+  color: var(--text-muted);
+  opacity: 0.5;
+  font-size: 9px;
 }
 
 .dice-history-player {
-  color: var(--text-secondary);
-  font-weight: 500;
+  color: var(--text-primary);
+  font-weight: 600;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dice-history-type {
+  font-size: 10px;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
 }
 
 .dice-history-result {
-  font-weight: bold;
-  color: #f5f3f7;
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  min-width: 24px;
+  text-align: right;
 }
 
-/* Resize Handles */
+.dice-history-result.crit-fail {
+  color: #ef4444 !important;
+}
+
+.dice-history-result.crit-success {
+  color: #22c55e !important;
+}
+
+/* Alças de redimensionamento */
 .resize-handle {
   position: absolute;
   z-index: 10;
 }
-.resize-right { top: 0; right: -3px; width: 6px; height: 100%; cursor: ew-resize; }
-.resize-left { top: 0; left: -3px; width: 6px; height: 100%; cursor: ew-resize; }
-.resize-bottom { bottom: -3px; left: 0; width: 100%; height: 6px; cursor: ns-resize; }
-.resize-bottom-right { bottom: -4px; right: -4px; width: 10px; height: 10px; cursor: nwse-resize; }
-.resize-bottom-left { bottom: -4px; left: -4px; width: 10px; height: 10px; cursor: nesw-resize; }
+.resize-right { top: 0; right: 0; width: 6px; height: 100%; cursor: ew-resize; }
+.resize-left { top: 0; left: 0; width: 6px; height: 100%; cursor: ew-resize; }
+.resize-bottom { bottom: 0; left: 0; width: 100%; height: 6px; cursor: ns-resize; }
+.resize-bottom-right { bottom: 0; right: 0; width: 14px; height: 14px; cursor: nwse-resize; }
+.resize-bottom-right::after {
+  content: '';
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid var(--text-muted);
+  border-bottom: 2px solid var(--text-muted);
+  opacity: 0.6;
+}
+.resize-bottom-left { bottom: 0; left: 0; width: 14px; height: 14px; cursor: nesw-resize; }
 
 /* TopBar Gótica */
 .jardim-topbar {

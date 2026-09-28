@@ -25,7 +25,7 @@ const MIN_HEIGHT = 340
 
 export default function DiceRoller({ onClose }) {
   const { user, character } = useGuest()
-  const [selected, setSelected] = useState(DICE_TYPES[3]) // D20 padrão para D&D/Fantasia
+  const [selected, setSelected] = useState(DICE_TYPES[2]) // D10 padrão
   const [count, setCount]       = useState(1)
   const [rolling, setRolling]   = useState(false)
   const [result, setResult]     = useState(null)
@@ -203,7 +203,7 @@ export default function DiceRoller({ onClose }) {
       <div className="resize-handle resize-bottom-left"  onMouseDown={onResizeMouseDown('bottom-left')} />
 
       <div className="dice-float-header" onMouseDown={onHeaderMouseDown}>
-        <span className="dice-float-title">🎲 Oráculo dos Dados</span>
+        <span className="dice-float-title">🎲 DADOS</span>
         <button className="dice-close" onClick={onClose} title="Fechar">×</button>
       </div>
 
@@ -259,7 +259,7 @@ export default function DiceRoller({ onClose }) {
         {rolling ? (
           <div className="dice-rolling">
             <span className="dice-roll-icon">{selected.icon}</span>
-            <span className="dice-roll-label">Lançando {diceLabel}…</span>
+            <span className="dice-roll-label">Rolando {diceLabel}…</span>
           </div>
         ) : result !== null ? (
           <>
@@ -288,15 +288,15 @@ export default function DiceRoller({ onClose }) {
             </div>
           </>
         ) : (
-          <div className="dice-result-label" style={{ color: 'var(--text-muted)' }}>
-            {count > 1 ? `${diceLabel} selecionados` : 'Selecione e lance os dados'}
+          <div className="dice-result-label">
+            {count > 1 ? `${diceLabel} SELECIONADOS` : 'SELECIONE E ROLE'}
           </div>
         )}
       </div>
 
       <div style={{ padding: '0 12px 12px' }}>
         <button className="dice-roll-btn" onClick={roll} disabled={rolling}>
-          {rolling ? 'Lançando…' : `Lançar ${diceLabel}`}
+          {rolling ? 'Rolando…' : `ROLAR ${diceLabel}`}
         </button>
       </div>
 
@@ -304,10 +304,10 @@ export default function DiceRoller({ onClose }) {
         className={`dice-float-history ${size.h !== null ? 'expanded' : ''}`}
         style={size.h !== null ? { flex: 1, minHeight: 0, overflowY: 'auto' } : {}}
       >
-        <div className="dice-float-history-title">Registros Recentes</div>
+        <div className="dice-float-history-title">ÚLTIMAS ROLAGENS</div>
         {history.length === 0 ? (
           <p style={{ fontSize: 11, color: 'var(--text-muted)', textAlign: 'center', padding: '10px 0' }}>
-            Nenhum dado rolado recentemente.
+            Nenhuma rolagem ainda.
           </p>
         ) : (
           <div className="dice-history-list">
