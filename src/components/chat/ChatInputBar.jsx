@@ -165,7 +165,7 @@ export default function ChatInputBar({
   const MAX_CHARS = 280
   const charCount = text.length
   const remaining = MAX_CHARS - charCount
-  const isNearLimit = charCount > 200
+  const isNearLimit = charCount > 0
   const isAtLimit = charCount >= MAX_CHARS
 
   return (
