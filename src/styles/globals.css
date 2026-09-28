@@ -442,6 +442,166 @@ html, body, #root {
   color: var(--text-muted);
 }
 
+/* ==============================================
+   SELETOR DE HUMOR (COMO VOCÊ ESTÁ?)
+   ============================================== */
+.chat-mood-picker-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 2, 7, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  animation: modalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.chat-mood-picker-card {
+  width: 100%;
+  max-width: 360px;
+  background: rgba(18, 13, 26, 0.96);
+  border: 1px solid var(--accent-border);
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.9), 0 0 20px rgba(168, 85, 247, 0.2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-mood-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--accent-border);
+}
+
+.chat-mood-picker-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-purple-light);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.chat-mood-picker-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+  transition: color 0.15s ease;
+}
+
+.chat-mood-picker-close:hover {
+  color: #fff;
+}
+
+.chat-mood-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  padding: 12px;
+}
+
+.chat-mood-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--accent-border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12.5px;
+  color: var(--text-primary);
+  transition: all 0.15s ease;
+  text-align: left;
+  min-height: 40px;
+}
+
+.chat-mood-option:hover {
+  background: rgba(147, 51, 234, 0.2);
+  border-color: var(--accent-purple-light);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.chat-mood-option.active {
+  background: rgba(147, 51, 234, 0.35);
+  border-color: var(--accent-purple-light);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.35);
+}
+
+.chat-mood-emoji {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.chat-mood-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.chat-mood-picker-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 12px 12px;
+}
+
+.chat-mood-clear-btn {
+  display: block;
+  width: 100%;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: 6px;
+  color: #fca5a5;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.chat-mood-clear-btn:hover {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: #f87171;
+  color: #fff;
+}
+
+.chat-mood-cancel-btn {
+  display: block;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--accent-border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.chat-mood-cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
 /* Abas de Salas no Rodapé */
 .chat-rooms-tab-bar {
   display: flex;

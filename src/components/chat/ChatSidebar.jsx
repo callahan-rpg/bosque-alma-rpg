@@ -2,14 +2,16 @@ import { useState, useMemo } from 'react'
 import { updateMood } from '../../utils/chatService'
 
 const MOODS = [
-  { id: 'calm',        label: 'Sereno',        emoji: '🌿' },
-  { id: 'mystical',    label: 'Místico',       emoji: '🔮' },
-  { id: 'focused',     label: 'Estudando',     emoji: '📜' },
-  { id: 'tired',       label: 'Exausto',       emoji: '🕯️' },
-  { id: 'curious',     label: 'Curioso',       emoji: '🍄' },
-  { id: 'somber',      label: 'Sombrio',       emoji: '💀' },
-  { id: 'alert',       label: 'Alerta',        emoji: '👁️' },
-  { id: 'happy',       label: 'Radiante',      emoji: '✨' },
+  { id: 'happy',       label: 'Feliz',        emoji: '😄' },
+  { id: 'relaxed',     label: 'Relaxado',      emoji: '😌' },
+  { id: 'focused',     label: 'Concentrado',   emoji: '🧠' },
+  { id: 'tired',       label: 'Cansado',       emoji: '😩' },
+  { id: 'sleepy',      label: 'Com sono',      emoji: '😴' },
+  { id: 'sad',         label: 'Triste',        emoji: '😢' },
+  { id: 'bored',       label: 'Entediado',     emoji: '😑' },
+  { id: 'grumpy',      label: 'Mal humorado',  emoji: '😠' },
+  { id: 'angry',       label: 'Irritado',      emoji: '😤' },
+  { id: 'scared',      label: 'Assustado',     emoji: '😱' },
 ]
 
 function getMoodDisplay(moodId) {
@@ -184,19 +186,19 @@ export default function ChatSidebar({
         </div>
       )}
 
-      {/* Seletor de Humor */}
+      {/* Seletor de Humor (abre sobreposto ao chat de forma ampla e limpa) */}
       {showMoodPicker && (
         <div className="chat-mood-picker-overlay" onClick={() => setShowMoodPicker(false)}>
           <div className="chat-mood-picker-card" onClick={(e) => e.stopPropagation()}>
             <div className="chat-mood-picker-header">
-              <span className="chat-mood-picker-title">🎭 Qual seu estado de espírito?</span>
+              <span className="chat-mood-picker-title">🎭 COMO VOCÊ ESTÁ?</span>
               <button
                 type="button"
                 className="chat-mood-picker-close"
                 onClick={() => setShowMoodPicker(false)}
                 title="Fechar"
               >
-                ×
+                ✕
               </button>
             </div>
 
@@ -222,7 +224,7 @@ export default function ChatSidebar({
                   className="chat-mood-clear-btn"
                   onClick={handleClearMood}
                 >
-                  ✕ Remover estado
+                  ✕ Remover humor
                 </button>
               )}
               <button
