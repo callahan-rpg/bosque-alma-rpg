@@ -3085,7 +3085,7 @@ html, body, #root {
 .compendium-bg-overlay {
   position: fixed;
   inset: 0;
-  background: linear-gradient(180deg, rgba(12, 12, 14, 0.55) 0%, rgba(12, 12, 14, 0.8) 50%, rgba(12, 12, 14, 0.96) 100%);
+  background: linear-gradient(180deg, rgba(12, 12, 14, 0.35) 0%, rgba(12, 12, 14, 0.6) 50%, rgba(12, 12, 14, 0.82) 100%);
   pointer-events: none;
   z-index: 1;
 }

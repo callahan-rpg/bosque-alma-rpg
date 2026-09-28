@@ -266,7 +266,7 @@ export default function Compendium() {
       <div
         className="compendium-bg-layer"
         style={{
-          backgroundImage: `radial-gradient(circle at 50% 30%, rgba(20, 20, 24, 0.4) 0%, rgba(10, 10, 12, 0.95) 100%), url("${compendiumBg}")`
+          backgroundImage: `url("${compendiumBg}")`
         }}
       />
       <div className="compendium-bg-overlay" />
