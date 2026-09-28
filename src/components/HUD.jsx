@@ -52,6 +52,15 @@ export default function HUD({ locationName }) {
 
           <button
             type="button"
+            className="hud-icon-btn"
+            onClick={() => navigate('/compendio')}
+            title="Abrir Compêndio (Bestiário, Herbário e Poções)"
+          >
+            📖
+          </button>
+
+          <button
+            type="button"
             className={`hud-icon-btn ${showDice ? 'active' : ''}`}
             onClick={() => setShowDice(p => !p)}
             title="Oráculo dos Dados"

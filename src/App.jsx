@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { GuestProvider } from './contexts/GuestContext.jsx'
 
 const Location = lazy(() => import('./pages/Location.jsx'))
+const Compendium = lazy(() => import('./pages/Compendium.jsx'))
 const Admin = lazy(() => import('./pages/Admin.jsx'))
 
 export default function App() {
@@ -16,6 +17,9 @@ export default function App() {
             
             {/* Visualização de Domínios e Localidades com Chat */}
             <Route path="/location/:slug" element={<Location />} />
+
+            {/* Compêndio do Bosque (Bestiário, Herbário e Poções) */}
+            <Route path="/compendio" element={<Compendium />} />
 
             {/* Portal de Mestre / Painel de Admin com Senha Mestra */}
             <Route path="/soul-master" element={<Admin />} />
