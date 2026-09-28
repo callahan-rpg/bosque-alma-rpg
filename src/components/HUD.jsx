@@ -2,10 +2,11 @@ import { useState } from 'react'
 import DiceRoller from './DiceRoller.jsx'
 import EditProfileModal from './chat/EditProfileModal.jsx'
 import SettingsModal from './SettingsModal.jsx'
+import WeatherWidget from './WeatherWidget.jsx'
 import { useGuest } from '../contexts/GuestContext.jsx'
 import { useNavigate } from 'react-router-dom'
 
-export default function HUD({ locationName }) {
+export default function HUD({ locationName, weatherCondition }) {
   const { character, updateProfile } = useGuest()
   const navigate = useNavigate()
   const [showDice, setShowDice] = useState(false)
@@ -29,6 +30,9 @@ export default function HUD({ locationName }) {
           {locationName && (
             <span className="hud-location-name">{locationName}</span>
           )}
+
+          {/* Widget de Clima, Horário e Fase da Lua */}
+          <WeatherWidget weatherCondition={weatherCondition} />
         </div>
 
         {/* Direita: Ícones de ação */}
@@ -99,3 +103,4 @@ export default function HUD({ locationName }) {
     </>
   )
 }
+

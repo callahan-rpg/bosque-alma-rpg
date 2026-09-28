@@ -2162,6 +2162,52 @@ html, body, #root {
   font-family: var(--font-gothic);
 }
 
+/* ===== Weather Widget ===== */
+.hud-weather-widget {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-left: 1px solid var(--accent-border);
+  font-size: 13px;
+  color: var(--text-primary);
+  user-select: none;
+}
+
+.hw-weather-icon {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.hw-sep {
+  color: var(--accent-border);
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+.hw-time {
+  font-family: var(--font-gothic);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--text-primary);
+  min-width: 38px;
+  text-align: center;
+}
+
+.hw-season,
+.hw-moon {
+  font-size: 14px;
+  line-height: 1;
+  cursor: default;
+}
+
+@media (max-width: 768px) {
+  .hud-weather-widget {
+    display: none;
+  }
+}
+
 .hud-right {
   display: flex;
   align-items: center;
