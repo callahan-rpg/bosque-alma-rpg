@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore'
+import { collection, onSnapshot, query, orderBy, doc, setDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase/config'
 import HUD from '../components/HUD.jsx'
+import { uploadImageFree } from '../utils/imageUpload'
 
 const CATEGORIES = [
   { id: 'criaturas', label: 'CRIATURAS', subtitle: 'Bestiário do Bosque', icon: '🐺' },
@@ -100,7 +101,72 @@ export default function Compendium() {
   const [entries, setEntries] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedId, setSelectedId] = useState(null)
-  const [searchFilter, setSearchFilter] = useState('')
+  const [compendiumBg, setCompendiumBg] = useState(() => localStorage.getItem('jardim_compendium_bg') || 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1600&auto=format&fit=crop&q=80')
+  const [showBgModal, setShowBgModal] = useState(false)
+  const [newBgUrl, setNewBgUrl] = useState('')
+  const [uploadingBg, setUploadingBg] = useState(false)
+  const [bgSaveStatus, setBgSaveStatus] = useState('')
+
+  const isMaster = sessionStorage.getItem('jardim_master_auth') === 'true'
+
+  // Escuta configuração global de fundo do Compêndio
+  useEffect(() => {
+    try {
+      const unsub = onSnapshot(doc(db, 'settings', 'compendium_config'), (snap) => {
+        if (snap.exists() && snap.data().backgroundImage) {
+          const bg = snap.data().backgroundImage
+          setCompendiumBg(bg)
+          localStorage.setItem('jardim_compendium_bg', bg)
+        }
+      }, (err) => {
+        console.warn('[Compendium] Erro ao carregar config:', err)
+      })
+      return () => unsub()
+    } catch (err) {
+      console.warn('[Compendium] Erro ao inicializar listener config:', err)
+    }
+  }, [])
+
+  const handleSaveBackground = async (url) => {
+    const targetUrl = url || newBgUrl
+    if (!targetUrl.trim()) return
+    setBgSaveStatus('Salvando...')
+    try {
+      setCompendiumBg(targetUrl.trim())
+      localStorage.setItem('jardim_compendium_bg', targetUrl.trim())
+      await setDoc(doc(db, 'settings', 'compendium_config'), {
+        backgroundImage: targetUrl.trim(),
+        updatedAt: serverTimestamp()
+      }, { merge: true })
+      setBgSaveStatus('Fundo atualizado!')
+      setTimeout(() => {
+        setBgSaveStatus('')
+        setShowBgModal(false)
+      }, 1000)
+    } catch (err) {
+      console.error(err)
+      setBgSaveStatus('Salvo localmente!')
+      setTimeout(() => {
+        setBgSaveStatus('')
+        setShowBgModal(false)
+      }, 1000)
+    }
+  }
+
+  const handleUploadBgFile = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploadingBg(true)
+    try {
+      const uploadedUrl = await uploadImageFree(file)
+      setNewBgUrl(uploadedUrl)
+      await handleSaveBackground(uploadedUrl)
+    } catch (err) {
+      alert('Erro ao enviar imagem: ' + err.message)
+    } finally {
+      setUploadingBg(false)
+    }
+  }
 
   // 1. Escuta entradas do Firestore em tempo real
   useEffect(() => {
@@ -194,8 +260,13 @@ export default function Compendium() {
       {/* HUD Menu Superior */}
       <HUD locationName="Compêndio de Koskovic" />
 
-      {/* Fundo Atmosférico Gótico */}
-      <div className="compendium-bg-layer" />
+      {/* Fundo Atmosférico */}
+      <div
+        className="compendium-bg-layer"
+        style={{
+          backgroundImage: `radial-gradient(circle at 50% 30%, rgba(20, 20, 24, 0.4) 0%, rgba(10, 10, 12, 0.95) 100%), url("${compendiumBg}")`
+        }}
+      />
       <div className="compendium-bg-overlay" />
 
       <main className="compendium-container">
@@ -237,6 +308,19 @@ export default function Compendium() {
               ❯
             </button>
           </div>
+
+          {/* Botão para Alterar Fundo (Mestre) */}
+          <button
+            type="button"
+            className="compendium-admin-bg-btn"
+            onClick={() => {
+              setNewBgUrl(compendiumBg)
+              setShowBgModal(true)
+            }}
+            title="Alterar Imagem de Fundo do Compêndio"
+          >
+            🖼️ Alterar Fundo
+          </button>
         </header>
 
         {/* Layout Principal de 3 Colunas (The Witcher 3) */}
@@ -423,6 +507,80 @@ export default function Compendium() {
           </article>
         </div>
       </main>
+
+      {/* Modal para Alterar Fundo do Compêndio */}
+      {showBgModal && (
+        <div className="compendium-bg-modal-overlay" onClick={() => setShowBgModal(false)}>
+          <div className="compendium-bg-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="compendium-bg-modal-header">
+              <span className="compendium-bg-modal-title">🖼️ Fundo do Compêndio</span>
+              <button
+                type="button"
+                className="compendium-bg-modal-close"
+                onClick={() => setShowBgModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="compendium-bg-modal-body">
+              {newBgUrl && (
+                <div className="compendium-bg-preview-box">
+                  <img src={newBgUrl} alt="Preview Fundo" onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                </div>
+              )}
+
+              <div className="profile-form-group">
+                <label className="profile-form-label">URL da Imagem de Fundo:</label>
+                <input
+                  type="url"
+                  className="profile-form-input"
+                  placeholder="https://exemplo.com/fundo-compendio.jpg"
+                  value={newBgUrl}
+                  onChange={(e) => setNewBgUrl(e.target.value)}
+                />
+              </div>
+
+              <div className="profile-form-group">
+                <label className="profile-form-label">Ou Enviar Arquivo do Computador:</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleUploadBgFile}
+                  disabled={uploadingBg}
+                  className="profile-form-input"
+                  style={{ padding: '6px' }}
+                />
+                {uploadingBg && <small style={{ color: '#9ca3af', marginTop: '4px' }}>Enviando imagem...</small>}
+              </div>
+
+              {bgSaveStatus && (
+                <div style={{ color: '#4ade80', fontSize: '13px', textAlign: 'center' }}>
+                  {bgSaveStatus}
+                </div>
+              )}
+
+              <div className="chat-user-modal-actions" style={{ marginTop: '8px' }}>
+                <button
+                  type="button"
+                  className="chat-action-btn primary"
+                  onClick={() => handleSaveBackground()}
+                  disabled={uploadingBg || !newBgUrl.trim()}
+                >
+                  Salvar Imagem de Fundo
+                </button>
+                <button
+                  type="button"
+                  className="chat-action-btn secondary"
+                  onClick={() => setShowBgModal(false)}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

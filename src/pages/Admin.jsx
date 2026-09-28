@@ -83,6 +83,9 @@ export default function Admin() {
   const [compDescription, setCompDescription] = useState('')
   const [compTactics, setCompTactics] = useState('')
   const [compAttributes, setCompAttributes] = useState([])
+  const [compendiumGlobalBg, setCompendiumGlobalBg] = useState('')
+  const [uploadingGlobalBg, setUploadingGlobalBg] = useState(false)
+  const [saveGlobalBgStatus, setSaveGlobalBgStatus] = useState('')
 
   const MASTER_PIN = import.meta.env.VITE_ADMIN_PIN || 'alma2026'
 
@@ -106,13 +109,21 @@ export default function Admin() {
     return () => unsub()
   }, [isAuthenticated])
 
-  // Escuta Compêndio
+  // Escuta Compêndio e Configurações
   useEffect(() => {
     if (!isAuthenticated) return
-    const unsub = onSnapshot(collection(db, 'compendium_entries'), (snap) => {
+    const unsubComp = onSnapshot(collection(db, 'compendium_entries'), (snap) => {
       setCompendiumList(snap.docs.map(d => ({ id: d.id, ...d.data() })))
     })
-    return () => unsub()
+    const unsubConfig = onSnapshot(doc(db, 'settings', 'compendium_config'), (snap) => {
+      if (snap.exists() && snap.data().backgroundImage) {
+        setCompendiumGlobalBg(snap.data().backgroundImage)
+      }
+    })
+    return () => {
+      unsubComp()
+      unsubConfig()
+    }
   }, [isAuthenticated])
 
   // ==========================================
@@ -308,6 +319,42 @@ export default function Admin() {
     } catch (err) {
       console.error(err)
       setSaveCompStatus('Erro ao salvar no Compêndio.')
+    }
+  }
+
+  const handleSaveGlobalCompBg = async (e) => {
+    e?.preventDefault()
+    setSaveGlobalBgStatus('Salvando fundo...')
+    try {
+      await setDoc(doc(db, 'settings', 'compendium_config'), {
+        backgroundImage: compendiumGlobalBg.trim(),
+        updatedAt: serverTimestamp()
+      }, { merge: true })
+      setSaveGlobalBgStatus('Imagem de fundo do Compêndio salva com sucesso!')
+      setTimeout(() => setSaveGlobalBgStatus(''), 3000)
+    } catch (err) {
+      console.error(err)
+      setSaveGlobalBgStatus('Erro ao salvar fundo do Compêndio.')
+    }
+  }
+
+  const handleUploadGlobalCompBg = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploadingGlobalBg(true)
+    try {
+      const url = await uploadImageFree(file)
+      setCompendiumGlobalBg(url)
+      await setDoc(doc(db, 'settings', 'compendium_config'), {
+        backgroundImage: url,
+        updatedAt: serverTimestamp()
+      }, { merge: true })
+      setSaveGlobalBgStatus('Imagem enviada e salva com sucesso!')
+      setTimeout(() => setSaveGlobalBgStatus(''), 3000)
+    } catch (err) {
+      alert('Erro ao enviar imagem: ' + err.message)
+    } finally {
+      setUploadingGlobalBg(false)
     }
   }
 
@@ -722,6 +769,54 @@ export default function Admin() {
           </aside>
 
           <main className="admin-editor-panel">
+            {/* Configuração de Fundo Global do Compêndio */}
+            <div className="admin-editor-card" style={{ marginBottom: '16px' }}>
+              <h2>🖼️ Imagem de Fundo do Compêndio</h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', marginBottom: '12px' }}>
+                Defina a imagem de fundo atmosférica que aparece atrás do Compêndio de Koskovic.
+              </p>
+
+              <form onSubmit={handleSaveGlobalCompBg} className="admin-form">
+                <div className="admin-form-group">
+                  <label>URL da Imagem:</label>
+                  <div className="admin-upload-group">
+                    <input
+                      type="url"
+                      value={compendiumGlobalBg}
+                      onChange={(e) => setCompendiumGlobalBg(e.target.value)}
+                      placeholder="https://exemplo.com/fundo-compendio.jpg"
+                    />
+                    <label className={`admin-upload-btn ${uploadingGlobalBg ? 'loading' : ''}`}>
+                      {uploadingGlobalBg ? 'Enviando...' : '📁 Enviar Imagem'}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleUploadGlobalCompBg}
+                        disabled={uploadingGlobalBg}
+                        style={{ display: 'none' }}
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                {compendiumGlobalBg && (
+                  <div className="admin-preview-img-box" style={{ maxHeight: '140px' }}>
+                    <img src={compendiumGlobalBg} alt="Preview Fundo Compêndio" />
+                  </div>
+                )}
+
+                {saveGlobalBgStatus && (
+                  <div className="admin-save-feedback">{saveGlobalBgStatus}</div>
+                )}
+
+                <div className="admin-form-actions">
+                  <button type="submit" className="admin-save-btn">
+                    💾 Salvar Fundo do Compêndio
+                  </button>
+                </div>
+              </form>
+            </div>
+
             <div className="admin-editor-card">
               <h2>{selectedCompEntry ? `Editando: ${selectedCompEntry.name}` : 'Criar Registro no Compêndio'}</h2>
 
