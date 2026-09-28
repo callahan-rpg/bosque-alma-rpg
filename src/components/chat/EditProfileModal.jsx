@@ -4,14 +4,6 @@ export default function EditProfileModal({ profile, onSave, onClose }) {
   const [name, setName] = useState(profile?.name || '')
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatarUrl || '')
 
-  const PRESET_AVATARS = [
-    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&auto=format&fit=crop&q=80',
-  ]
-
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!name.trim()) return
@@ -44,20 +36,7 @@ export default function EditProfileModal({ profile, onSave, onClose }) {
                 <span className="profile-avatar-placeholder-icon">👤</span>
               )}
             </div>
-            <p className="profile-avatar-hint">Escolha uma foto ou insira um link abaixo</p>
-          </div>
-
-          <div className="profile-presets-row">
-            {PRESET_AVATARS.map((url, idx) => (
-              <button
-                key={idx}
-                type="button"
-                className={`profile-preset-avatar-btn ${avatarUrl === url ? 'selected' : ''}`}
-                onClick={() => setAvatarUrl(url)}
-              >
-                <img src={url} alt={`Preset ${idx + 1}`} />
-              </button>
-            ))}
+            <p className="profile-avatar-hint">Insira o link da sua foto no campo abaixo</p>
           </div>
 
           <div className="profile-form-group">
