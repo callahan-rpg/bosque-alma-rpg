@@ -11,85 +11,6 @@ const CATEGORIES = [
   { id: 'pocoes', label: 'POÇÕES', subtitle: 'Alquimia & Elixires', icon: '🧪' },
 ]
 
-const FALLBACK_ENTRIES = [
-  {
-    id: 'urso-sombrio',
-    name: 'Urso das Sombras',
-    category: 'criaturas',
-    subcategory: 'Feras Mágicas',
-    imageUrl: 'https://res.cloudinary.com/z3cr8lix/image/upload/v1789136338/iszapvfszdg6phioddwn.png',
-    quote: 'Quando a névoa do crepúsculo desce sobre os carvalhos antigos, eles não buscam abrigo — eles caçam.',
-    quoteAuthor: 'Alma Koskovic, Guardiã do Bosque',
-    description: 'Enormes predadores cujos pelos absorvem a pouca luz ambiente, tornando-os quase invisíveis entre os troncos retorcidos. Ao contrário de ursos comuns, estas feras foram moldadas pelas emanações arcanas do solo necromântico, desenvolvendo garras cristalizadas e uma resistência formidável a feitiços de gelo.',
-    tactics: 'São vulneráveis a fogo puro e óleos de consagrado. Evite confrontá-los frontalmente quando suas presas emitirem um brilho violeta.',
-    attributes: [
-      { label: 'Fogo Arcano', icon: '🔥' },
-      { label: 'Óleo Necrófago', icon: '🧪' },
-      { label: 'Sinal Quen', icon: '🛡️' }
-    ]
-  },
-  {
-    id: 'lobo-espectral',
-    name: 'Lobo Espectral',
-    category: 'criaturas',
-    subcategory: 'Espectros',
-    imageUrl: 'https://images.unsplash.com/photo-1564865878688-9a244444042a?w=800&auto=format&fit=crop&q=80',
-    quote: 'Não ouça seus uivos; eles não chamam a alcateia, chamam a sua alma.',
-    quoteAuthor: 'Antigo provérbio de Koskovic',
-    description: 'Espíritos inquietos de caninos que pereceram sob os encantamentos de expansão territorial. Movem-se em silêncio absoluto e são capazes de atravessar raízes densas como fumaça.',
-    tactics: 'Poeira lunar e armadilhas yrden forçam sua forma a se materializar temporariamente.',
-    attributes: [
-      { label: 'Poeira Lunar', icon: '✨' },
-      { label: 'Prata Pura', icon: '⚔️' }
-    ]
-  },
-  {
-    id: 'mandragora-noturna',
-    name: 'Mandrágora Sussurrante',
-    category: 'plantas_fungos',
-    subcategory: 'Plantas Raras',
-    imageUrl: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=800&auto=format&fit=crop&q=80',
-    quote: 'Se colhida sem o encanto de silêncio, seu lamento pode ensurdecer até os carvalhos milenares.',
-    quoteAuthor: 'Tratado de Botânica Arcana, Vol. II',
-    description: 'Uma raiz milagrosa que cresce exclusivamente nas fendas úmidas próximas às fontes arcanas. Suas folhas roxas emitem uma fluorescência suave ao anoitecer e suas fibras são essenciais para elixires de regeneração vitalícia.',
-    tactics: 'Deve ser colhida usando luvas de couro consagrado sob a lua minguante.',
-    attributes: [
-      { label: 'Propriedade Regenerativa', icon: '💚' },
-      { label: 'Catalisador Alquímico', icon: '✨' }
-    ]
-  },
-  {
-    id: 'cogumelo-lamento',
-    name: 'Cogumelo do Lamento',
-    category: 'plantas_fungos',
-    subcategory: 'Fungos Necróticos',
-    imageUrl: 'https://images.unsplash.com/photo-1543852786-1cf6624b9987?w=800&auto=format&fit=crop&q=80',
-    quote: 'Seu esporo tem o cheiro de chuva e terra virada. Uma única inalação induz visões do passado.',
-    quoteAuthor: 'Grimório das Sombras',
-    description: 'Brotam em anéis perfeitos sobre raízes de árvores mortas no bosque. Quando perturbados, liberam uma névoa arroxeada de esporos que desacelera a percepção temporal de quem estiver próximo.',
-    tactics: 'Queime os brotos jovens para evitar alucinações territoriais.',
-    attributes: [
-      { label: 'Efeito Paralisante', icon: '🌀' },
-      { label: 'Alquimia Sombria', icon: '💀' }
-    ]
-  },
-  {
-    id: 'elixir-visao-espectral',
-    name: 'Elixir da Visão Espectral',
-    category: 'pocoes',
-    subcategory: 'Elixires Arcanos',
-    imageUrl: 'https://images.unsplash.com/photo-1514733670139-4d87a1941d55?w=800&auto=format&fit=crop&q=80',
-    quote: 'Um gole que queima a garganta como gelo seco, mas abre os olhos para o véu oculto.',
-    quoteAuthor: 'Caderno de Fórmulas de Alma',
-    description: 'Destilado a partir de folhas de mandrágora e essência de névoa. Permite ao usuário enxergar trilhas invisíveis, auras mágicas e entidades que habitam o plano intermediário do bosque.',
-    tactics: 'Duração de 15 minutos. Causa leve fotofobia após o término do efeito.',
-    attributes: [
-      { label: 'Visão no Escuro', icon: '👁️' },
-      { label: 'Detecção Mágica', icon: '🔮' }
-    ]
-  }
-]
-
 export default function Compendium() {
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -180,18 +101,18 @@ export default function Compendium() {
           const list = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }))
           setEntries(list)
         } else {
-          setEntries(FALLBACK_ENTRIES)
+          setEntries([])
         }
         setLoading(false)
       }, (err) => {
-        console.warn('[Compendium] Firestore erro, usando fallback:', err)
-        setEntries(FALLBACK_ENTRIES)
+        console.warn('[Compendium] Firestore erro:', err)
+        setEntries([])
         setLoading(false)
       })
 
       return () => unsub()
     } catch (err) {
-      setEntries(FALLBACK_ENTRIES)
+      setEntries([])
       setLoading(false)
     }
   }, [])

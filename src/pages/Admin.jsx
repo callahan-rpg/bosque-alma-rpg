@@ -6,6 +6,7 @@ import {
   setDoc,
   deleteDoc,
   addDoc,
+  getDocs,
   serverTimestamp
 } from 'firebase/firestore'
 import { db } from '../firebase/config'
@@ -58,6 +59,8 @@ export default function Admin() {
   const [timeSeason, setTimeSeason] = useState('autumn')  // override de estação
   const [timeMoon, setTimeMoon]     = useState('full')    // override de fase da lua
   const [saveTimeStatus, setSaveTimeStatus] = useState('')
+  const [clearingDice, setClearingDice] = useState(false)
+  const [clearDiceStatus, setClearDiceStatus] = useState('')
 
   // ==========================================
   // ESTADOS DE LOCALIDADES & CONFIGURAÇÕES GLOBAIS
@@ -462,6 +465,25 @@ export default function Admin() {
     } catch (err) {
       console.error(err)
       setSaveTimeStatus('❌ Erro ao salvar configuração de tempo.')
+    }
+  }
+
+  const handleClearDiceHistory = async () => {
+    if (!window.confirm('Tem certeza que deseja apagar todo o histórico de rolagens de dados do Bosque? Esta ação é definitiva e apagará os dados de todos os jogadores.')) return
+    setClearingDice(true)
+    setClearDiceStatus('Limpando histórico de rolagens...')
+    try {
+      const snap = await getDocs(collection(db, 'dice_rolls'))
+      const deletePromises = snap.docs.map(d => deleteDoc(doc(db, 'dice_rolls', d.id)))
+      await Promise.all(deletePromises)
+      setClearDiceStatus(`✅ Histórico limpo com sucesso! (${snap.size} registros apagados)`)
+      setTimeout(() => setClearDiceStatus(''), 4000)
+    } catch (err) {
+      console.error(err)
+      setClearDiceStatus('❌ Erro ao limpar histórico de dados.')
+      setTimeout(() => setClearDiceStatus(''), 4000)
+    } finally {
+      setClearingDice(false)
     }
   }
 
@@ -1314,6 +1336,40 @@ export default function Admin() {
                 </button>
               </div>
             </form>
+
+            {/* Seção de Ferramentas do Mestre: Limpeza de Rolagens de Dados */}
+            <div className="admin-form-header" style={{ marginTop: 32, borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 24 }}>
+              <h2>🎲 Ferramentas & Histórico de Dados</h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: '13px', marginTop: 4 }}>
+                Limpe o registro público de rolagens de dados feitas pelos visitantes e pelo mestre no Bosque.
+              </p>
+            </div>
+
+            <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <button
+                type="button"
+                className="admin-delete-btn"
+                onClick={handleClearDiceHistory}
+                disabled={clearingDice}
+                style={{
+                  alignSelf: 'flex-start',
+                  padding: '10px 18px',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8
+                }}
+              >
+                {clearingDice ? '⏳ Limpando Histórico...' : '🗑️ Limpar Todo o Histórico de Rolagens'}
+              </button>
+
+              {clearDiceStatus && (
+                <div style={{ fontSize: 13, color: clearDiceStatus.startsWith('✅') ? '#86efac' : '#fca5a5', fontWeight: 500 }}>
+                  {clearDiceStatus}
+                </div>
+              )}
+            </div>
           </main>
         </div>
       )}
