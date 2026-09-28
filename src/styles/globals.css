@@ -4165,8 +4165,67 @@ html, body, #root {
   color: #f87171;
 }
 
+/* ===== Admin: Localidade Padrão ===== */
+.admin-default-loc-card {
+  background: rgba(147, 51, 234, 0.08);
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 8px;
+  backdrop-filter: blur(8px);
+}
 
+.admin-default-loc-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #e9d5ff;
+  margin-bottom: 4px;
+}
 
+.admin-default-star {
+  font-size: 15px;
+  color: #fbbf24;
+}
 
+.admin-default-loc-desc {
+  font-size: 11px;
+  color: var(--text-muted, #9ca3af);
+  line-height: 1.35;
+  margin: 0 0 8px 0;
+}
 
+.admin-default-loc-picker select {
+  width: 100%;
+  background: rgba(15, 10, 25, 0.85);
+  border: 1px solid rgba(167, 139, 250, 0.4);
+  color: #f3e8ff;
+  border-radius: 6px;
+}
 
+.admin-default-pill {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  background: rgba(251, 191, 36, 0.15);
+  border: 1px solid rgba(251, 191, 36, 0.45);
+  color: #fbbf24;
+  padding: 1px 6px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.admin-default-pill-large {
+  font-size: 11px;
+  font-weight: 600;
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  padding: 3px 10px;
+  border-radius: 999px;
+  display: inline-block;
+  margin-top: 4px;
+}

@@ -4,10 +4,12 @@ import EditProfileModal from './chat/EditProfileModal.jsx'
 import SettingsModal from './SettingsModal.jsx'
 import WeatherWidget from './WeatherWidget.jsx'
 import { useGuest } from '../contexts/GuestContext.jsx'
+import { useDefaultLocation } from '../hooks/useDefaultLocation'
 import { useNavigate } from 'react-router-dom'
 
 export default function HUD({ locationName, weatherCondition }) {
   const { character, updateProfile } = useGuest()
+  const { defaultSlug } = useDefaultLocation()
   const navigate = useNavigate()
   const [showDice, setShowDice] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
@@ -21,8 +23,8 @@ export default function HUD({ locationName, weatherCondition }) {
           <button
             type="button"
             className="hud-logo hud-logo-btn"
-            onClick={() => navigate('/location/crepusculo')}
-            title="Voltar ao Jardim do Crepúsculo"
+            onClick={() => navigate(`/location/${defaultSlug}`)}
+            title="Ir para a Entrada Principal do Bosque de Alma"
           >
             BOSQUE DE ALMA
           </button>

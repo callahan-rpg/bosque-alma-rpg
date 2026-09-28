@@ -60,8 +60,10 @@ export default function Admin() {
   const [saveTimeStatus, setSaveTimeStatus] = useState('')
 
   // ==========================================
-  // ESTADOS DE LOCALIDADES
+  // ESTADOS DE LOCALIDADES & CONFIGURAÇÕES GLOBAIS
   // ==========================================
+  const [defaultLocation, setDefaultLocation] = useState('crepusculo')
+  const [saveDefaultLocStatus, setSaveDefaultLocStatus] = useState('')
   const [locations, setLocations] = useState([])
   const [selectedLoc, setSelectedLoc] = useState(null)
   const [saveLocStatus, setSaveLocStatus] = useState('')
@@ -130,10 +132,11 @@ export default function Admin() {
         setCompendiumGlobalBg(snap.data().backgroundImage)
       }
     })
-    // Escuta configurações de tempo/estação
+    // Escuta configurações globais (tempo, estação, localidade padrão)
     const unsubTime = onSnapshot(doc(db, 'settings', 'game_config'), (snap) => {
       if (snap.exists()) {
         const d = snap.data()
+        if (d.defaultLocation)      setDefaultLocation(d.defaultLocation)
         if (d.time?.mode)           setTimeMode(d.time.mode)
         if (d.time?.value || d.time?.currentTime) setTimeValue(d.time.value || d.time.currentTime)
         if (d.time?.speedRatio)     setTimeSpeed(Number(d.time.speedRatio))
@@ -243,6 +246,28 @@ export default function Admin() {
     } catch (err) {
       console.error(err)
       alert('Erro ao excluir localidade.')
+    }
+  }
+
+  const handleSetDefaultLocation = async (slug) => {
+    const targetSlug = slug || formSlug
+    if (!targetSlug) {
+      alert('Selecione ou salve uma localidade válida primeiro.')
+      return
+    }
+    setSaveDefaultLocStatus('Definindo localidade padrão...')
+    try {
+      await setDoc(doc(db, 'settings', 'game_config'), {
+        defaultLocation: targetSlug,
+        updatedAt: serverTimestamp()
+      }, { merge: true })
+      setDefaultLocation(targetSlug)
+      localStorage.setItem('bosque_default_location', targetSlug)
+      setSaveDefaultLocStatus(`⭐ "${targetSlug}" é agora a entrada principal do Bosque!`)
+      setTimeout(() => setSaveDefaultLocStatus(''), 3500)
+    } catch (err) {
+      console.error(err)
+      setSaveDefaultLocStatus('❌ Erro ao salvar localidade padrão.')
     }
   }
 
@@ -465,7 +490,7 @@ export default function Admin() {
             <button
               type="button"
               className="admin-login-back-btn"
-              onClick={() => navigate('/location/crepusculo')}
+              onClick={() => navigate(`/location/${defaultLocation}`)}
             >
               ← Voltar ao Bosque
             </button>
@@ -512,7 +537,7 @@ export default function Admin() {
           <button type="button" className="admin-nav-link-btn" onClick={() => navigate('/compendio')}>
             📖 Ver Compêndio
           </button>
-          <button type="button" className="admin-nav-link-btn" onClick={() => navigate('/location/crepusculo')}>
+          <button type="button" className="admin-nav-link-btn" onClick={() => navigate(`/location/${defaultLocation}`)}>
             🌿 Ver Bosque
           </button>
           <button
@@ -534,7 +559,38 @@ export default function Admin() {
       {adminTab === 'locations' && (
         <div className="admin-main-grid">
           <aside className="admin-locations-sidebar">
-            <div className="admin-sidebar-header">
+            {/* Banner de Localidade Padrão */}
+            <div className="admin-default-loc-card">
+              <div className="admin-default-loc-header">
+                <span className="admin-default-star">⭐</span>
+                <strong>Entrada Principal do Bosque</strong>
+              </div>
+              <p className="admin-default-loc-desc">
+                Esta é a área que abre ao acessar o site e ao clicar em <em>"BOSQUE DE ALMA"</em> no menu.
+              </p>
+              <div className="admin-default-loc-picker">
+                <select
+                  className="profile-form-input"
+                  value={defaultLocation}
+                  onChange={(e) => handleSetDefaultLocation(e.target.value)}
+                  style={{ fontSize: 12, padding: '6px 8px' }}
+                >
+                  <option value="crepusculo">Pátio da Cabana (crepusculo)</option>
+                  {locations.filter(l => l.id !== 'crepusculo').map(l => (
+                    <option key={l.id} value={l.id}>
+                      {l.name || l.id} ({l.id})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {saveDefaultLocStatus && (
+                <div style={{ fontSize: 11, color: 'var(--accent-glow, #a78bfa)', marginTop: 4 }}>
+                  {saveDefaultLocStatus}
+                </div>
+              )}
+            </div>
+
+            <div className="admin-sidebar-header" style={{ marginTop: 12 }}>
               <h3>Localidades ({locations.length})</h3>
               <button type="button" className="admin-add-btn" onClick={startNewLocation}>
                 + Nova Área
@@ -545,39 +601,49 @@ export default function Admin() {
               {locations.length === 0 ? (
                 <p className="admin-empty-text">Nenhuma área customizada ainda.</p>
               ) : (
-                locations.map((loc) => (
-                  <div
-                    key={loc.id}
-                    className={`admin-loc-item ${formSlug === loc.id ? 'active' : ''}`}
-                    onClick={() => selectLocForEdit(loc)}
-                  >
-                    <div className="admin-loc-item-info">
-                      <strong>{loc.name || loc.id}</strong>
-                      <small>/{loc.id}</small>
+                locations.map((loc) => {
+                  const isDefault = (loc.id === defaultLocation) || (loc.slug === defaultLocation)
+                  return (
+                    <div
+                      key={loc.id}
+                      className={`admin-loc-item ${formSlug === loc.id ? 'active' : ''}`}
+                      onClick={() => selectLocForEdit(loc)}
+                    >
+                      <div className="admin-loc-item-info">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <strong>{loc.name || loc.id}</strong>
+                          {isDefault && (
+                            <span className="admin-default-pill" title="Localidade Padrão do Bosque">
+                              ⭐ Padrão
+                            </span>
+                          )}
+                        </div>
+                        <small>/{loc.id}</small>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <button
+                          type="button"
+                          className="admin-loc-visit-btn"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            window.open(`/location/${loc.id || loc.slug}`, '_blank')
+                          }}
+                          title="Visitar Localidade (Abrir em nova aba)"
+                        >
+                          ↗️
+                        </button>
+                        <button
+                          type="button"
+                          className="admin-loc-delete-btn"
+                          onClick={(e) => { e.stopPropagation(); handleDeleteLocation(loc.id); }}
+                          title="Excluir"
+                        >
+                          🗑️
+                        </button>
+                      </div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <button
-                        type="button"
-                        className="admin-loc-visit-btn"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          window.open(`/location/${loc.id || loc.slug}`, '_blank')
-                        }}
-                        title="Visitar Localidade (Abrir em nova aba)"
-                      >
-                        ↗️
-                      </button>
-                      <button
-                        type="button"
-                        className="admin-loc-delete-btn"
-                        onClick={(e) => { e.stopPropagation(); handleDeleteLocation(loc.id); }}
-                        title="Excluir"
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                  </div>
-                ))
+                  )
+                })
               )}
             </div>
           </aside>
@@ -585,17 +651,37 @@ export default function Admin() {
           <main className="admin-editor-panel">
             <div className="admin-editor-card">
               <div className="admin-editor-header-row">
-                <h2>{selectedLoc ? `Editando: ${selectedLoc.name}` : 'Criar Nova Localidade'}</h2>
-                {formSlug && (
-                  <button
-                    type="button"
-                    className="admin-visit-loc-action-btn"
-                    onClick={() => window.open(`/location/${formSlug}`, '_blank')}
-                    title="Abrir este local diretamente em uma nova aba"
-                  >
-                    🔗 Visitar Localidade ({formSlug})
-                  </button>
-                )}
+                <div>
+                  <h2>{selectedLoc ? `Editando: ${selectedLoc.name}` : 'Criar Nova Localidade'}</h2>
+                  {formSlug && formSlug === defaultLocation && (
+                    <span className="admin-default-pill-large">
+                      ⭐ Esta é a Localidade Padrão (Entrada Principal)
+                    </span>
+                  )}
+                </div>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                  {formSlug && formSlug !== defaultLocation && (
+                    <button
+                      type="button"
+                      className="admin-tab-nav-btn"
+                      onClick={() => handleSetDefaultLocation(formSlug)}
+                      title="Definir esta localidade como a que abre inicialmente no site"
+                      style={{ padding: '6px 12px', fontSize: 12 }}
+                    >
+                      ⭐ Definir como Padrão
+                    </button>
+                  )}
+                  {formSlug && (
+                    <button
+                      type="button"
+                      className="admin-visit-loc-action-btn"
+                      onClick={() => window.open(`/location/${formSlug}`, '_blank')}
+                      title="Abrir este local diretamente em uma nova aba"
+                    >
+                      🔗 Visitar Localidade ({formSlug})
+                    </button>
+                  )}
+                </div>
               </div>
 
               <form onSubmit={handleSaveLocation} className="admin-form">
