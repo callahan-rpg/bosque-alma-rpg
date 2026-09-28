@@ -307,7 +307,10 @@ export default function ChatMessageList({
                       const count = Object.keys(uidsMap || {}).length
                       if (count === 0) return null
                       const hasMyReaction = currentUser?.uid && uidsMap[currentUser.uid]
-                      const namesList = Object.values(uidsMap).join(', ')
+                      const namesList = Object.values(uidsMap || {})
+                        .filter(Boolean)
+                        .map(v => (typeof v === 'string' && v !== 'true' ? v : 'Viajante'))
+                        .join(', ')
 
                       return (
                         <button

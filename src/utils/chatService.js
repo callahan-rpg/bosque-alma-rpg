@@ -164,7 +164,8 @@ export function subscribeZoneChat(zoneSlug, callback, sessionStartTime, maxCount
 /**
  * Escuta mensagens de uma sala privada (DM)
  */
-export function subscribePrivateChat(roomId, callback, sessionStartTime, maxCount = 50) {
+export function subscribePrivateChat(uid1, uid2, callback, sessionStartTime, maxCount = 50) {
+  const roomId = getPrivateRoomId(uid1, uid2)
   if (!rtdb || !roomId) return () => {}
 
   const startTime = typeof sessionStartTime === 'number' ? sessionStartTime : getEstimatedServerTime()
@@ -178,12 +179,21 @@ export function subscribePrivateChat(roomId, callback, sessionStartTime, maxCoun
 
     const raw = snapshot.val()
     const list = Object.entries(raw)
-      .map(([id, val]) => ({ id, ...val }))
+      .map(([id, val]) => ({
+        id,
+        ...val
+      }))
       .filter((msg) => {
-        const ts = msg.timestamp || 0
-        return ts >= startTime - 1000
+        const ts = typeof msg.timestamp === 'number' ? msg.timestamp : getEstimatedServerTime()
+        return ts >= (startTime - 5000)
       })
-      .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0))
+      .sort((a, b) => {
+        const timeA = typeof a?.timestamp === 'number' ? a.timestamp : 0
+        const timeB = typeof b?.timestamp === 'number' ? b.timestamp : 0
+        const timeDiff = timeA - timeB
+        if (timeDiff !== 0) return timeDiff
+        return String(a?.id || '').localeCompare(String(b?.id || ''))
+      })
 
     callback(list)
   }
@@ -238,14 +248,22 @@ export function subscribePinnedMessage(zoneSlug, callback) {
 /**
  * Alterna reação de emoji em uma mensagem
  */
-export async function toggleReaction(zoneSlug, messageId, emoji, userUid) {
-  if (!rtdb || !zoneSlug || !messageId || !emoji || !userUid) return
-  const rxRef = ref(rtdb, `chat/zones/${zoneSlug}/messages/${messageId}/reactions/${emoji}/${userUid}`)
-  const snap = await get(rxRef)
-  if (snap.exists()) {
-    await remove(rxRef)
-  } else {
-    await set(rxRef, true)
+export async function toggleReaction(zoneSlugOrRoomId, messageId, emoji, uid, characterName = 'Viajante', isPrivate = false) {
+  if (!rtdb || !zoneSlugOrRoomId || !messageId || !emoji || !uid) return
+  try {
+    const basePath = isPrivate
+      ? `chat/private/${zoneSlugOrRoomId}/messages/${messageId}/reactions/${emoji}/${uid}`
+      : `chat/zones/${zoneSlugOrRoomId}/messages/${messageId}/reactions/${emoji}/${uid}`
+
+    const rxRef = ref(rtdb, basePath)
+    const snap = await get(rxRef)
+    if (snap.exists()) {
+      await remove(rxRef)
+    } else {
+      await set(rxRef, characterName || 'Viajante')
+    }
+  } catch (err) {
+    console.warn('[chatService] Erro ao alternar reação:', err)
   }
 }
 

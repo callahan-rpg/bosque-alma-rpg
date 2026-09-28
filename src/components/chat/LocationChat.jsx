@@ -21,7 +21,8 @@ import {
   unpinZoneMessage,
   subscribePinnedMessage,
   updatePresenceStatus,
-  getEstimatedServerTime
+  getEstimatedServerTime,
+  getPrivateRoomId
 } from '../../utils/chatService'
 import {
   playMessageSound,
@@ -252,11 +253,11 @@ export default function LocationChat({ slug, locationName }) {
 
     openDms.forEach(dm => {
       if (!dmSubscriptionsRef.current[dm.uid]) {
-        const { getPrivateRoomId } = require ? {} : {}
-        const roomId = [user.uid, dm.uid].sort().join('_')
         dmSubscriptionsRef.current[dm.uid] = subscribePrivateChat(
-          roomId,
-          (msgs) => setDmMessagesMap(prev => ({ ...prev, [dm.uid]: msgs }))
+          user.uid,
+          dm.uid,
+          (msgs) => setDmMessagesMap(prev => ({ ...prev, [dm.uid]: msgs })),
+          sessionStartTimeRef.current
         )
       }
     })
@@ -353,9 +354,16 @@ export default function LocationChat({ slug, locationName }) {
 
   const handleToggleReaction = async (msgId, emoji) => {
     if (!user?.uid || !msgId || !emoji) return
+    const charName = character?.name || character?.characterName || 'Viajante'
     if (activeTab === 'zone') {
       if (!slug) return
-      await toggleReaction(slug, msgId, emoji, user.uid)
+      await toggleReaction(slug, msgId, emoji, user.uid, charName, false)
+    } else if (activeTab.startsWith('dm_')) {
+      const targetUid = activeTab.replace('dm_', '')
+      const roomId = getPrivateRoomId(user.uid, targetUid)
+      if (roomId) {
+        await toggleReaction(roomId, msgId, emoji, user.uid, charName, true)
+      }
     }
   }
 
