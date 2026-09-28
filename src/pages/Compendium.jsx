@@ -311,18 +311,7 @@ export default function Compendium() {
             </button>
           </div>
 
-          {/* Botão para Alterar Fundo (Mestre) */}
-          <button
-            type="button"
-            className="compendium-admin-bg-btn"
-            onClick={() => {
-              setNewBgUrl(compendiumBg)
-              setShowBgModal(true)
-            }}
-            title="Alterar Imagem de Fundo do Compêndio"
-          >
-            🖼️ Alterar Fundo
-          </button>
+
         </header>
 
         {/* Layout Principal de 3 Colunas (The Witcher 3) */}
