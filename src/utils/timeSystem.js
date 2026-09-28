@@ -52,32 +52,48 @@ export const WEATHER_CONDITIONS = {
 
 /**
  * Calcula a data e hora in-game.
- * Regra: 1 dia in-game = 12 horas reais (speedRatio 2×).
- * @param {Object} config - Configurações (do Firestore ou null)
+ * Suporta modo progressivo (o relógio parte da hora configurada pelo mestre e avança progressivamente)
+ * ou modo manual/pausado (hora congelada).
+ * @param {Object} config - Configurações (do Firestore settings/game_config ou null)
  * @returns {Object} Dados completos de tempo, data, estação e lua
  */
 export function calculateGameTime(config) {
-  const baseEpochMs = config?.time?.baseEpochMs || new Date('2026-09-01T00:00:00Z').getTime()
-  const baseYear    = config?.time?.baseYear   || 2026
-  const baseMonth   = config?.time?.baseMonth  || 9  // 1-indexed (9 = Setembro)
-  const baseDay     = config?.time?.baseDay    || 1
-  const baseHour    = config?.time?.baseHour   ?? 10
-  const baseMinute  = config?.time?.baseMinute ?? 0
-  const isDynamic   = config?.time?.mode !== 'manual'
+  const timeConfig = config?.time || {}
+  const isDynamic = timeConfig.mode !== 'manual'
+  const speedRatio = Number(timeConfig.speedRatio) || 1 // 1 = 1x tempo real, 2 = 2x, etc.
 
+  // Horário base definido
+  const timeVal = timeConfig.value || timeConfig.currentTime || '10:00'
+  const [hStr, mStr] = String(timeVal).split(':')
+  const baseHour = typeof timeConfig.baseHour === 'number' ? timeConfig.baseHour : (parseInt(hStr || '10', 10) || 10)
+  const baseMinute = typeof timeConfig.baseMinute === 'number' ? timeConfig.baseMinute : (parseInt(mStr || '0', 10) || 0)
+
+  // Marco temporal em que o mestre salvou a hora
+  const baseEpochMs = typeof timeConfig.baseEpochMs === 'number'
+    ? timeConfig.baseEpochMs
+    : (config?.updatedAt?.toMillis ? config.updatedAt.toMillis() : new Date('2026-09-01T00:00:00Z').getTime())
+
+  const baseYear  = timeConfig.baseYear  || 2026
+  const baseMonth = timeConfig.baseMonth || 9 // 1-indexed (Setembro)
+  const baseDay   = timeConfig.baseDay   || 1
+
+  // Se o relógio estiver pausado/manual fixo:
   if (!isDynamic) {
-    const manualVal    = config?.time?.value     || '10:00'
-    const manualPeriod = config?.time?.period    || 'day'
-    const manualSeason = config?.time?.season    || 'autumn'
-    const manualMoon   = config?.time?.moonPhase || 'full'
+    const hour = baseHour
+    const minute = baseMinute
+    const timeString = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
+    const period = (hour >= 6 && hour < 19) ? 'day' : 'night'
+    const manualSeason = timeConfig.seasonOverride || timeConfig.season || 'autumn'
+    const manualMoon   = timeConfig.moonOverride   || timeConfig.moonPhase || 'full'
     const currentSeason = SEASONS[manualSeason] || SEASONS.autumn
     const currentMoon   = MOON_PHASES.find(m => m.id === manualMoon) || MOON_PHASES[4]
+
     return {
       isDynamic: false,
-      timeString: manualVal,
-      hour: parseInt(manualVal.split(':')[0] || '10', 10),
-      minute: parseInt(manualVal.split(':')[1] || '00', 10),
-      period: manualPeriod,
+      timeString,
+      hour,
+      minute,
+      period,
       day: baseDay,
       month: baseMonth,
       monthName: MONTHS[baseMonth - 1]?.name || 'Setembro',
@@ -88,10 +104,11 @@ export function calculateGameTime(config) {
     }
   }
 
-  // Modo Dinâmico: tempo in-game corre 2× mais rápido que o real
+  // Modo Progressivo / Dinâmico:
+  // Calcula quanto tempo passou desde que o mestre definiu a hora base
   const nowMs = Date.now()
-  const elapsedGameMs = Math.max(0, nowMs - baseEpochMs) * 2
-  const baseGameDate    = new Date(Date.UTC(baseYear, baseMonth - 1, baseDay, baseHour, baseMinute, 0))
+  const elapsedGameMs = Math.max(0, nowMs - baseEpochMs) * speedRatio
+  const baseGameDate = new Date(Date.UTC(baseYear, baseMonth - 1, baseDay, baseHour, baseMinute, 0))
   const currentGameDate = new Date(baseGameDate.getTime() + elapsedGameMs)
 
   const hour     = currentGameDate.getUTCHours()
@@ -105,14 +122,14 @@ export function calculateGameTime(config) {
   const period = (hour >= 6 && hour < 19) ? 'day' : 'night'
 
   const monthSeasonId = MONTHS[monthIdx]?.season || 'autumn'
-  const season = SEASONS[config?.time?.seasonOverride || monthSeasonId] || SEASONS.autumn
+  const season = SEASONS[timeConfig.seasonOverride || monthSeasonId] || SEASONS.autumn
 
   // Fase da lua — ciclo sinódico ~29.53 dias
   const daysSinceEpoch = (currentGameDate.getTime() - new Date(Date.UTC(2026, 0, 1)).getTime()) / 86400000
   const cyclePosition  = (daysSinceEpoch % 29.53058867) / 29.53058867
   const moonIndex      = Math.floor(cyclePosition * 8) % 8
-  const moonPhase = config?.time?.moonOverride
-    ? (MOON_PHASES.find(m => m.id === config.time.moonOverride) || MOON_PHASES[moonIndex])
+  const moonPhase = timeConfig.moonOverride
+    ? (MOON_PHASES.find(m => m.id === timeConfig.moonOverride) || MOON_PHASES[moonIndex])
     : MOON_PHASES[moonIndex]
 
   return {
@@ -127,7 +144,7 @@ export function calculateGameTime(config) {
     year,
     season,
     moonPhase,
-    formattedDate: `${String(day).padStart(2, '0')} de ${MONTHS[monthIdx]?.name}, ${year}`
+    formattedDate: `${String(day).padStart(2, '0')} de ${MONTHS[monthIdx]?.name || 'Setembro'}, ${year}`
   }
 }
 

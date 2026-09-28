@@ -52,10 +52,11 @@ export default function Admin() {
   // ==========================================
   // ESTADOS DE TEMPO & ESTAÇÃO
   // ==========================================
-  const [timeMode, setTimeMode] = useState('dynamic')       // 'dynamic' | 'manual'
-  const [timeValue, setTimeValue] = useState('10:00')       // HH:MM para modo manual
-  const [timeSeason, setTimeSeason] = useState('autumn')    // override de estação
-  const [timeMoon, setTimeMoon]     = useState('full')      // override de fase da lua
+  const [timeMode, setTimeMode]     = useState('dynamic')   // 'dynamic' | 'manual'
+  const [timeValue, setTimeValue]   = useState('10:00')   // HH:MM horário base configurado
+  const [timeSpeed, setTimeSpeed]   = useState(1)          // 1 = tempo real, 2 = 2x, 4 = 4x
+  const [timeSeason, setTimeSeason] = useState('autumn')  // override de estação
+  const [timeMoon, setTimeMoon]     = useState('full')    // override de fase da lua
   const [saveTimeStatus, setSaveTimeStatus] = useState('')
 
   // ==========================================
@@ -133,8 +134,9 @@ export default function Admin() {
     const unsubTime = onSnapshot(doc(db, 'settings', 'game_config'), (snap) => {
       if (snap.exists()) {
         const d = snap.data()
-        if (d.time?.mode)     setTimeMode(d.time.mode)
-        if (d.time?.value)    setTimeValue(d.time.value)
+        if (d.time?.mode)           setTimeMode(d.time.mode)
+        if (d.time?.value || d.time?.currentTime) setTimeValue(d.time.value || d.time.currentTime)
+        if (d.time?.speedRatio)     setTimeSpeed(Number(d.time.speedRatio))
         if (d.time?.seasonOverride) setTimeSeason(d.time.seasonOverride)
         if (d.time?.moonOverride)   setTimeMoon(d.time.moonOverride)
       }
@@ -398,22 +400,40 @@ export default function Admin() {
   // ==========================================
   // FUNÇÕES DE TEMPO & ESTAÇÃO
   // ==========================================
+  const handleSetCurrentRealTime = () => {
+    const now = new Date()
+    const hh = String(now.getHours()).padStart(2, '0')
+    const mm = String(now.getMinutes()).padStart(2, '0')
+    setTimeValue(`${hh}:${mm}`)
+  }
+
   const handleSaveTimeConfig = async (e) => {
     e.preventDefault()
     setSaveTimeStatus('Salvando...')
     try {
+      const [hStr, mStr] = String(timeValue || '10:00').split(':')
+      const baseHour = parseInt(hStr || '10', 10) || 10
+      const baseMinute = parseInt(mStr || '00', 10) || 0
+      const isDay = baseHour >= 6 && baseHour < 19
+
       const payload = {
         time: {
           mode: timeMode,
-          ...(timeMode === 'manual' ? { value: timeValue, period: parseInt(timeValue.split(':')[0] || '10', 10) >= 6 && parseInt(timeValue.split(':')[0] || '10', 10) < 19 ? 'day' : 'night' } : {}),
+          value: timeValue,
+          currentTime: timeValue,
+          baseHour,
+          baseMinute,
+          baseEpochMs: Date.now(),
+          speedRatio: Number(timeSpeed) || 1,
+          period: isDay ? 'day' : 'night',
           seasonOverride: timeSeason,
           moonOverride: timeMoon,
         },
         updatedAt: serverTimestamp()
       }
       await setDoc(doc(db, 'settings', 'game_config'), payload, { merge: true })
-      setSaveTimeStatus('✅ Configuração de tempo salva!')
-      setTimeout(() => setSaveTimeStatus(''), 3000)
+      setSaveTimeStatus('✅ Configuração de tempo salva! O relógio atualizará automaticamente.')
+      setTimeout(() => setSaveTimeStatus(''), 3500)
     } catch (err) {
       console.error(err)
       setSaveTimeStatus('❌ Erro ao salvar configuração de tempo.')
@@ -1052,36 +1072,10 @@ export default function Admin() {
 
             <form onSubmit={handleSaveTimeConfig} className="admin-loc-form">
 
-              {/* Modo do Relógio */}
+              {/* Horário do Bosque */}
               <div className="profile-form-group">
-                <label className="profile-form-label">Modo do Relógio</label>
-                <div style={{ display: 'flex', gap: 10 }}>
-                  <button
-                    type="button"
-                    className={`admin-tab-nav-btn ${timeMode === 'dynamic' ? 'active' : ''}`}
-                    onClick={() => setTimeMode('dynamic')}
-                  >
-                    🔄 Dinâmico (tempo real × 2)
-                  </button>
-                  <button
-                    type="button"
-                    className={`admin-tab-nav-btn ${timeMode === 'manual' ? 'active' : ''}`}
-                    onClick={() => setTimeMode('manual')}
-                  >
-                    🔒 Manual (hora fixa)
-                  </button>
-                </div>
-                {timeMode === 'dynamic' && (
-                  <small style={{ color: 'var(--text-muted)', marginTop: 6, display: 'block' }}>
-                    O relógio avança automaticamente: 1 dia in-game = 12 horas reais.
-                  </small>
-                )}
-              </div>
-
-              {/* Hora Manual */}
-              {timeMode === 'manual' && (
-                <div className="profile-form-group">
-                  <label className="profile-form-label">Horário Fixo (HH:MM)</label>
+                <label className="profile-form-label">Horário do Bosque (HH:MM)</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                   <input
                     type="time"
                     className="profile-form-input"
@@ -1089,6 +1083,69 @@ export default function Admin() {
                     onChange={e => setTimeValue(e.target.value)}
                     style={{ maxWidth: 160 }}
                   />
+                  <button
+                    type="button"
+                    className="admin-tab-nav-btn"
+                    onClick={handleSetCurrentRealTime}
+                    title="Preenche com o horário atual do seu computador"
+                    style={{ padding: '8px 14px', fontSize: 12 }}
+                  >
+                    ⏰ Usar Hora Real Agora
+                  </button>
+                </div>
+                <small style={{ color: 'var(--text-muted)', marginTop: 6, display: 'block' }}>
+                  Defina a hora base. Se o relógio estiver em modo progressivo, ele continuará correndo naturalmente a partir deste horário!
+                </small>
+              </div>
+
+              {/* Comportamento do Relógio */}
+              <div className="profile-form-group">
+                <label className="profile-form-label">Comportamento do Relógio</label>
+                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    className={`admin-tab-nav-btn ${timeMode === 'dynamic' ? 'active' : ''}`}
+                    onClick={() => setTimeMode('dynamic')}
+                  >
+                    ⏩ Progressivo (Avança sozinho)
+                  </button>
+                  <button
+                    type="button"
+                    className={`admin-tab-nav-btn ${timeMode === 'manual' ? 'active' : ''}`}
+                    onClick={() => setTimeMode('manual')}
+                  >
+                    🔒 Congelado (Hora fixa)
+                  </button>
+                </div>
+                <small style={{ color: 'var(--text-muted)', marginTop: 6, display: 'block' }}>
+                  {timeMode === 'dynamic'
+                    ? 'O relógio avança progressivamente a cada segundo a partir da hora definida.'
+                    : 'O relógio fica estático e não avança com o tempo.'}
+                </small>
+              </div>
+
+              {/* Velocidade do Tempo (somente em modo progressivo) */}
+              {timeMode === 'dynamic' && (
+                <div className="profile-form-group">
+                  <label className="profile-form-label">Velocidade da Passagem do Tempo</label>
+                  <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                    {[
+                      { val: 1, label: '1× Tempo Real', desc: '1 min real = 1 min no Bosque' },
+                      { val: 2, label: '2× Dinâmico RPG', desc: '12h reais = 1 dia no Bosque' },
+                      { val: 4, label: '4× Acelerado', desc: '6h reais = 1 dia no Bosque' },
+                    ].map(spd => (
+                      <button
+                        key={spd.val}
+                        type="button"
+                        className={`admin-tab-nav-btn ${timeSpeed === spd.val ? 'active' : ''}`}
+                        onClick={() => setTimeSpeed(spd.val)}
+                        style={{ flexDirection: 'column', alignItems: 'flex-start', padding: '8px 12px' }}
+                      >
+                        <span style={{ fontWeight: 'bold' }}>{spd.label}</span>
+                        <span style={{ fontSize: 10, opacity: 0.75 }}>{spd.desc}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -1118,7 +1175,7 @@ export default function Admin() {
 
               {/* Fase da Lua */}
               <div className="profile-form-group">
-                <label className="profile-form-label">Fase da Lua (override manual)</label>
+                <label className="profile-form-label">Fase da Lua</label>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
                   {[
                     { id: 'new',             label: 'Nova',       icon: '🌑' },
@@ -1143,7 +1200,7 @@ export default function Admin() {
                   ))}
                 </div>
                 <small style={{ color: 'var(--text-muted)', marginTop: 6, display: 'block' }}>
-                  Em modo dinâmico, a lua avança automaticamente pelo ciclo sinódico (~29.5 dias). Selecione uma fase aqui para forçar um override fixo.
+                  Selecione uma fase da lua para fixar no céu do Bosque.
                 </small>
               </div>
 
