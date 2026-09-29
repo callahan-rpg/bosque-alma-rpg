@@ -25,10 +25,12 @@ export default function ChatInputBar({
 
     const cursorPos = e.target.selectionStart
     const textBeforeCursor = val.slice(0, cursorPos)
-    const match = textBeforeCursor.match(/@([a-zA-Z0-9_À-ÿ ]{0,30})$/)
+    // Captura @NomeComPossívelEspaço - aceita espaços APENAS se ainda não há espaço duplo ou ponto
+    const match = textBeforeCursor.match(/@([a-zA-Z0-9_À-ÿ](?:[a-zA-Z0-9_À-ÿ ]){0,28})?$/)
 
-    if (match) {
-      setMentionQuery(match[1].toLowerCase())
+    if (match && match[0].startsWith('@')) {
+      const query = (match[1] || '').toLowerCase().trim()
+      setMentionQuery(query)
       setMentionIndex(0)
     } else {
       setMentionQuery(null)
@@ -47,7 +49,10 @@ export default function ChatInputBar({
     const textBeforeCursor = text.slice(0, cursorPos)
     const textAfterCursor = text.slice(cursorPos)
 
-    const newBefore = textBeforeCursor.replace(/@([a-zA-Z0-9_À-ÿ ]{0,30})$/, `@${characterName} `)
+    const newBefore = textBeforeCursor.replace(
+      /@([a-zA-Z0-9_À-ÿ](?:[a-zA-Z0-9_À-ÿ ]){0,28})?$/,
+      `@${characterName} `
+    )
     const nextText = newBefore + textAfterCursor
     setText(nextText.slice(0, 280))
     setMentionQuery(null)
