@@ -10,7 +10,7 @@ import { calculateGameTime, resolveLocationWeather } from '../utils/timeSystem'
  * Props:
  *   weatherCondition {string} - Condição de clima da localidade atual (ex: 'rainy', 'foggy').
  */
-export default function WeatherWidget({ weatherCondition }) {
+export default function WeatherWidget({ weatherCondition, temperature }) {
   const [gameConfig, setGameConfig] = useState(null)
   const [tick, setTick] = useState(0)
 
@@ -33,13 +33,25 @@ export default function WeatherWidget({ weatherCondition }) {
   const gameTime = calculateGameTime(gameConfig)
   const weather  = resolveLocationWeather(weatherCondition, gameTime)
 
+  const hasTemp = temperature !== undefined && temperature !== null && temperature !== ''
+  const formattedTemp = hasTemp
+    ? (typeof temperature === 'number' || !isNaN(Number(temperature)) ? `${temperature}°C` : String(temperature))
+    : null
+
   return (
     <div
       className="hud-weather-widget"
-      title={`${weather.label} | ${gameTime.timeString} | ${gameTime.season.name} | ${gameTime.moonPhase.name}`}
+      title={`${weather.label}${formattedTemp ? ` (${formattedTemp})` : ''} | ${gameTime.timeString} | ${gameTime.season.name} | ${gameTime.moonPhase.name}`}
     >
       {/* Clima */}
       <span className="hw-weather-icon">{weather.icon}</span>
+
+      {/* Temperatura em Graus Celsius */}
+      {formattedTemp && (
+        <span className="hw-temp" title={`Temperatura do Local: ${formattedTemp}`}>
+          {formattedTemp}
+        </span>
+      )}
 
       {/* Separador */}
       <span className="hw-sep">|</span>

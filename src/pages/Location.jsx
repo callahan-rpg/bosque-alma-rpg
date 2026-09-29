@@ -66,7 +66,11 @@ export default function Location() {
       <AmbientSoundPlayer locationSoundUrl={loc.locationSound || ''} />
 
       {/* HUD Menu Superior Arredondado */}
-      <HUD locationName={loc.name} weatherCondition={loc.weatherCondition || 'none'} />
+      <HUD
+        locationName={loc.name}
+        weatherCondition={loc.weatherCondition || 'none'}
+        temperature={loc.temperature}
+      />
 
       {/* Imagem de Fundo e Overlay */}
       {loc.backgroundImage && (

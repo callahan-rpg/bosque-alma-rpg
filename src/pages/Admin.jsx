@@ -78,6 +78,7 @@ export default function Admin() {
   const [formBg, setFormBg] = useState('')
   const [formSound, setFormSound] = useState('')
   const [formClimate, setFormClimate] = useState('none')
+  const [formTemp, setFormTemp] = useState('')
   const [formNavButtons, setFormNavButtons] = useState([])
 
   // ==========================================
@@ -190,6 +191,7 @@ export default function Admin() {
     setFormBg('')
     setFormSound('')
     setFormClimate('none')
+    setFormTemp('')
     setFormNavButtons([])
   }
 
@@ -201,6 +203,7 @@ export default function Admin() {
     setFormBg(loc.backgroundImage || '')
     setFormSound(loc.locationSound || '')
     setFormClimate(loc.weatherCondition || 'none')
+    setFormTemp(loc.temperature !== undefined && loc.temperature !== null ? loc.temperature : '')
     setFormNavButtons(loc.navigationButtons || [])
   }
 
@@ -251,6 +254,7 @@ export default function Admin() {
         backgroundImage: formBg.trim(),
         locationSound: formSound.trim(),
         weatherCondition: formClimate,
+        temperature: formTemp !== '' ? Number(formTemp) : null,
         navigationButtons: formNavButtons.filter(b => b.targetSlug.trim()),
         updatedAt: Date.now()
       }
@@ -917,6 +921,18 @@ export default function Admin() {
                         </option>
                       ))}
                     </select>
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Temperatura (°C):</label>
+                    <input
+                      type="number"
+                      value={formTemp}
+                      onChange={(e) => setFormTemp(e.target.value)}
+                      placeholder="ex: 18, 5, -2"
+                      step="1"
+                    />
+                    <small>Exibida junto ao clima no HUD</small>
                   </div>
                 </div>
 
