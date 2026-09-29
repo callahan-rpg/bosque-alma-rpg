@@ -2067,7 +2067,10 @@ html, body, #root {
 }
 
 .location-bg-overlay {
-  display: none;
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(9, 7, 13, 0.3) 0%, rgba(9, 7, 13, 0.82) 100%);
+  pointer-events: none;
 }
 
 .location-content-wrapper {
@@ -2318,7 +2321,11 @@ html, body, #root {
 }
 
 .location-bg-overlay {
-  display: none;
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(9, 7, 13, 0.35) 0%, rgba(9, 7, 13, 0.1) 40%, rgba(9, 7, 13, 0.65) 100%);
+  pointer-events: none;
+  z-index: 1;
 }
 
 .location-content {
@@ -3323,7 +3330,11 @@ html, body, #root {
 }
 
 .compendium-bg-overlay {
-  display: none;
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(12, 12, 14, 0.35) 0%, rgba(12, 12, 14, 0.6) 50%, rgba(12, 12, 14, 0.82) 100%);
+  pointer-events: none;
+  z-index: 1;
 }
 
 .compendium-container {
