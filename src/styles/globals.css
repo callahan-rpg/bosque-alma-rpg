@@ -3530,18 +3530,47 @@ html, body, #root {
   gap: 4px;
 }
 
-.compendium-group-header {
+.compendium-group-header-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  margin-bottom: 4px;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  margin-bottom: 2px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.compendium-group-header-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.compendium-group-header-btn.active {
+  background: rgba(230, 180, 100, 0.12);
+  border-color: rgba(230, 180, 100, 0.35);
+}
+
+.compendium-group-header-btn.active .compendium-group-title {
+  color: #f3d082;
+}
+
+.compendium-group-header-btn.active .compendium-group-star {
+  color: #f3d082;
 }
 
 .compendium-group-star {
   color: #9ca3af;
   font-size: 0.75rem;
+  transition: transform 0.2s ease;
+  display: inline-block;
+  width: 12px;
+  text-align: center;
 }
 
 .compendium-group-title {
@@ -3551,12 +3580,37 @@ html, body, #root {
   letter-spacing: 1.5px;
   color: #d1d5db;
   text-transform: uppercase;
+  flex: 1;
+}
+
+.compendium-group-count {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #9ca3af;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 1px 6px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .compendium-group-items {
   display: flex;
   flex-direction: column;
   gap: 3px;
+  padding-left: 4px;
+  margin-bottom: 6px;
+  animation: fadeInGroup 0.2s ease-out;
+}
+
+@keyframes fadeInGroup {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .compendium-item-btn {
@@ -3593,18 +3647,20 @@ html, body, #root {
   height: 32px;
   border-radius: 4px;
   overflow: hidden;
-  background: rgba(14, 14, 16, 0.98);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(10, 10, 12, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  padding: 1px;
 }
 
 .compendium-item-thumb {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
 }
 
 .compendium-item-thumb-placeholder {

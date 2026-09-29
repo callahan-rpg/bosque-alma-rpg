@@ -160,6 +160,23 @@ export default function Compendium() {
 
   const [activeLoreTab, setActiveLoreTab] = useState('info') // 'info' | 'stats'
 
+  const [expandedGroup, setExpandedGroup] = useState(null)
+
+  // Quando mudar a categoria ou carregar registros, abre por padrão o grupo do item selecionado ou o primeiro
+  useEffect(() => {
+    if (categoryEntries.length > 0) {
+      const currentSelected = categoryEntries.find(e => e.id === selectedId) || categoryEntries[0]
+      const targetGroup = currentSelected ? (currentSelected.subcategory || 'Geral') : Object.keys(groupedEntries)[0]
+      setExpandedGroup(targetGroup || null)
+    } else {
+      setExpandedGroup(null)
+    }
+  }, [activeCategory])
+
+  const toggleGroup = (groupName) => {
+    setExpandedGroup(prev => (prev === groupName ? null : groupName))
+  }
+
   // Reseta a aba para 'info' ao trocar de entrada
   useEffect(() => {
     setActiveLoreTab('info')
@@ -272,43 +289,60 @@ export default function Compendium() {
                   <span>Nenhum registro encontrado.</span>
                 </div>
               ) : (
-                Object.entries(groupedEntries).map(([groupName, groupItems]) => (
-                  <div key={groupName} className="compendium-group-section">
-                    <div className="compendium-group-header">
-                      <span className="compendium-group-star">✦</span>
-                      <span className="compendium-group-title">{groupName.toUpperCase()}</span>
-                    </div>
+                Object.entries(groupedEntries).map(([groupName, groupItems]) => {
+                  const isExpanded = searchFilter.trim() ? true : (expandedGroup === groupName)
+                  return (
+                    <div
+                      key={groupName}
+                      className={`compendium-group-section ${isExpanded ? 'is-expanded' : 'is-collapsed'}`}
+                    >
+                      <button
+                        type="button"
+                        className={`compendium-group-header-btn ${isExpanded ? 'active' : ''}`}
+                        onClick={() => toggleGroup(groupName)}
+                        title={isExpanded ? 'Recolher grupo' : 'Expandir grupo'}
+                      >
+                        <span className="compendium-group-star">{isExpanded ? '▾' : '▸'}</span>
+                        <span className="compendium-group-title">{groupName.toUpperCase()}</span>
+                        <span className="compendium-group-count">{groupItems.length}</span>
+                      </button>
 
-                    <div className="compendium-group-items">
-                      {groupItems.map(item => {
-                        const isSelected = item.id === selectedId
-                        return (
-                          <button
-                            key={item.id}
-                            type="button"
-                            className={`compendium-item-btn ${isSelected ? 'active' : ''}`}
-                            onClick={() => setSelectedId(item.id)}
-                          >
-                            <div className="compendium-item-thumb-wrapper">
-                              {item.thumbnailUrl || item.imageUrl ? (
-                                <img
-                                   src={item.thumbnailUrl || item.imageUrl}
-                                  alt=""
-                                  className="compendium-item-thumb"
-                                />
-                              ) : (
-                                <span className="compendium-item-thumb-placeholder">
-                                  {currentCategoryObj.icon}
-                                </span>
-                              )}
-                            </div>
-                            <span className="compendium-item-name">{item.name}</span>
-                          </button>
-                        )
-                      })}
+                      {isExpanded && (
+                        <div className="compendium-group-items">
+                          {groupItems.map(item => {
+                            const isSelected = item.id === selectedId
+                            return (
+                              <button
+                                key={item.id}
+                                type="button"
+                                className={`compendium-item-btn ${isSelected ? 'active' : ''}`}
+                                onClick={() => {
+                                  setSelectedId(item.id)
+                                  setExpandedGroup(groupName)
+                                }}
+                              >
+                                <div className="compendium-item-thumb-wrapper">
+                                  {item.thumbnailUrl || item.imageUrl ? (
+                                    <img
+                                      src={item.thumbnailUrl || item.imageUrl}
+                                      alt=""
+                                      className="compendium-item-thumb"
+                                    />
+                                  ) : (
+                                    <span className="compendium-item-thumb-placeholder">
+                                      {currentCategoryObj.icon}
+                                    </span>
+                                  )}
+                                </div>
+                                <span className="compendium-item-name">{item.name}</span>
+                              </button>
+                            )
+                          })}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))
+                  )
+                })
               )}
             </div>
           </aside>
