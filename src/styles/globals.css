@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Almendra:ital,wght@0,400;0,700;1,400;1,700&family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700;900&family=Fondamento:ital@0;1&family=MedievalSharp&family=Inter:wght@300;400;500;600;700&display=swap');
+
 /* ==============================================
    O BOSQUE DE ALMA KOSKOVIC — ESTILOS GÓTICOS
    Paleta: Roxo Profundo, Ametista, Ardósia e Prata
@@ -2494,8 +2496,8 @@ html, body, #root {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  font-family: 'Fondamento', 'Almendra', 'Cinzel', serif;
-  font-size: 1.02rem;
+  font-family: 'Almendra', 'Cinzel Decorative', 'Fondamento', 'Cinzel', serif;
+  font-size: 1.05rem;
   font-weight: 700;
   color: #f8f6ff;
   letter-spacing: 0.025em;
