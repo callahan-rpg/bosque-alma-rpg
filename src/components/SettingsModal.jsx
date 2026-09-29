@@ -136,7 +136,7 @@ export default function SettingsModal({ onClose }) {
           <div className="settings-group-header">
             <div>
               <div className="settings-group-title">🌧️ Efeitos Climáticos em Tela</div>
-              <div className="settings-group-subtitle">Neve, chuva, névoa e tempestades arcanas</div>
+              <div className="settings-group-subtitle">Neve, chuva, névoa, tempestades e fagulhas de calor</div>
             </div>
             <input
               type="checkbox"

@@ -46,6 +46,8 @@ export const WEATHER_CONDITIONS = {
   storm:       { icon: '⛈️', label: 'Tempestade Arcana',   temp: 10 },
   foggy:       { icon: '🌫️', label: 'Névoa Espectral',     temp: 10 },
   snowy:       { icon: '❄️', label: 'Neve Encantada',      temp: -2 },
+  lava:        { icon: '🌋', label: 'Fagulhas & Lava Ardente', temp: 38 },
+  embers:      { icon: '🔥', label: 'Calor Infernal & Brasas', temp: 35 },
   clear_night: { icon: '🌙', label: 'Noite Estrelada',     temp: 14 },
   magic:       { icon: '✨', label: 'Aura Mágica',         temp: 20 },
 }

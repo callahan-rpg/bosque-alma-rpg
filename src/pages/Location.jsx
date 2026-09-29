@@ -72,6 +72,7 @@ export default function Location() {
         minTemp={loc.minTemp}
         maxTemp={loc.maxTemp}
         temperature={loc.temperature}
+        windSpeed={loc.windSpeed || loc.wind}
       />
 
       {/* Imagem de Fundo e Overlay */}
@@ -103,6 +104,7 @@ export default function Location() {
           {/* Chat Central */}
           <div className="chat-container">
             <LocationChat
+              key={currentSlug}
               slug={currentSlug}
               locationName={loc.name}
             />

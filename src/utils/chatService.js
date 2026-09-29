@@ -135,22 +135,37 @@ export async function clearUserInboxItem(myUid, senderUid) {
 export function subscribeZoneChat(zoneSlug, callback, sessionStartTime, maxCount = 50) {
   if (!rtdb || !zoneSlug) return () => {}
 
-  const startTime = typeof sessionStartTime === 'number' ? sessionStartTime : getEstimatedServerTime()
+  let isFirstSnapshot = true
+  let sessionCutoff = typeof sessionStartTime === 'number' && sessionStartTime > 0
+    ? sessionStartTime
+    : getEstimatedServerTime()
+
   const messagesRef = query(ref(rtdb, `chat/zones/${zoneSlug}/messages`), limitToLast(maxCount))
 
   const handleValue = (snapshot) => {
     if (!snapshot.exists()) {
+      isFirstSnapshot = false
       callback([])
       return
     }
 
     const raw = snapshot.val()
-    const list = Object.entries(raw)
-      .map(([id, val]) => ({ id, ...val }))
+    const entries = Object.entries(raw).map(([id, val]) => ({ id, ...val }))
+
+    if (isFirstSnapshot) {
+      isFirstSnapshot = false
+      // No primeiro carregamento, garante que o corte seja pelo menos o timestamp mais recente existente
+      // para evitar que mensagens antigas vazem devido a diferença de relógio local vs servidor
+      const maxExistingTs = entries.reduce((max, m) => Math.max(max, typeof m.timestamp === 'number' ? m.timestamp : 0), 0)
+      if (maxExistingTs > sessionCutoff) {
+        sessionCutoff = maxExistingTs
+      }
+    }
+
+    const list = entries
       .filter((msg) => {
-        // Exibe apenas mensagens enviadas a partir do momento em que a página foi aberta/carregada
-        const ts = msg.timestamp || 0
-        return ts >= startTime - 1000
+        const ts = typeof msg.timestamp === 'number' ? msg.timestamp : 0
+        return ts > sessionCutoff
       })
       .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0))
 
@@ -168,24 +183,35 @@ export function subscribePrivateChat(uid1, uid2, callback, sessionStartTime, max
   const roomId = getPrivateRoomId(uid1, uid2)
   if (!rtdb || !roomId) return () => {}
 
-  const startTime = typeof sessionStartTime === 'number' ? sessionStartTime : getEstimatedServerTime()
+  let isFirstSnapshot = true
+  let sessionCutoff = typeof sessionStartTime === 'number' && sessionStartTime > 0
+    ? sessionStartTime
+    : getEstimatedServerTime()
+
   const messagesRef = query(ref(rtdb, `chat/private/${roomId}/messages`), limitToLast(maxCount))
 
   const handleValue = (snapshot) => {
     if (!snapshot.exists()) {
+      isFirstSnapshot = false
       callback([])
       return
     }
 
     const raw = snapshot.val()
-    const list = Object.entries(raw)
-      .map(([id, val]) => ({
-        id,
-        ...val
-      }))
+    const entries = Object.entries(raw).map(([id, val]) => ({ id, ...val }))
+
+    if (isFirstSnapshot) {
+      isFirstSnapshot = false
+      const maxExistingTs = entries.reduce((max, m) => Math.max(max, typeof m.timestamp === 'number' ? m.timestamp : 0), 0)
+      if (maxExistingTs > sessionCutoff) {
+        sessionCutoff = maxExistingTs
+      }
+    }
+
+    const list = entries
       .filter((msg) => {
-        const ts = typeof msg.timestamp === 'number' ? msg.timestamp : getEstimatedServerTime()
-        return ts >= (startTime - 5000)
+        const ts = typeof msg.timestamp === 'number' ? msg.timestamp : 0
+        return ts > sessionCutoff
       })
       .sort((a, b) => {
         const timeA = typeof a?.timestamp === 'number' ? a.timestamp : 0

@@ -13,7 +13,7 @@ import { calculateGameTime, resolveLocationWeather, calculateLocationTemperature
  *   maxTemp {number} - Temperatura máxima em °C (tarde)
  *   temperature {number} - Temperatura base/legada
  */
-export default function WeatherWidget({ weatherCondition, minTemp, maxTemp, temperature }) {
+export default function WeatherWidget({ weatherCondition, minTemp, maxTemp, temperature, windSpeed }) {
   const [gameConfig, setGameConfig] = useState(null)
   const [tick, setTick] = useState(0)
 
@@ -37,10 +37,17 @@ export default function WeatherWidget({ weatherCondition, minTemp, maxTemp, temp
   const weather  = resolveLocationWeather(weatherCondition, gameTime)
   const tempCalc = calculateLocationTemperature({ minTemp, maxTemp, temperature }, weatherCondition, gameTime)
 
+  const hasWind = windSpeed !== undefined && windSpeed !== null && String(windSpeed).trim() !== ''
+  const formattedWind = hasWind
+    ? (typeof windSpeed === 'number' || (!isNaN(Number(windSpeed)) && !String(windSpeed).includes('km'))
+        ? `${windSpeed} km/h`
+        : String(windSpeed).trim())
+    : null
+
   return (
     <div
       className="hud-weather-widget"
-      title={`${weather.label} | ${tempCalc.string} (Mín: ${tempCalc.min}°C / Máx: ${tempCalc.max}°C) | ${gameTime.timeString} | ${gameTime.season.name} | ${gameTime.moonPhase.name}`}
+      title={`${weather.label} | ${tempCalc.string} (Mín: ${tempCalc.min}°C / Máx: ${tempCalc.max}°C)${formattedWind ? ` | Vento: ${formattedWind}` : ''} | ${gameTime.timeString} | ${gameTime.season.name} | ${gameTime.moonPhase.name}`}
     >
       {/* Clima */}
       <span className="hw-weather-icon">{weather.icon}</span>
@@ -52,6 +59,16 @@ export default function WeatherWidget({ weatherCondition, minTemp, maxTemp, temp
       >
         {tempCalc.string}
       </span>
+
+      {/* Indicador de Velocidade do Vento (exibido apenas onde configurado) */}
+      {formattedWind && (
+        <>
+          <span className="hw-sep">|</span>
+          <span className="hw-wind" title={`Velocidade do Vento: ${formattedWind}`}>
+            💨 {formattedWind}
+          </span>
+        </>
+      )}
 
       {/* Separador */}
       <span className="hw-sep">|</span>

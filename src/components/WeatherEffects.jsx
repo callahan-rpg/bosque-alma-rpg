@@ -106,23 +106,123 @@ export default function WeatherEffects({ condition = 'none', enabled = true }) {
       }
     }
 
-    // Relâmpagos em tempestade arcana
-    let lightningOpacity = 0
-    let nextLightningTime = Date.now() + Math.random() * 6000 + 4000
+    // 🌋 FAGULHAS DE LAVA / BRASAS DE CALOR
+    if (condition === 'lava' || condition === 'embers') {
+      const sparkCount = 140
+      for (let i = 0; i < sparkCount; i++) {
+        const isAsh = Math.random() < 0.22
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          radius: isAsh ? Math.random() * 2 + 0.8 : Math.random() * 2.8 + 0.8,
+          speedY: Math.random() * 1.8 + 0.7,
+          driftX: (Math.random() - 0.5) * 0.9,
+          swing: Math.random() * Math.PI * 2,
+          swingSpeed: Math.random() * 0.04 + 0.015,
+          opacity: Math.random() * 0.7 + 0.3,
+          color: isAsh
+            ? 'rgba(100, 90, 85,'
+            : Math.random() < 0.35
+              ? 'rgba(255, 200, 60,' // Dourado incandescente
+              : Math.random() < 0.7
+                ? 'rgba(255, 95, 20,' // Laranja ardente
+                : 'rgba(255, 35, 10,', // Vermelho brasa
+          glow: !isAsh && Math.random() < 0.6
+        })
+      }
+    }
+
+    // ⚡ Procedural Lightning Generator
+    const createLightningBolt = (w, h) => {
+      const startX = Math.random() * (w * 0.7) + (w * 0.15)
+      const endX = startX + (Math.random() - 0.5) * (w * 0.35)
+      const segments = []
+      const branches = []
+
+      let currX = startX
+      let currY = 0
+      const totalSteps = Math.floor(Math.random() * 8 + 10)
+      const stepY = h / totalSteps
+
+      for (let i = 0; i <= totalSteps; i++) {
+        const nextX = i === totalSteps ? endX : currX + (Math.random() - 0.5) * 65
+        const nextY = Math.min(h, currY + stepY + (Math.random() - 0.5) * 15)
+        segments.push({ x1: currX, y1: currY, x2: nextX, y2: nextY })
+
+        // 30% de chance de criar bifurcação / galho elétrico
+        if (i > 1 && i < totalSteps - 2 && Math.random() < 0.35) {
+          let bX = currX
+          let bY = currY
+          const branchDir = Math.random() < 0.5 ? -1 : 1
+          const branchSteps = Math.floor(Math.random() * 4 + 3)
+          for (let b = 0; b < branchSteps; b++) {
+            const nBX = bX + (Math.random() * 35 + 10) * branchDir
+            const nBY = bY + (Math.random() * 25 + 12)
+            branches.push({ x1: bX, y1: bY, x2: nBX, y2: nBY })
+            bX = nBX
+            bY = nBY
+          }
+        }
+
+        currX = nextX
+        currY = nextY
+      }
+
+      return { segments, branches, alpha: 1.0 }
+    }
+
+    // Relâmpagos e Raios
+    let activeBolt = null
+    let lightningFlash = 0
+    let nextLightningTime = Date.now() + Math.random() * 3000 + 1500
 
     const render = () => {
       ctx.clearRect(0, 0, width, height)
 
-      if (condition === 'storm') {
+      // ⚡ Efeito de Raios (Tempestade Arcana e Tempestade de Raios Seca)
+      if (condition === 'storm' || condition === 'lightning') {
         const now = Date.now()
         if (now > nextLightningTime) {
-          lightningOpacity = 0.8
-          nextLightningTime = now + Math.random() * 8000 + 5000
+          lightningFlash = 0.8
+          activeBolt = createLightningBolt(width, height)
+          // Intervalo entre raios: de 3 a 7 segundos
+          nextLightningTime = now + Math.random() * 4500 + 2500
         }
-        if (lightningOpacity > 0) {
-          ctx.fillStyle = `rgba(230, 245, 255, ${lightningOpacity})`
+
+        // Clarão do ambiente
+        if (lightningFlash > 0) {
+          ctx.fillStyle = `rgba(225, 235, 255, ${lightningFlash * 0.35})`
           ctx.fillRect(0, 0, width, height)
-          lightningOpacity -= 0.04
+          lightningFlash -= 0.06
+        }
+
+        // Desenho dos raios elétricos no céu
+        if (activeBolt && activeBolt.alpha > 0) {
+          ctx.save()
+          // Halo / Brilho Externo violeta-elétrico
+          ctx.shadowColor = 'rgba(190, 140, 255, 0.95)'
+          ctx.shadowBlur = 18
+          ctx.strokeStyle = `rgba(168, 85, 247, ${activeBolt.alpha * 0.85})`
+          ctx.lineWidth = 4.5
+          ctx.beginPath()
+          activeBolt.segments.forEach(s => {
+            ctx.moveTo(s.x1, s.y1)
+            ctx.lineTo(s.x2, s.y2)
+          })
+          activeBolt.branches.forEach(b => {
+            ctx.moveTo(b.x1, b.y1)
+            ctx.lineTo(b.x2, b.y2)
+          })
+          ctx.stroke()
+
+          // Núcleo branco incandescente do raio
+          ctx.strokeStyle = `rgba(255, 255, 255, ${activeBolt.alpha})`
+          ctx.lineWidth = 1.8
+          ctx.stroke()
+          ctx.restore()
+
+          activeBolt.alpha -= 0.07
+          if (activeBolt.alpha <= 0) activeBolt = null
         }
       }
 
@@ -190,6 +290,34 @@ export default function WeatherEffects({ condition = 'none', enabled = true }) {
         }
       }
 
+      if (condition === 'lava' || condition === 'embers') {
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i]
+          ctx.beginPath()
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
+          ctx.fillStyle = `${p.color} ${p.opacity})`
+          if (p.glow) {
+            ctx.shadowColor = 'rgba(255, 120, 30, 0.85)'
+            ctx.shadowBlur = 9
+          } else {
+            ctx.shadowBlur = 0
+          }
+          ctx.fill()
+          ctx.shadowBlur = 0
+
+          p.y -= p.speedY
+          p.x += p.driftX + Math.sin(p.swing) * 0.7
+          p.swing += p.swingSpeed
+
+          if (p.y < -12) {
+            p.y = height + 12
+            p.x = Math.random() * width
+          }
+          if (p.x > width + 12) p.x = -12
+          if (p.x < -12) p.x = width + 12
+        }
+      }
+
       animationFrameId = requestAnimationFrame(render)
     }
 
@@ -201,7 +329,7 @@ export default function WeatherEffects({ condition = 'none', enabled = true }) {
     }
   }, [condition, enabled, fxEnabled])
 
-  if (!enabled || !fxEnabled || !['rainy', 'storm', 'foggy', 'snowy', 'cloudy'].includes(condition)) {
+  if (!enabled || !fxEnabled || !['rainy', 'storm', 'foggy', 'snowy', 'cloudy', 'lava', 'embers', 'lightning'].includes(condition)) {
     return null
   }
 

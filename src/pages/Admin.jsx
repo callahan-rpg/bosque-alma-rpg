@@ -18,7 +18,9 @@ const CLIMATE_OPTIONS = [
   { value: 'snowy', label: 'Nevando (Véu da Geada)', icon: '❄️' },
   { value: 'foggy', label: 'Névoa / Neblina Rasteira (Brejo)', icon: '🌫️' },
   { value: 'rainy', label: 'Chovendo', icon: '🌧️' },
-  { value: 'storm', label: 'Tempestade Arcana com Relâmpagos', icon: '⛈️' },
+  { value: 'storm', label: 'Tempestade Arcana com Chuva e Relâmpagos', icon: '⛈️' },
+  { value: 'lightning', label: 'Tempestade de Raios (Apenas Raios / Sem Chuva)', icon: '⚡' },
+  { value: 'lava', label: 'Fagulhas & Lava Ardente (Calor Extremo)', icon: '🌋' },
 ]
 
 const COMPENDIUM_CATEGORIES = [
@@ -80,6 +82,7 @@ export default function Admin() {
   const [formClimate, setFormClimate] = useState('none')
   const [formMinTemp, setFormMinTemp] = useState('')
   const [formMaxTemp, setFormMaxTemp] = useState('')
+  const [formWindSpeed, setFormWindSpeed] = useState('')
   const [formNavButtons, setFormNavButtons] = useState([])
 
   // ==========================================
@@ -194,6 +197,7 @@ export default function Admin() {
     setFormClimate('none')
     setFormMinTemp('')
     setFormMaxTemp('')
+    setFormWindSpeed('')
     setFormNavButtons([])
   }
 
@@ -215,6 +219,7 @@ export default function Admin() {
         ? loc.maxTemp
         : (loc.temperature !== undefined && loc.temperature !== null ? Number(loc.temperature) + 4 : '')
     )
+    setFormWindSpeed(loc.windSpeed || loc.wind || '')
     setFormNavButtons(loc.navigationButtons || [])
   }
 
@@ -270,6 +275,7 @@ export default function Admin() {
         temperature: (formMinTemp !== '' && formMaxTemp !== '')
           ? Math.round((Number(formMinTemp) + Number(formMaxTemp)) / 2)
           : (formMinTemp !== '' ? Number(formMinTemp) : (formMaxTemp !== '' ? Number(formMaxTemp) : null)),
+        windSpeed: formWindSpeed.trim() || null,
         navigationButtons: formNavButtons.filter(b => b.targetSlug.trim()),
         updatedAt: Date.now()
       }
@@ -960,6 +966,17 @@ export default function Admin() {
                       step="1"
                     />
                     <small>Pico de calor à tarde</small>
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Velocidade do Vento (Opcional):</label>
+                    <input
+                      type="text"
+                      value={formWindSpeed}
+                      onChange={(e) => setFormWindSpeed(e.target.value)}
+                      placeholder="ex: 18 km/h ou 25 km/h"
+                    />
+                    <small>Exibido apenas em locais com vento</small>
                   </div>
                 </div>
 
