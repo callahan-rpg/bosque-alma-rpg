@@ -114,13 +114,6 @@ export default function ChatSidebar({
     await updateMood(currentUserId, null)
   }
 
-  const hasUnreadVisitors = useMemo(() => {
-    return visitors.some(v => v.uid && unreadDms[v.uid])
-  }, [visitors, unreadDms])
-
-  const hasUnreadFriends = useMemo(() => {
-    return friendsWithStatus.some(f => f.uid && unreadDms[f.uid])
-  }, [friendsWithStatus, unreadDms])
 
   return (
     <div className="chat-sidebar">
@@ -260,17 +253,16 @@ export default function ChatSidebar({
               const isMe = u.uid === currentUserId
               const isFriend = friendsList.some(f => (f.friendUid || f.id) === u.uid)
               const isNpc = u.role === 'npc' || u.isNpc || u.uid?.startsWith('npc_')
-              const isUnreadDm = !isMe && !!unreadDms[u.uid]
               const presenceData = onlineMap.get(u.uid)
               const moodId = isMe ? myMood : (presenceData?.mood || null)
               const moodDisplay = getMoodDisplay(moodId)
               const showAwayIcon = isMe ? isAway : (presenceData?.status === 'away')
 
               return (
-                <div key={u.uid} className={`chat-user-item-wrapper ${isUnreadDm ? 'has-unread-dm' : ''}`}>
+                <div key={u.uid} className="chat-user-item-wrapper">
                   <button
                     type="button"
-                    className={`chat-user-item ${isMe ? 'is-me' : ''} ${isFriend ? 'is-friend' : ''} ${isNpc ? 'is-npc-visitor' : ''} ${isUnreadDm ? 'unread-dm-highlight' : ''}`}
+                    className={`chat-user-item ${isMe ? 'is-me' : ''} ${isFriend ? 'is-friend' : ''} ${isNpc ? 'is-npc-visitor' : ''}`}
                     onClick={() => {
                       if (isMe) {
                         setShowMoodPicker(p => !p)
@@ -293,15 +285,9 @@ export default function ChatSidebar({
                           <span className="chat-my-mood-badge">{moodDisplay}</span>
                         )}
                       </span>
-                      {isUnreadDm && (
-                        <span className="chat-user-unread-badge" title="Nova mensagem privada!">
-                          <span className="chat-user-unread-dot" />
-                          <span>Nova mensagem</span>
-                        </span>
-                      )}
                     </div>
                   </button>
-                  {!isMe && moodDisplay && !isUnreadDm && (
+                  {!isMe && moodDisplay && (
                     <span className="chat-mood-tooltip">
                       {u.characterName || 'Viajante'} está {MOODS.find(x => x.id === moodId)?.label?.toLowerCase()}
                       {' '}<span className="chat-mood-tooltip-emoji">{MOODS.find(x => x.id === moodId)?.emoji}</span>
@@ -319,13 +305,12 @@ export default function ChatSidebar({
           ) : (
             friendsWithStatus.map(friend => {
               const friendMoodDisplay = getMoodDisplay(friend.mood)
-              const isUnreadDm = !!unreadDms[friend.uid]
 
               return (
-                <div key={friend.uid} className={`chat-user-item-wrapper ${isUnreadDm ? 'has-unread-dm' : ''}`}>
+                <div key={friend.uid} className="chat-user-item-wrapper">
                   <button
                     type="button"
-                    className={`chat-user-item friend-item ${friend.isOnline ? 'online' : 'offline'} ${isUnreadDm ? 'unread-dm-highlight' : ''}`}
+                    className={`chat-user-item friend-item ${friend.isOnline ? 'online' : 'offline'}`}
                     onClick={() => onSelectUser(friend)}
                     title={`Clique para interagir com ${friend.characterName}`}
                   >
@@ -335,19 +320,12 @@ export default function ChatSidebar({
                         {friend.status === 'away' && <span className="chat-away-icon" title="Ausente">🌙</span>}
                         {friend.characterName}
                       </span>
-                      {isUnreadDm ? (
-                        <span className="chat-user-unread-badge" title="Nova mensagem privada!">
-                          <span className="chat-user-unread-dot" />
-                          <span>Nova mensagem</span>
-                        </span>
-                      ) : (
-                        <span className="chat-user-loc-sub">
-                          {friend.isOnline ? `📍 ${friend.locationName}` : '💤 Offline'}
-                        </span>
-                      )}
+                      <span className="chat-user-loc-sub">
+                        {friend.isOnline ? `📍 ${friend.locationName}` : '💤 Offline'}
+                      </span>
                     </div>
                   </button>
-                  {friend.mood && !isUnreadDm && (
+                  {friend.mood && (
                     <span className="chat-mood-tooltip">
                       {friend.characterName} está {MOODS.find(x => x.id === friend.mood)?.label?.toLowerCase()}
                       {' '}<span className="chat-mood-tooltip-emoji">{MOODS.find(x => x.id === friend.mood)?.emoji}</span>
@@ -364,21 +342,19 @@ export default function ChatSidebar({
       <div className="chat-sidebar-tabs">
         <button
           type="button"
-          className={`chat-sidebar-tab-btn ${activeTab === 'visitors' ? 'active' : ''} ${hasUnreadVisitors ? 'has-unread' : ''}`}
+          className={`chat-sidebar-tab-btn ${activeTab === 'visitors' ? 'active' : ''}`}
           onClick={() => setActiveTab('visitors')}
         >
           {isPrivateChat ? 'Privado (2)' : 'Local'}
-          {hasUnreadVisitors && <span className="chat-sidebar-tab-unread-dot" title="Mensagem não lida!" />}
         </button>
 
         <button
           type="button"
-          className={`chat-sidebar-tab-btn ${activeTab === 'friends' ? 'active' : ''} ${hasUnreadFriends ? 'has-unread' : ''}`}
+          className={`chat-sidebar-tab-btn ${activeTab === 'friends' ? 'active' : ''}`}
           onClick={() => setActiveTab('friends')}
         >
           Amigos
           {friendRequests.length > 0 && <span className="chat-tab-badge">{friendRequests.length}</span>}
-          {hasUnreadFriends && <span className="chat-sidebar-tab-unread-dot" title="Mensagem não lida!" />}
         </button>
       </div>
     </div>
