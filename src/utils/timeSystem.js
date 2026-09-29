@@ -165,3 +165,70 @@ export function resolveLocationWeather(weatherCondition, gameTime) {
 
   return WEATHER_CONDITIONS[condition] || WEATHER_CONDITIONS['none']
 }
+
+/**
+ * Calcula a temperatura dinâmica em graus Celsius (°C) de acordo com o horário in-game,
+ * variando suavemente entre o mínimo (madrugada/noite) e o máximo (meio da tarde).
+ *
+ * @param {Object} locationParams - { minTemp, maxTemp, temperature }
+ * @param {string} weatherCondition - Condição de clima
+ * @param {Object} gameTime - Horário e período calculados
+ * @returns {Object} { current, min, max, string }
+ */
+export function calculateLocationTemperature(locationParams, weatherCondition, gameTime) {
+  const weather = resolveLocationWeather(weatherCondition, gameTime)
+  const baseWeatherTemp = weather?.temp !== undefined ? weather.temp : 18
+
+  let min = locationParams?.minTemp ?? locationParams?.temperatureMin
+  let max = locationParams?.maxTemp ?? locationParams?.temperatureMax
+
+  // Se o mestre configurou apenas a temperatura base legada/única:
+  if ((min === undefined || min === null || min === '') && (max === undefined || max === null || max === '')) {
+    if (locationParams?.temperature !== undefined && locationParams?.temperature !== null && locationParams?.temperature !== '') {
+      const base = Number(locationParams.temperature)
+      if (!isNaN(base)) {
+        min = base - 4
+        max = base + 4
+      }
+    }
+  }
+
+  // Se apenas min foi definido:
+  if (min !== undefined && min !== null && min !== '' && (max === undefined || max === null || max === '')) {
+    max = Number(min) + 6
+  }
+  // Se apenas max foi definido:
+  if (max !== undefined && max !== null && max !== '' && (min === undefined || min === null || min === '')) {
+    min = Number(max) - 6
+  }
+
+  const finalMin = (min !== undefined && min !== null && min !== '' && !isNaN(Number(min)))
+    ? Number(min)
+    : (baseWeatherTemp - 4)
+
+  const finalMax = (max !== undefined && max !== null && max !== '' && !isNaN(Number(max)))
+    ? Number(max)
+    : (baseWeatherTemp + 4)
+
+  const actualMin = Math.min(finalMin, finalMax)
+  const actualMax = Math.max(finalMin, finalMax)
+
+  const hour = gameTime?.hour ?? 12
+  const minute = gameTime?.minute ?? 0
+  const hourFrac = hour + (minute / 60)
+
+  // Curva diurna senoidal contínua:
+  // Ponto de menor temperatura na madrugada (~03:00 - 05:00)
+  // Ponto de maior temperatura no meio da tarde (~15:00)
+  const factor = Math.sin(((hourFrac - 9) / 24) * 2 * Math.PI) // oscila entre -1 e +1
+  const avg = (actualMin + actualMax) / 2
+  const amp = (actualMax - actualMin) / 2
+  const currentTemp = Math.round(avg + amp * factor)
+
+  return {
+    current: currentTemp,
+    min: actualMin,
+    max: actualMax,
+    string: `${currentTemp}°C`
+  }
+}

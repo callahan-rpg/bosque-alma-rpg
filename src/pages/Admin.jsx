@@ -78,7 +78,8 @@ export default function Admin() {
   const [formBg, setFormBg] = useState('')
   const [formSound, setFormSound] = useState('')
   const [formClimate, setFormClimate] = useState('none')
-  const [formTemp, setFormTemp] = useState('')
+  const [formMinTemp, setFormMinTemp] = useState('')
+  const [formMaxTemp, setFormMaxTemp] = useState('')
   const [formNavButtons, setFormNavButtons] = useState([])
 
   // ==========================================
@@ -191,7 +192,8 @@ export default function Admin() {
     setFormBg('')
     setFormSound('')
     setFormClimate('none')
-    setFormTemp('')
+    setFormMinTemp('')
+    setFormMaxTemp('')
     setFormNavButtons([])
   }
 
@@ -203,7 +205,16 @@ export default function Admin() {
     setFormBg(loc.backgroundImage || '')
     setFormSound(loc.locationSound || '')
     setFormClimate(loc.weatherCondition || 'none')
-    setFormTemp(loc.temperature !== undefined && loc.temperature !== null ? loc.temperature : '')
+    setFormMinTemp(
+      loc.minTemp !== undefined && loc.minTemp !== null
+        ? loc.minTemp
+        : (loc.temperature !== undefined && loc.temperature !== null ? Number(loc.temperature) - 4 : '')
+    )
+    setFormMaxTemp(
+      loc.maxTemp !== undefined && loc.maxTemp !== null
+        ? loc.maxTemp
+        : (loc.temperature !== undefined && loc.temperature !== null ? Number(loc.temperature) + 4 : '')
+    )
     setFormNavButtons(loc.navigationButtons || [])
   }
 
@@ -254,7 +265,11 @@ export default function Admin() {
         backgroundImage: formBg.trim(),
         locationSound: formSound.trim(),
         weatherCondition: formClimate,
-        temperature: formTemp !== '' ? Number(formTemp) : null,
+        minTemp: formMinTemp !== '' ? Number(formMinTemp) : null,
+        maxTemp: formMaxTemp !== '' ? Number(formMaxTemp) : null,
+        temperature: (formMinTemp !== '' && formMaxTemp !== '')
+          ? Math.round((Number(formMinTemp) + Number(formMaxTemp)) / 2)
+          : (formMinTemp !== '' ? Number(formMinTemp) : (formMaxTemp !== '' ? Number(formMaxTemp) : null)),
         navigationButtons: formNavButtons.filter(b => b.targetSlug.trim()),
         updatedAt: Date.now()
       }
@@ -924,15 +939,27 @@ export default function Admin() {
                   </div>
 
                   <div className="admin-form-group">
-                    <label>Temperatura (°C):</label>
+                    <label>Temp. Mínima (°C) ❄️:</label>
                     <input
                       type="number"
-                      value={formTemp}
-                      onChange={(e) => setFormTemp(e.target.value)}
-                      placeholder="ex: 18, 5, -2"
+                      value={formMinTemp}
+                      onChange={(e) => setFormMinTemp(e.target.value)}
+                      placeholder="ex: 8 (Madrugada)"
                       step="1"
                     />
-                    <small>Exibida junto ao clima no HUD</small>
+                    <small>Frio da madrugada / noite</small>
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Temp. Máxima (°C) ☀️:</label>
+                    <input
+                      type="number"
+                      value={formMaxTemp}
+                      onChange={(e) => setFormMaxTemp(e.target.value)}
+                      placeholder="ex: 22 (Meio da Tarde)"
+                      step="1"
+                    />
+                    <small>Pico de calor à tarde</small>
                   </div>
                 </div>
 

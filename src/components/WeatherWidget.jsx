@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { doc, onSnapshot } from 'firebase/firestore'
 import { db } from '../firebase/config'
-import { calculateGameTime, resolveLocationWeather } from '../utils/timeSystem'
+import { calculateGameTime, resolveLocationWeather, calculateLocationTemperature } from '../utils/timeSystem'
 
 /**
  * Widget de Clima, Horário e Fase da Lua para o HUD do Bosque de Alma RPG.
@@ -9,8 +9,11 @@ import { calculateGameTime, resolveLocationWeather } from '../utils/timeSystem'
  *
  * Props:
  *   weatherCondition {string} - Condição de clima da localidade atual (ex: 'rainy', 'foggy').
+ *   minTemp {number} - Temperatura mínima em °C (madrugada/noite)
+ *   maxTemp {number} - Temperatura máxima em °C (tarde)
+ *   temperature {number} - Temperatura base/legada
  */
-export default function WeatherWidget({ weatherCondition, temperature }) {
+export default function WeatherWidget({ weatherCondition, minTemp, maxTemp, temperature }) {
   const [gameConfig, setGameConfig] = useState(null)
   const [tick, setTick] = useState(0)
 
@@ -24,7 +27,7 @@ export default function WeatherWidget({ weatherCondition, temperature }) {
     return () => unsub()
   }, [])
 
-  // Tick para atualização do relógio em tempo real (modo dinâmico)
+  // Tick para atualização do relógio e temperatura em tempo real (modo dinâmico)
   useEffect(() => {
     const id = setInterval(() => setTick(t => t + 1), 1000)
     return () => clearInterval(id)
@@ -32,26 +35,23 @@ export default function WeatherWidget({ weatherCondition, temperature }) {
 
   const gameTime = calculateGameTime(gameConfig)
   const weather  = resolveLocationWeather(weatherCondition, gameTime)
-
-  const hasTemp = temperature !== undefined && temperature !== null && temperature !== ''
-  const formattedTemp = hasTemp
-    ? (typeof temperature === 'number' || !isNaN(Number(temperature)) ? `${temperature}°C` : String(temperature))
-    : null
+  const tempCalc = calculateLocationTemperature({ minTemp, maxTemp, temperature }, weatherCondition, gameTime)
 
   return (
     <div
       className="hud-weather-widget"
-      title={`${weather.label}${formattedTemp ? ` (${formattedTemp})` : ''} | ${gameTime.timeString} | ${gameTime.season.name} | ${gameTime.moonPhase.name}`}
+      title={`${weather.label} | ${tempCalc.string} (Mín: ${tempCalc.min}°C / Máx: ${tempCalc.max}°C) | ${gameTime.timeString} | ${gameTime.season.name} | ${gameTime.moonPhase.name}`}
     >
       {/* Clima */}
       <span className="hw-weather-icon">{weather.icon}</span>
 
-      {/* Temperatura em Graus Celsius */}
-      {formattedTemp && (
-        <span className="hw-temp" title={`Temperatura do Local: ${formattedTemp}`}>
-          {formattedTemp}
-        </span>
-      )}
+      {/* Temperatura dinâmica em Graus Celsius */}
+      <span
+        className="hw-temp"
+        title={`Temperatura Atual: ${tempCalc.string} (Varia de ${tempCalc.min}°C na madrugada até ${tempCalc.max}°C à tarde)`}
+      >
+        {tempCalc.string}
+      </span>
 
       {/* Separador */}
       <span className="hw-sep">|</span>

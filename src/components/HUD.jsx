@@ -7,7 +7,7 @@ import { useGuest } from '../contexts/GuestContext.jsx'
 import { useDefaultLocation } from '../hooks/useDefaultLocation'
 import { useNavigate } from 'react-router-dom'
 
-export default function HUD({ locationName, weatherCondition, temperature }) {
+export default function HUD({ locationName, weatherCondition, minTemp, maxTemp, temperature }) {
   const { character, updateProfile } = useGuest()
   const { defaultSlug } = useDefaultLocation()
   const navigate = useNavigate()
@@ -33,8 +33,13 @@ export default function HUD({ locationName, weatherCondition, temperature }) {
             <span className="hud-location-name">{locationName}</span>
           )}
 
-          {/* Widget de Clima, Horário e Fase da Lua */}
-          <WeatherWidget weatherCondition={weatherCondition} temperature={temperature} />
+          {/* Widget de Clima, Horário e Fase da Lua com Temperatura Dinâmica */}
+          <WeatherWidget
+            weatherCondition={weatherCondition}
+            minTemp={minTemp}
+            maxTemp={maxTemp}
+            temperature={temperature}
+          />
         </div>
 
         {/* Direita: Ícones de ação */}

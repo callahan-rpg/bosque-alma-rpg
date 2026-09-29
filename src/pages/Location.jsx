@@ -69,6 +69,8 @@ export default function Location() {
       <HUD
         locationName={loc.name}
         weatherCondition={loc.weatherCondition || 'none'}
+        minTemp={loc.minTemp}
+        maxTemp={loc.maxTemp}
         temperature={loc.temperature}
       />
 
