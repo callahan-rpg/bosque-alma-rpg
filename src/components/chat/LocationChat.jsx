@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useGuest } from '../../contexts/GuestContext.jsx'
 import ChatPresenceSync from './ChatPresenceSync.jsx'
 import ChatMessageList from './ChatMessageList.jsx'
