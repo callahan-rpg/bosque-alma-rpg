@@ -27,7 +27,9 @@ import {
 import {
   playMessageSound,
   playMentionSound,
-  playEventAlertSound
+  playEventAlertSound,
+  playUserJoinedSound,
+  playDirectMessageSound
 } from '../../utils/chatAudio'
 import {
   subscribeFriends,
@@ -88,7 +90,7 @@ export default function LocationChat({ slug, locationName }) {
   // Sistema de Som
   const [soundVolume, setSoundVolume] = useState(() => {
     const saved = localStorage.getItem('jardim_chat_sound_vol')
-    return saved !== null ? parseFloat(saved) : 0.5
+    return saved !== null ? parseFloat(saved) : 0.8
   })
   const [soundEnabled, setSoundEnabled] = useState(() => {
     const saved = localStorage.getItem('jardim_chat_sound_enabled')
@@ -130,7 +132,7 @@ export default function LocationChat({ slug, locationName }) {
 
   const handleTestSound = () => {
     if (soundEnabled) {
-      playMentionSound(soundVolume)
+      playUserJoinedSound(soundVolume)
     }
   }
 
@@ -214,14 +216,44 @@ export default function LocationChat({ slug, locationName }) {
     return () => unsub()
   }, [slug])
 
-  // 2. Escuta presença online
+  // 2. Escuta presença online e avisa com som quando alguém entra no lugar
+  const previousVisitorsRef = useRef(null)
+  const isInitialPresenceRef = useRef(true)
+
+  useEffect(() => {
+    isInitialPresenceRef.current = true
+    previousVisitorsRef.current = null
+  }, [slug])
+
   useEffect(() => {
     const unsub = subscribeOnlinePresence((list) => {
       setOnlineUsers(list)
       syncAvatarsFromPresence(list)
+
+      const visitorsInRoom = (list || []).filter(u => u && u.locationSlug === slug)
+      const currentUids = new Set(visitorsInRoom.map(u => u.uid).filter(Boolean))
+
+      if (isInitialPresenceRef.current) {
+        isInitialPresenceRef.current = false
+        previousVisitorsRef.current = currentUids
+      } else if (previousVisitorsRef.current) {
+        const myUid = userRef.current?.uid
+        const newlyJoined = visitorsInRoom.filter(u =>
+          u.uid &&
+          u.uid !== myUid &&
+          !previousVisitorsRef.current.has(u.uid) &&
+          !ignoredUidsRef.current.includes(u.uid)
+        )
+
+        if (newlyJoined.length > 0 && soundEnabledRef.current) {
+          playUserJoinedSound(soundVolumeRef.current)
+        }
+
+        previousVisitorsRef.current = currentUids
+      }
     })
     return () => unsub()
-  }, [])
+  }, [slug])
 
   // Alimenta cache de avatar
   useEffect(() => {
@@ -246,6 +278,7 @@ export default function LocationChat({ slug, locationName }) {
   }, [user?.uid])
 
   // 4. Escuta DMs
+  const lastDmMsgIdsRef = useRef({})
   useEffect(() => {
     if (!user?.uid) return
 
@@ -256,7 +289,22 @@ export default function LocationChat({ slug, locationName }) {
         dmSubscriptionsRef.current[dm.uid] = subscribePrivateChat(
           user.uid,
           dm.uid,
-          (msgs) => setDmMessagesMap(prev => ({ ...prev, [dm.uid]: msgs })),
+          (msgs) => {
+            setDmMessagesMap(prev => ({ ...prev, [dm.uid]: msgs }))
+
+            if (msgs.length > 0) {
+              const lastMsg = msgs[msgs.length - 1]
+              const lastId = lastMsg?.id || `${lastMsg?.uid}_${lastMsg?.timestamp}`
+              const prevLastId = lastDmMsgIdsRef.current[dm.uid]
+
+              if (prevLastId && lastId !== prevLastId) {
+                if (lastMsg?.uid && lastMsg.uid !== userRef.current?.uid && soundEnabledRef.current) {
+                  playDirectMessageSound(soundVolumeRef.current)
+                }
+              }
+              lastDmMsgIdsRef.current[dm.uid] = lastId
+            }
+          },
           sessionStartTimeRef.current
         )
       }
@@ -266,6 +314,7 @@ export default function LocationChat({ slug, locationName }) {
       if (!currentUids.has(uid)) {
         dmSubscriptionsRef.current[uid]?.()
         delete dmSubscriptionsRef.current[uid]
+        delete lastDmMsgIdsRef.current[uid]
       }
     })
   }, [user?.uid, openDms])
@@ -278,6 +327,7 @@ export default function LocationChat({ slug, locationName }) {
   }, [])
 
   // 4.1 Escuta Inbox
+  const prevInboxKeysRef = useRef(new Set())
   useEffect(() => {
     if (!user?.uid) return
 
@@ -287,7 +337,9 @@ export default function LocationChat({ slug, locationName }) {
         : null
       const nextUnread = {}
 
-      const entries = Object.entries(inboxData)
+      const entries = Object.entries(inboxData || {})
+      let hasNewDmAlert = false
+
       entries.forEach(([senderUid, item]) => {
         if (!senderUid || senderUid === user.uid) return
 
@@ -302,10 +354,18 @@ export default function LocationChat({ slug, locationName }) {
 
         if (senderUid !== currentActiveSender) {
           nextUnread[senderUid] = true
+          if (!prevInboxKeysRef.current.has(senderUid) && soundEnabledRef.current) {
+            hasNewDmAlert = true
+          }
         } else {
           clearUserInboxItem(user.uid, senderUid)
         }
       })
+
+      if (hasNewDmAlert) {
+        playDirectMessageSound(soundVolumeRef.current)
+      }
+      prevInboxKeysRef.current = new Set(entries.map(([s]) => s))
 
       setUnreadDms(nextUnread)
     })
