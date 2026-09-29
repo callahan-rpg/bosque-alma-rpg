@@ -2424,11 +2424,11 @@ html, body, #root {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 220px;
+  min-width: 180px;
   width: auto;
-  max-width: 320px;
-  height: 56px;
-  padding: 0 38px;
+  max-width: 260px;
+  height: 46px;
+  padding: 0 28px;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -2436,7 +2436,7 @@ html, body, #root {
   text-decoration: none;
   user-select: none;
   transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.25s ease;
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 4px rgba(109, 40, 217, 0.2));
+  filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 3px rgba(109, 40, 217, 0.2));
 }
 
 .fantasy-btn-frame {
@@ -2458,7 +2458,7 @@ html, body, #root {
 /* Brilho e Shimmer Especular no Hover */
 .fantasy-btn-shimmer {
   position: absolute;
-  inset: 6px 16px;
+  inset: 4px 12px;
   border-radius: 4px;
   pointer-events: none;
   z-index: 2;
@@ -2493,18 +2493,18 @@ html, body, #root {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   font-family: 'Fondamento', 'Almendra', 'Cinzel', serif;
-  font-size: 1.15rem;
+  font-size: 1.02rem;
   font-weight: 700;
   color: #f8f6ff;
-  letter-spacing: 0.03em;
-  line-height: 1.3;
-  padding: 2px 4px;
+  letter-spacing: 0.025em;
+  line-height: 1.25;
+  padding: 1px 2px;
   text-shadow:
-    0 0 6px #e9d5ff,
-    0 0 14px #c084fc,
-    0 0 24px #9333ea,
+    0 0 5px #e9d5ff,
+    0 0 12px #c084fc,
+    0 0 20px #9333ea,
     0 2px 4px #000000,
     0 0 1px #2e1065;
   transition: color 0.25s ease, text-shadow 0.25s ease, transform 0.2s ease;
@@ -2512,23 +2512,23 @@ html, body, #root {
 }
 
 .fantasy-rpg-btn.is-compact .fantasy-btn-text {
-  font-size: 1.02rem;
-  letter-spacing: 0.02em;
+  font-size: 0.9rem;
+  letter-spacing: 0.015em;
 }
 
 .fantasy-rpg-btn.is-very-compact .fantasy-btn-text {
-  font-size: 0.88rem;
+  font-size: 0.78rem;
   letter-spacing: 0.01em;
 }
 
 .fantasy-btn-label {
   display: inline-block;
-  line-height: 1.3;
+  line-height: 1.25;
 }
 
 .fantasy-btn-icon {
   display: inline-flex;
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   color: #e9d5ff;
 }
 

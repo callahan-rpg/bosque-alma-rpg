@@ -26,46 +26,44 @@ export default function FantasyNavButton({
       title={title || textStr}
       style={style}
     >
-      {/* Moldura de Fundo em SVG com acabamento chanfrado de alta fidelidade */}
+      {/* Moldura de Fundo em SVG com acabamento chanfrado mais fino e elegante */}
       <div className="fantasy-btn-frame">
         <svg
           className="fantasy-btn-svg"
-          viewBox="0 0 280 64"
+          viewBox="0 0 280 52"
           preserveAspectRatio="none"
           aria-hidden="true"
         >
           <defs>
-            {/* Gradientes da Moldura Metálica Externa */}
+            {/* Gradientes da Moldura Metálica Externa Mais Fina */}
             <linearGradient id="metalTopBevel" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#4a4f5d" />
-              <stop offset="40%" stopColor="#2e3340" />
-              <stop offset="100%" stopColor="#15171e" />
+              <stop offset="0%" stopColor="#3d424f" />
+              <stop offset="40%" stopColor="#252934" />
+              <stop offset="100%" stopColor="#12141a" />
             </linearGradient>
 
             <linearGradient id="metalBottomBevel" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#1a1d24" />
-              <stop offset="60%" stopColor="#2a2e3a" />
-              <stop offset="100%" stopColor="#454b59" />
+              <stop offset="0%" stopColor="#15171d" />
+              <stop offset="60%" stopColor="#232731" />
+              <stop offset="100%" stopColor="#383d49" />
             </linearGradient>
 
             {/* Gradiente da Face de Pedra Ametista Central */}
             <linearGradient id="amethystCoreGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#12051e" />
-              <stop offset="25%" stopColor="#240a3d" />
-              <stop offset="48%" stopColor="#3d1163" />
-              <stop offset="50%" stopColor="#551a8b" />
-              <stop offset="52%" stopColor="#3d1163" />
-              <stop offset="78%" stopColor="#22093a" />
-              <stop offset="100%" stopColor="#10031c" />
+              <stop offset="0%" stopColor="#150624" />
+              <stop offset="25%" stopColor="#260b40" />
+              <stop offset="50%" stopColor="#3d1163" />
+              <stop offset="75%" stopColor="#240a3c" />
+              <stop offset="100%" stopColor="#12041e" />
             </linearGradient>
 
             {/* Gradiente da Borda Roxa de Neon Interna */}
             <linearGradient id="purpleNeonEdge" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#8b5cf6" />
-              <stop offset="20%" stopColor="#c084fc" />
-              <stop offset="50%" stopColor="#e9d5ff" />
-              <stop offset="80%" stopColor="#c084fc" />
-              <stop offset="100%" stopColor="#8b5cf6" />
+              <stop offset="0%" stopColor="#7c3aed" />
+              <stop offset="25%" stopColor="#a855f7" />
+              <stop offset="50%" stopColor="#d8b4fe" />
+              <stop offset="75%" stopColor="#a855f7" />
+              <stop offset="100%" stopColor="#7c3aed" />
             </linearGradient>
 
             {/* Gradiente das Gemas Laterais em Gota/Amêndoa */}
@@ -84,126 +82,106 @@ export default function FantasyNavButton({
               <stop offset="75%" stopColor="#9333ea" />
               <stop offset="100%" stopColor="#3b0764" />
             </radialGradient>
-
-            {/* Filtro de Brilho Místico */}
-            <filter id="purpleGlowFilter" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="3" result="blur" />
-              <feComposite in="SourceGraphic" in2="blur" operator="over" />
-            </filter>
           </defs>
 
           {/* Sombra Externa do Botão */}
           <polygon
-            points="28,2 252,2 278,32 252,62 28,62 2,32"
-            fill="#060408"
-            opacity="0.9"
-            transform="translate(0, 1.5)"
+            points="24,2 256,2 278,26 256,50 24,50 2,26"
+            fill="#050307"
+            opacity="0.85"
+            transform="translate(0, 1)"
           />
 
-          {/* Base Chanfrada Metálica Externa */}
+          {/* Base Chanfrada Metálica Externa Fina */}
           <polygon
-            points="28,2 252,2 278,32 252,62 28,62 2,32"
+            points="24,2 256,2 278,26 256,50 24,50 2,26"
             fill="url(#metalTopBevel)"
-            stroke="#1c1f26"
-            strokeWidth="1.5"
+            stroke="#16181f"
+            strokeWidth="1"
           />
 
-          {/* Destaque Metálico Superior (Luz refletida) */}
+          {/* Destaque Metálico Superior Sutil */}
           <polyline
-            points="3,31 28,3 252,3 277,31"
+            points="3,25 24,2.5 256,2.5 277,25"
             fill="none"
-            stroke="#636b7d"
-            strokeWidth="1.2"
+            stroke="#4e5566"
+            strokeWidth="0.9"
             strokeLinecap="round"
           />
 
           {/* Sombra Metálica Inferior */}
           <polyline
-            points="3,33 28,61 252,61 277,33"
+            points="3,27 24,49.5 256,49.5 277,27"
             fill="none"
-            stroke="#0b0d11"
-            strokeWidth="1.5"
+            stroke="#0a0c10"
+            strokeWidth="1"
             strokeLinecap="round"
           />
 
-          {/* Moldura Interna Chanfrada */}
+          {/* Núcleo de Ametista Expandido (Borda cinza mais fina) */}
           <polygon
-            points="33,7 247,7 269,32 247,57 33,57 11,32"
-            fill="#100b17"
-            stroke="#1d152b"
-            strokeWidth="1"
-          />
-
-          {/* Núcleo de Ametista (Fundo do Botão) */}
-          <polygon
-            points="36,9 244,9 265,32 244,55 36,55 15,32"
+            points="25,4.5 255,4.5 273,26 255,47.5 25,47.5 7,26"
             fill="url(#amethystCoreGrad)"
           />
 
-          {/* Borda Neon Roxa Interna */}
+          {/* Borda Neon Roxa Interna Delicada */}
           <polygon
-            points="37,10 243,10 263,32 243,54 37,54 17,32"
+            points="26,5.5 254,5.5 271,26 254,46.5 26,46.5 9,26"
             fill="none"
             stroke="url(#purpleNeonEdge)"
-            strokeWidth="1.6"
+            strokeWidth="1.2"
             strokeOpacity="0.85"
             className="fantasy-svg-neon-edge"
           />
 
           {/* ── GEMA ESQUERDA (Amêndoa / Teardrop) ── */}
-          {/* Engaste / Bezel Metálico */}
           <path
-            d="M 12 32 C 12 24, 27 25, 27 32 C 27 39, 12 40, 12 32 Z"
-            fill="#1a1c23"
-            stroke="#3a3f4d"
-            strokeWidth="1"
+            d="M 6 26 C 6 20, 18 20, 18 26 C 18 32, 6 32, 6 26 Z"
+            fill="#14161c"
+            stroke="#2f3440"
+            strokeWidth="0.8"
           />
-          {/* Gema de Ametista */}
           <path
-            d="M 14 32 C 14 26, 25 27, 25 32 C 25 37, 14 38, 14 32 Z"
+            d="M 7.5 26 C 7.5 21, 16.5 21, 16.5 26 C 16.5 31, 7.5 31, 7.5 26 Z"
             fill="url(#gemGlow)"
             className="fantasy-side-gem"
           />
-          {/* Brilho da Gema Esquerda */}
-          <ellipse cx="18" cy="30" rx="2.5" ry="1.2" fill="#ffffff" opacity="0.9" />
+          <ellipse cx="11" cy="24.5" rx="1.8" ry="0.9" fill="#ffffff" opacity="0.9" />
 
           {/* ── GEMA DIREITA (Amêndoa / Teardrop) ── */}
-          {/* Engaste / Bezel Metálico */}
           <path
-            d="M 268 32 C 268 24, 253 25, 253 32 C 253 39, 268 40, 268 32 Z"
-            fill="#1a1c23"
-            stroke="#3a3f4d"
-            strokeWidth="1"
+            d="M 274 26 C 274 20, 262 20, 262 26 C 262 32, 274 32, 274 26 Z"
+            fill="#14161c"
+            stroke="#2f3440"
+            strokeWidth="0.8"
           />
-          {/* Gema de Ametista */}
           <path
-            d="M 266 32 C 266 26, 255 27, 255 32 C 255 37, 266 38, 266 32 Z"
+            d="M 272.5 26 C 272.5 21, 263.5 21, 263.5 26 C 263.5 31, 272.5 31, 272.5 26 Z"
             fill="url(#gemGlow)"
             className="fantasy-side-gem"
           />
-          {/* Brilho da Gema Direita */}
-          <ellipse cx="262" cy="30" rx="2.5" ry="1.2" fill="#ffffff" opacity="0.9" />
+          <ellipse cx="269" cy="24.5" rx="1.8" ry="0.9" fill="#ffffff" opacity="0.9" />
 
           {/* ── 4 GEMAS PEQUENAS DOS CANTOS (Rebites / Studs) ── */}
-          {/* Canto Superior Esquerdo */}
-          <circle cx="34" cy="9" r="3.2" fill="#1e222a" stroke="#4b5263" strokeWidth="0.8" />
-          <circle cx="34" cy="9" r="2.2" fill="url(#cornerGem)" className="fantasy-corner-gem" />
-          <circle cx="33.5" cy="8.5" r="0.7" fill="#ffffff" opacity="0.9" />
+          {/* Superior Esquerdo */}
+          <circle cx="25" cy="5" r="2.2" fill="#181b22" stroke="#3d4352" strokeWidth="0.6" />
+          <circle cx="25" cy="5" r="1.4" fill="url(#cornerGem)" className="fantasy-corner-gem" />
+          <circle cx="24.6" cy="4.6" r="0.5" fill="#ffffff" opacity="0.9" />
 
-          {/* Canto Superior Direito */}
-          <circle cx="246" cy="9" r="3.2" fill="#1e222a" stroke="#4b5263" strokeWidth="0.8" />
-          <circle cx="246" cy="9" r="2.2" fill="url(#cornerGem)" className="fantasy-corner-gem" />
-          <circle cx="245.5" cy="8.5" r="0.7" fill="#ffffff" opacity="0.9" />
+          {/* Superior Direito */}
+          <circle cx="255" cy="5" r="2.2" fill="#181b22" stroke="#3d4352" strokeWidth="0.6" />
+          <circle cx="255" cy="5" r="1.4" fill="url(#cornerGem)" className="fantasy-corner-gem" />
+          <circle cx="254.6" cy="4.6" r="0.5" fill="#ffffff" opacity="0.9" />
 
-          {/* Canto Inferior Esquerdo */}
-          <circle cx="34" cy="55" r="3.2" fill="#1e222a" stroke="#4b5263" strokeWidth="0.8" />
-          <circle cx="34" cy="55" r="2.2" fill="url(#cornerGem)" className="fantasy-corner-gem" />
-          <circle cx="33.5" cy="54.5" r="0.7" fill="#ffffff" opacity="0.9" />
+          {/* Inferior Esquerdo */}
+          <circle cx="25" cy="47" r="2.2" fill="#181b22" stroke="#3d4352" strokeWidth="0.6" />
+          <circle cx="25" cy="47" r="1.4" fill="url(#cornerGem)" className="fantasy-corner-gem" />
+          <circle cx="24.6" cy="46.6" r="0.5" fill="#ffffff" opacity="0.9" />
 
-          {/* Canto Inferior Direito */}
-          <circle cx="246" cy="55" r="3.2" fill="#1e222a" stroke="#4b5263" strokeWidth="0.8" />
-          <circle cx="246" cy="55" r="2.2" fill="url(#cornerGem)" className="fantasy-corner-gem" />
-          <circle cx="245.5" cy="54.5" r="0.7" fill="#ffffff" opacity="0.9" />
+          {/* Inferior Direito */}
+          <circle cx="255" cy="47" r="2.2" fill="#181b22" stroke="#3d4352" strokeWidth="0.6" />
+          <circle cx="255" cy="47" r="1.4" fill="url(#cornerGem)" className="fantasy-corner-gem" />
+          <circle cx="254.6" cy="46.6" r="0.5" fill="#ffffff" opacity="0.9" />
         </svg>
       </div>
 
