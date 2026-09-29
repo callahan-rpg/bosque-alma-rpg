@@ -25,7 +25,7 @@ export default function ChatInputBar({
 
     const cursorPos = e.target.selectionStart
     const textBeforeCursor = val.slice(0, cursorPos)
-    const match = textBeforeCursor.match(/@([a-zA-Z0-9_À-ÿ]*)$/)
+    const match = textBeforeCursor.match(/@([a-zA-Z0-9_À-ÿ ]{0,30})$/)
 
     if (match) {
       setMentionQuery(match[1].toLowerCase())
@@ -37,7 +37,7 @@ export default function ChatInputBar({
 
   const filteredUsers = mentionQuery !== null
     ? onlineUsers
-        .filter(u => u.characterName && u.characterName.toLowerCase().includes(mentionQuery))
+        .filter(u => u && u.characterName && u.characterName.toLowerCase().includes(mentionQuery.trim()))
         .slice(0, 5)
     : []
 
@@ -47,7 +47,7 @@ export default function ChatInputBar({
     const textBeforeCursor = text.slice(0, cursorPos)
     const textAfterCursor = text.slice(cursorPos)
 
-    const newBefore = textBeforeCursor.replace(/@([a-zA-Z0-9_À-ÿ]*)$/, `@${characterName} `)
+    const newBefore = textBeforeCursor.replace(/@([a-zA-Z0-9_À-ÿ ]{0,30})$/, `@${characterName} `)
     const nextText = newBefore + textAfterCursor
     setText(nextText.slice(0, 280))
     setMentionQuery(null)

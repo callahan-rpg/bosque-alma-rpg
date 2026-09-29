@@ -580,6 +580,7 @@ export default function LocationChat({ slug, locationName }) {
                   messages={currentMessages}
                   currentUser={user}
                   myCharacterName={character?.name}
+                  onlineUsers={onlineUsers}
                   isAdmin={isAdmin}
                   ignoredUids={ignoredUids}
                   isPrivateChat={activeTab.startsWith('dm_')}

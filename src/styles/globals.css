@@ -263,16 +263,64 @@ html, body, #root {
 }
 
 .chat-mention-tag {
-  background: rgba(168, 85, 247, 0.2);
-  color: #e9d5ff;
-  padding: 1px 5px;
-  border-radius: 4px;
-  font-weight: 500;
+  display: inline-block;
+  background: rgba(147, 51, 234, 0.22);
+  color: #f3e8ff;
+  border: 1px solid rgba(192, 132, 252, 0.45);
+  padding: 1px 7px;
+  margin: 0 2px;
+  border-radius: 5px;
+  font-weight: 600;
+  font-size: 0.88em;
+  letter-spacing: 0.01em;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  vertical-align: baseline;
+  word-break: keep-all;
+}
+
+.chat-mention-tag:hover {
+  background: rgba(168, 85, 247, 0.38);
+  border-color: rgba(216, 180, 254, 0.8);
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
 }
 
 .chat-mention-tag.is-mention-me {
-  background: var(--accent-purple);
-  color: #fff;
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.32) 0%, rgba(168, 85, 247, 0.4) 100%);
+  color: #fef08a;
+  border: 1px solid rgba(250, 204, 21, 0.7);
+  font-weight: 700;
+  box-shadow: 0 0 10px rgba(234, 179, 8, 0.35);
+  animation: mentionBadgeGlow 2.5s infinite alternate ease-in-out;
+}
+
+.chat-mention-tag.is-mention-me:hover {
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.45) 0%, rgba(168, 85, 247, 0.55) 100%);
+  border-color: #fde047;
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(250, 204, 21, 0.65);
+}
+
+@keyframes mentionBadgeGlow {
+  0% {
+    box-shadow: 0 0 6px rgba(234, 179, 8, 0.25);
+  }
+  100% {
+    box-shadow: 0 0 14px rgba(234, 179, 8, 0.55), 0 0 6px rgba(168, 85, 247, 0.4);
+  }
+}
+
+.chat-theme-light .chat-mention-tag {
+  background: rgba(126, 34, 206, 0.12);
+  color: #581c87;
+  border: 1px solid rgba(147, 51, 234, 0.4);
+}
+
+.chat-theme-light .chat-mention-tag.is-mention-me {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(147, 51, 234, 0.2) 100%);
+  color: #78350f;
+  border: 1px solid rgba(217, 119, 6, 0.65);
 }
 
 /* Eventos e Sistema */

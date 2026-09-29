@@ -22,12 +22,32 @@ function formatFullDateTime(timestamp) {
   return `${d.toLocaleDateString('pt-BR')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`
 }
 
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 /**
  * Converte *ação narrativa* para <span className="chat-action-narrative">,
- * _texto em itálico_ para <em>, destaca @Menções e formata » linhas de citação.
+ * _texto em itálico_ para <em>, destaca @Menções completas e formata » linhas de citação.
  */
-function formatText(text, myCharacterName) {
+function formatText(text, myCharacterName, knownNames = []) {
   if (!text) return null
+
+  // Prepara lista de nomes conhecidos ordenados pelo comprimento (mais longos primeiro)
+  const uniqueNames = Array.from(new Set(
+    [myCharacterName, ...knownNames]
+      .filter(n => typeof n === 'string' && n.trim().length > 0)
+      .map(n => n.trim().replace(/^@/, ''))
+  )).sort((a, b) => b.length - a.length)
+
+  // Monta expressão regular para capturar menções completas
+  let mentionPattern = '@[a-zA-Z0-9_À-ÿ]+(?:\\s+[A-ZÀ-ÿ][a-zA-Z0-9_À-ÿ]*)*'
+  if (uniqueNames.length > 0) {
+    const escaped = uniqueNames.map(escapeRegExp).join('|')
+    mentionPattern = `@(?:${escaped}|[a-zA-Z0-9_À-ÿ]+(?:\\s+[A-ZÀ-ÿ][a-zA-Z0-9_À-ÿ]*)*)`
+  }
+
+  const splitRegex = new RegExp(`(\\*\\*[^*]+\\*\\*|\\*[^*]+\\*|_[^_]+_|${mentionPattern})`, 'g')
 
   const lines = text.split('\n')
   const elements = []
@@ -47,8 +67,10 @@ function formatText(text, myCharacterName) {
       return
     }
 
-    const parts = line.split(/(\*[^*]+\*|_[^_]+_|@[a-zA-Z0-9_À-ÿ]+)/g)
+    const parts = line.split(splitRegex)
     parts.forEach((part, i) => {
+      if (!part) return
+
       if (part.startsWith('*') && part.endsWith('*') && part.length > 2) {
         elements.push(
           <span key={`${lineIdx}-${i}`} className="chat-action-narrative">
@@ -58,9 +80,22 @@ function formatText(text, myCharacterName) {
       } else if (part.startsWith('_') && part.endsWith('_') && part.length > 2) {
         elements.push(<em key={`${lineIdx}-${i}`}>{part.slice(1, -1)}</em>)
       } else if (part.startsWith('@')) {
-        const isMentionMe = myCharacterName && part.slice(1).toLowerCase() === myCharacterName.toLowerCase()
+        const mentionTarget = part.slice(1).trim().toLowerCase()
+        const myName = myCharacterName?.trim()?.toLowerCase()
+        const isMentionMe = Boolean(
+          myName && (
+            mentionTarget === myName ||
+            (myName.includes(' ') && mentionTarget === myName.split(' ')[0]) ||
+            (mentionTarget.includes(' ') && myName === mentionTarget.split(' ')[0])
+          )
+        )
+
         elements.push(
-          <span key={`${lineIdx}-${i}`} className={`chat-mention-tag ${isMentionMe ? 'is-mention-me' : ''}`}>
+          <span
+            key={`${lineIdx}-${i}`}
+            className={`chat-mention-tag ${isMentionMe ? 'is-mention-me' : ''}`}
+            title={isMentionMe ? 'Você foi mencionado!' : `Menção a ${part.slice(1)}`}
+          >
             {part}
           </span>
         )
@@ -77,6 +112,7 @@ export default function ChatMessageList({
   messages = [],
   currentUser,
   myCharacterName,
+  onlineUsers = [],
   isAdmin = false,
   ignoredUids = [],
   isPrivateChat = false,
@@ -90,6 +126,18 @@ export default function ChatMessageList({
 }) {
   const scrollRef = useRef(null)
   const [contextMenu, setContextMenu] = useState(null)
+
+  const knownNames = useMemo(() => {
+    const names = new Set()
+    if (myCharacterName) names.add(myCharacterName)
+    messages.forEach(m => {
+      if (m?.characterName) names.add(m.characterName)
+    })
+    onlineUsers.forEach(u => {
+      if (u?.characterName) names.add(u.characterName)
+    })
+    return Array.from(names)
+  }, [messages, onlineUsers, myCharacterName])
 
   const visibleMessages = useMemo(
     () => messages.filter(m => !ignoredUids.includes(m.uid)),
@@ -196,7 +244,7 @@ export default function ChatMessageList({
                   <span className="chat-event-icon">✨</span>
                   <span className="chat-event-title">{msg.characterName || 'ECO DO BOSQUE'}</span>
                 </div>
-                <div className="chat-event-text">{formatText(msg.text, myCharacterName)}</div>
+                <div className="chat-event-text">{formatText(msg.text, myCharacterName, knownNames)}</div>
 
                 {isAdmin && onDeleteMessage && (
                   <button
@@ -298,7 +346,7 @@ export default function ChatMessageList({
                 </div>
 
                 <div className="chat-msg-body-wrapper">
-                  <span className="chat-msg-body">{formatText(msg.text, myCharacterName)}</span>
+                  <span className="chat-msg-body">{formatText(msg.text, myCharacterName, knownNames)}</span>
                 </div>
 
                 {hasReactions && (
