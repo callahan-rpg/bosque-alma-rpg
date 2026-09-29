@@ -183,8 +183,7 @@ export function subscribePrivateChat(uid1, uid2, callback, sessionStartTime, max
   const roomId = getPrivateRoomId(uid1, uid2)
   if (!rtdb || !roomId) return () => {}
 
-  let isFirstSnapshot = true
-  let sessionCutoff = typeof sessionStartTime === 'number' && sessionStartTime > 0
+  const sessionCutoff = typeof sessionStartTime === 'number' && sessionStartTime > 0
     ? sessionStartTime
     : getEstimatedServerTime()
 
@@ -192,7 +191,6 @@ export function subscribePrivateChat(uid1, uid2, callback, sessionStartTime, max
 
   const handleValue = (snapshot) => {
     if (!snapshot.exists()) {
-      isFirstSnapshot = false
       callback([])
       return
     }
@@ -200,18 +198,10 @@ export function subscribePrivateChat(uid1, uid2, callback, sessionStartTime, max
     const raw = snapshot.val()
     const entries = Object.entries(raw).map(([id, val]) => ({ id, ...val }))
 
-    if (isFirstSnapshot) {
-      isFirstSnapshot = false
-      const maxExistingTs = entries.reduce((max, m) => Math.max(max, typeof m.timestamp === 'number' ? m.timestamp : 0), 0)
-      if (maxExistingTs > sessionCutoff) {
-        sessionCutoff = maxExistingTs
-      }
-    }
-
     const list = entries
       .filter((msg) => {
         const ts = typeof msg.timestamp === 'number' ? msg.timestamp : 0
-        return ts > sessionCutoff
+        return ts >= sessionCutoff
       })
       .sort((a, b) => {
         const timeA = typeof a?.timestamp === 'number' ? a.timestamp : 0
