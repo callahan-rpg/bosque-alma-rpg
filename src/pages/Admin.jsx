@@ -93,10 +93,35 @@ export default function Admin() {
   const [compCategory, setCompCategory] = useState('criaturas')
   const [compSubcategory, setCompSubcategory] = useState('')
   const [compImageUrl, setCompImageUrl] = useState('')
+  const [compHeightWeight, setCompHeightWeight] = useState('')
+  const [compArmorClass, setCompArmorClass] = useState(10)
+  const [compHp, setCompHp] = useState(100)
+  const [compMp, setCompMp] = useState(50)
+  const [compSpecies, setCompSpecies] = useState('')
+  const [compRiskLevel, setCompRiskLevel] = useState(3)
+  const [compMatingSeason, setCompMatingSeason] = useState('')
+  const [compHabitat, setCompHabitat] = useState('')
+  const [compCanRationalize, setCompCanRationalize] = useState(false)
+  const [compPassive1Name, setCompPassive1Name] = useState('')
+  const [compPassive1Desc, setCompPassive1Desc] = useState('')
+  const [compPassive2Name, setCompPassive2Name] = useState('')
+  const [compPassive2Desc, setCompPassive2Desc] = useState('')
+  const [compActiveName, setCompActiveName] = useState('')
+  const [compActiveDesc, setCompActiveDesc] = useState('')
   const [compQuote, setCompQuote] = useState('')
   const [compQuoteAuthor, setCompQuoteAuthor] = useState('')
   const [compDescription, setCompDescription] = useState('')
   const [compTactics, setCompTactics] = useState('')
+  const [compWeaknesses, setCompWeaknesses] = useState([])
+  const [compStats, setCompStats] = useState({
+    forca: 10,
+    destreza: 10,
+    poder: 10,
+    sabedoria: 10,
+    carisma: 10,
+    vitalidade: 10
+  })
+  const [compDrops, setCompDrops] = useState([])
   const [compAttributes, setCompAttributes] = useState([])
   const [compendiumGlobalBg, setCompendiumGlobalBg] = useState('')
   const [uploadingGlobalBg, setUploadingGlobalBg] = useState(false)
@@ -283,11 +308,35 @@ export default function Admin() {
     setCompCategory('criaturas')
     setCompSubcategory('')
     setCompImageUrl('')
+    setCompHeightWeight('')
+    setCompArmorClass(10)
+    setCompHp(100)
+    setCompMp(50)
+    setCompSpecies('')
+    setCompRiskLevel(3)
+    setCompMatingSeason('')
+    setCompHabitat('')
+    setCompCanRationalize(false)
+    setCompPassive1Name('')
+    setCompPassive1Desc('')
+    setCompPassive2Name('')
+    setCompPassive2Desc('')
+    setCompActiveName('')
+    setCompActiveDesc('')
     setCompQuote('')
     setCompQuoteAuthor('')
     setCompDescription('')
     setCompTactics('')
-    setCompAttributes([])
+    setCompWeaknesses([])
+    setCompStats({
+      forca: 10,
+      destreza: 10,
+      poder: 10,
+      sabedoria: 10,
+      carisma: 10,
+      vitalidade: 10
+    })
+    setCompDrops([])
   }
 
   const selectCompEntryForEdit = (entry) => {
@@ -296,11 +345,35 @@ export default function Admin() {
     setCompCategory(entry.category || 'criaturas')
     setCompSubcategory(entry.subcategory || '')
     setCompImageUrl(entry.imageUrl || '')
+    setCompHeightWeight(entry.heightWeight || '')
+    setCompArmorClass(entry.armorClass ?? entry.ca ?? 10)
+    setCompHp(entry.hp ?? 100)
+    setCompMp(entry.mp ?? 50)
+    setCompSpecies(entry.species || entry.classe || '')
+    setCompRiskLevel(entry.riskLevel ?? 3)
+    setCompMatingSeason(entry.matingSeason || '')
+    setCompHabitat(entry.habitat || '')
+    setCompCanRationalize(entry.canRationalize ?? (entry.stats?.sabedoria !== null && entry.stats?.sabedoria !== undefined))
+    setCompPassive1Name(entry.abilities?.passive1?.name || '')
+    setCompPassive1Desc(entry.abilities?.passive1?.desc || '')
+    setCompPassive2Name(entry.abilities?.passive2?.name || '')
+    setCompPassive2Desc(entry.abilities?.passive2?.desc || '')
+    setCompActiveName(entry.abilities?.active?.name || '')
+    setCompActiveDesc(entry.abilities?.active?.desc || '')
     setCompQuote(entry.quote || '')
     setCompQuoteAuthor(entry.quoteAuthor || '')
     setCompDescription(entry.description || '')
     setCompTactics(entry.tactics || '')
-    setCompAttributes(entry.attributes || [])
+    setCompWeaknesses(entry.weaknesses || entry.attributes || [])
+    setCompStats({
+      forca: entry.stats?.forca ?? 10,
+      destreza: entry.stats?.destreza ?? 10,
+      poder: entry.stats?.poder ?? 10,
+      sabedoria: entry.stats?.sabedoria ?? 10,
+      carisma: entry.stats?.carisma ?? 10,
+      vitalidade: entry.stats?.vitalidade ?? 10,
+    })
+    setCompDrops(entry.drops || [])
   }
 
   const handleUploadCompImg = async (e) => {
@@ -317,20 +390,43 @@ export default function Admin() {
     }
   }
 
-  const handleAddAttribute = () => {
-    setCompAttributes(prev => [...prev, { label: 'Novo Atributo', icon: '✦' }])
+  const handleAddWeakness = () => {
+    setCompWeaknesses(prev => [...prev, { label: 'Nova Fraqueza', icon: '⚡' }])
   }
 
-  const handleUpdateAttribute = (index, field, value) => {
-    setCompAttributes(prev => {
+  const handleUpdateWeakness = (index, field, value) => {
+    setCompWeaknesses(prev => {
       const next = [...prev]
       next[index] = { ...next[index], [field]: value }
       return next
     })
   }
 
-  const handleRemoveAttribute = (index) => {
-    setCompAttributes(prev => prev.filter((_, i) => i !== index))
+  const handleRemoveWeakness = (index) => {
+    setCompWeaknesses(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const handleAddDrop = () => {
+    setCompDrops(prev => [...prev, { name: '', chance: 'Comum', icon: compCategory === 'plantas_fungos' ? '🌸' : '💎' }])
+  }
+
+  const handleUpdateDrop = (index, field, value) => {
+    setCompDrops(prev => {
+      const next = [...prev]
+      next[index] = { ...next[index], [field]: value }
+      return next
+    })
+  }
+
+  const handleRemoveDrop = (index) => {
+    setCompDrops(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const handleUpdateStat = (key, value) => {
+    setCompStats(prev => ({
+      ...prev,
+      [key]: value
+    }))
   }
 
   const handleSaveCompEntry = async (e) => {
@@ -347,11 +443,37 @@ export default function Admin() {
         category: compCategory,
         subcategory: compSubcategory.trim(),
         imageUrl: compImageUrl.trim(),
+        heightWeight: compHeightWeight.trim(),
+        armorClass: Number(compArmorClass) || 10,
+        ca: Number(compArmorClass) || 10,
+        hp: Number(compHp) || 100,
+        mp: Number(compMp) || 0,
+        species: compSpecies.trim(),
+        classe: compSpecies.trim(),
+        riskLevel: Math.max(0, Math.min(5, Number(compRiskLevel) || 0)),
+        matingSeason: compMatingSeason.trim(),
+        habitat: compHabitat.trim(),
+        canRationalize: Boolean(compCanRationalize),
         quote: compQuote.trim(),
         quoteAuthor: compQuoteAuthor.trim(),
         description: compDescription.trim(),
         tactics: compTactics.trim(),
-        attributes: compAttributes.filter(a => a.label.trim()),
+        weaknesses: compWeaknesses.filter(a => a.label?.trim()),
+        attributes: compWeaknesses.filter(a => a.label?.trim()),
+        stats: {
+          forca: Number(compStats.forca) || 0,
+          destreza: Number(compStats.destreza) || 0,
+          poder: Number(compStats.poder) || 0,
+          sabedoria: compCanRationalize ? (Number(compStats.sabedoria) || 0) : null,
+          carisma: Number(compStats.carisma) || 0,
+          vitalidade: Number(compStats.vitalidade) || 0,
+        },
+        abilities: {
+          passive1: { name: compPassive1Name.trim(), desc: compPassive1Desc.trim() },
+          passive2: { name: compPassive2Name.trim(), desc: compPassive2Desc.trim() },
+          active: { name: compActiveName.trim(), desc: compActiveDesc.trim() },
+        },
+        drops: compDrops.filter(d => (typeof d === 'string' ? d.trim() : d.name?.trim())),
         updatedAt: serverTimestamp()
       }
 
@@ -1076,7 +1198,213 @@ export default function Admin() {
                   </div>
                 </div>
 
-                {/* Citação de abertura / Lore */}
+                {/* ── SEÇÃO: ECOLOGIA & STATUS DE COMBATE (HP, MP, RISCO, ESPÉCIE) ── */}
+                <div className="admin-nav-section">
+                  <div className="admin-nav-header">
+                    <label>🩸 Vida, Mana, Risco & Dimensões:</label>
+                  </div>
+                  <div className="admin-form-row">
+                    <div className="admin-form-group" style={{ flex: 1 }}>
+                      <label>❤️ Vida (HP):</label>
+                      <input
+                        type="number"
+                        value={compHp}
+                        onChange={(e) => setCompHp(e.target.value)}
+                        placeholder="ex: 120"
+                      />
+                    </div>
+                    <div className="admin-form-group" style={{ flex: 1 }}>
+                      <label>🔮 Mana (MP):</label>
+                      <input
+                        type="number"
+                        value={compMp}
+                        onChange={(e) => setCompMp(e.target.value)}
+                        placeholder="ex: 60"
+                      />
+                    </div>
+                    <div className="admin-form-group" style={{ flex: 1 }}>
+                      <label>🛡️ Classe de Armadura (CA):</label>
+                      <input
+                        type="number"
+                        value={compArmorClass}
+                        onChange={(e) => setCompArmorClass(e.target.value)}
+                        placeholder="ex: 14"
+                      />
+                    </div>
+                    <div className="admin-form-group" style={{ flex: 1 }}>
+                      <label>💀 Risco (0 a 5 Crânios):</label>
+                      <select
+                        value={compRiskLevel}
+                        onChange={(e) => setCompRiskLevel(Number(e.target.value))}
+                      >
+                        <option value={0}>0 - Inofensivo / Neutro</option>
+                        <option value={1}>1 - 💀 (Baixo)</option>
+                        <option value={2}>2 - 💀💀 (Moderado)</option>
+                        <option value={3}>3 - 💀💀💀 (Perigoso)</option>
+                        <option value={4}>4 - 💀💀💀💀 (Mortal)</option>
+                        <option value={5}>5 - 💀💀💀💀💀 (Calamidade)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="admin-form-row">
+                    <div className="admin-form-group" style={{ flex: 1.5 }}>
+                      <label>🐾 Espécie (Classe):</label>
+                      <input
+                        type="text"
+                        value={compSpecies}
+                        onChange={(e) => setCompSpecies(e.target.value)}
+                        placeholder="ex: Predador Draconiano, Aracnídeo Gigante..."
+                      />
+                    </div>
+                    <div className="admin-form-group" style={{ flex: 1.2 }}>
+                      <label>📏 Altura e Peso (ex: 2.40m | 85kg):</label>
+                      <input
+                        type="text"
+                        value={compHeightWeight}
+                        onChange={(e) => setCompHeightWeight(e.target.value)}
+                        placeholder="ex: 2.40m | 85kg"
+                      />
+                    </div>
+                    <div className="admin-form-group" style={{ flex: 1.2 }}>
+                      <label>🍂 Época de Acasalamento:</label>
+                      <input
+                        type="text"
+                        value={compMatingSeason}
+                        onChange={(e) => setCompMatingSeason(e.target.value)}
+                        placeholder="ex: Primavera / Outono"
+                      />
+                    </div>
+                    <div className="admin-form-group" style={{ flex: 1.2 }}>
+                      <label>🏔️ Habitat Natural:</label>
+                      <input
+                        type="text"
+                        value={compHabitat}
+                        onChange={(e) => setCompHabitat(e.target.value)}
+                        placeholder="ex: Bosques Profundos, Picos Nevados"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* ── ATRIBUTOS DE FICHA (FORÇA, DESTREZA, SABEDORIA) ── */}
+                <div className="admin-nav-section">
+                  <div className="admin-nav-header" style={{ justifyContent: 'space-between' }}>
+                    <label>✦ Atributos de Ficha (Força, Destreza & Sabedoria):</label>
+                    <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.8rem', cursor: 'pointer', color: '#c084fc' }}>
+                      <input
+                        type="checkbox"
+                        checked={compCanRationalize}
+                        onChange={(e) => setCompCanRationalize(e.target.checked)}
+                      />
+                      Consegue Racionalizar (habilita Sabedoria)
+                    </label>
+                  </div>
+                  <div className="admin-stats-inputs-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+                    <div className="admin-stat-input-box">
+                      <span className="stat-icon">⚔️</span>
+                      <label>FORÇA:</label>
+                      <input
+                        type="number"
+                        value={compStats.forca ?? 10}
+                        onChange={(e) => handleUpdateStat('forca', e.target.value)}
+                      />
+                    </div>
+                    <div className="admin-stat-input-box">
+                      <span className="stat-icon">🏹</span>
+                      <label>DESTREZA:</label>
+                      <input
+                        type="number"
+                        value={compStats.destreza ?? 10}
+                        onChange={(e) => handleUpdateStat('destreza', e.target.value)}
+                      />
+                    </div>
+                    <div className={`admin-stat-input-box ${!compCanRationalize ? 'disabled' : ''}`}>
+                      <span className="stat-icon">📜</span>
+                      <label>SABEDORIA:</label>
+                      <input
+                        type="number"
+                        disabled={!compCanRationalize}
+                        value={compCanRationalize ? (compStats.sabedoria ?? 10) : ''}
+                        placeholder={compCanRationalize ? '10' : 'Não Racionaliza'}
+                        onChange={(e) => handleUpdateStat('sabedoria', e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* ── HABILIDADES (2 PASSIVAS E 1 ATIVA) ── */}
+                <div className="admin-nav-section">
+                  <div className="admin-nav-header">
+                    <label>✨ Habilidades (2 Passivas e 1 Ativa):</label>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {/* Passiva 1 */}
+                    <div style={{ background: 'rgba(255,255,255,0.03)', padding: '10px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#93c5fd' }}>🛡️ HABILIDADE PASSIVA 1</span>
+                      <div className="admin-form-row" style={{ marginTop: '6px', marginBottom: 0 }}>
+                        <input
+                          type="text"
+                          style={{ flex: 1 }}
+                          value={compPassive1Name}
+                          onChange={(e) => setCompPassive1Name(e.target.value)}
+                          placeholder="Nome da Passiva 1 (ex: Pele de Pedra)"
+                        />
+                        <input
+                          type="text"
+                          style={{ flex: 2 }}
+                          value={compPassive1Desc}
+                          onChange={(e) => setCompPassive1Desc(e.target.value)}
+                          placeholder="Descrição do efeito passivo..."
+                        />
+                      </div>
+                    </div>
+
+                    {/* Passiva 2 */}
+                    <div style={{ background: 'rgba(255,255,255,0.03)', padding: '10px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#93c5fd' }}>👁️ HABILIDADE PASSIVA 2</span>
+                      <div className="admin-form-row" style={{ marginTop: '6px', marginBottom: 0 }}>
+                        <input
+                          type="text"
+                          style={{ flex: 1 }}
+                          value={compPassive2Name}
+                          onChange={(e) => setCompPassive2Name(e.target.value)}
+                          placeholder="Nome da Passiva 2 (ex: Sentido Predatório)"
+                        />
+                        <input
+                          type="text"
+                          style={{ flex: 2 }}
+                          value={compPassive2Desc}
+                          onChange={(e) => setCompPassive2Desc(e.target.value)}
+                          placeholder="Descrição do efeito passivo..."
+                        />
+                      </div>
+                    </div>
+
+                    {/* Ativa */}
+                    <div style={{ background: 'rgba(255,255,255,0.03)', padding: '10px', borderRadius: '6px', border: '1px solid rgba(234,179,8,0.2)' }}>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#fde047' }}>⚡ HABILIDADE ATIVA</span>
+                      <div className="admin-form-row" style={{ marginTop: '6px', marginBottom: 0 }}>
+                        <input
+                          type="text"
+                          style={{ flex: 1 }}
+                          value={compActiveName}
+                          onChange={(e) => setCompActiveName(e.target.value)}
+                          placeholder="Nome da Ativa (ex: Rugido Sísmico)"
+                        />
+                        <input
+                          type="text"
+                          style={{ flex: 2 }}
+                          value={compActiveDesc}
+                          onChange={(e) => setCompActiveDesc(e.target.value)}
+                          placeholder="Descrição do efeito ativo..."
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* ── LORE, DESCRIÇÃO E CITAÇÃO ── */}
                 <div className="admin-form-row">
                   <div className="admin-form-group" style={{ flex: 2 }}>
                     <label>Frase / Citação de Abertura (Opcional):</label>
@@ -1087,6 +1415,7 @@ export default function Admin() {
                       placeholder="ex: Quando a névoa do crepúsculo desce sobre os carvalhos..."
                     />
                   </div>
+
                   <div className="admin-form-group" style={{ flex: 1 }}>
                     <label>Autor da Frase:</label>
                     <input
@@ -1101,7 +1430,7 @@ export default function Admin() {
                 <div className="admin-form-group">
                   <label>Descrição Detalhada & Lore:</label>
                   <textarea
-                    rows={6}
+                    rows={5}
                     value={compDescription}
                     onChange={(e) => setCompDescription(e.target.value)}
                     placeholder="Escreva a descrição do tomo de conhecimento, características biológicas, origem..."
@@ -1109,7 +1438,7 @@ export default function Admin() {
                 </div>
 
                 <div className="admin-form-group">
-                  <label>Táticas de Combate / Modo de Coleta / Efeitos Alquímicos:</label>
+                  <label>Comportamento, Modo de Coleta ou Efeitos:</label>
                   <textarea
                     rows={3}
                     value={compTactics}
@@ -1118,36 +1447,85 @@ export default function Admin() {
                   />
                 </div>
 
-                {/* Atributos / Ícones de Eficácia */}
+                {/* ── DROPS / COLETÁVEIS & RECURSOS ── */}
                 <div className="admin-nav-section">
                   <div className="admin-nav-header">
-                    <label>Badges de Eficácia / Propriedades (Ícone + Texto):</label>
-                    <button type="button" className="admin-add-nav-btn" onClick={handleAddAttribute}>
-                      + Adicionar Propriedade
+                    <label>
+                      {compCategory === 'criaturas'
+                        ? '🎒 Espólios / Drops da Criatura:'
+                        : '🌿 Recursos / Extrações Coletáveis (Pólen, Seiva, etc.):'}
+                    </label>
+                    <button type="button" className="admin-add-nav-btn" onClick={handleAddDrop}>
+                      + Adicionar Item Dropável
                     </button>
                   </div>
 
                   <div className="admin-nav-list">
-                    {compAttributes.map((attr, idx) => (
+                    {compDrops.map((drop, idx) => (
                       <div key={idx} className="admin-nav-item-row">
                         <input
                           type="text"
                           style={{ width: '60px', textAlign: 'center' }}
-                          value={attr.icon || '✦'}
-                          onChange={(e) => handleUpdateAttribute(idx, 'icon', e.target.value)}
+                          value={drop.icon || (compCategory === 'plantas_fungos' ? '🌸' : '💎')}
+                          onChange={(e) => handleUpdateDrop(idx, 'icon', e.target.value)}
+                          placeholder="Ícone"
+                        />
+                        <input
+                          type="text"
+                          style={{ flex: 2 }}
+                          value={drop.name || ''}
+                          onChange={(e) => handleUpdateDrop(idx, 'name', e.target.value)}
+                          placeholder="Nome do Item (ex: Pólen Dourado, Couro Grisálido)"
+                        />
+                        <input
+                          type="text"
+                          style={{ flex: 1 }}
+                          value={drop.chance || ''}
+                          onChange={(e) => handleUpdateDrop(idx, 'chance', e.target.value)}
+                          placeholder="Raridade/Chance (ex: Comum, Raro, 15%)"
+                        />
+                        <button
+                          type="button"
+                          className="admin-remove-nav-btn"
+                          onClick={() => handleRemoveDrop(idx)}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* ── FRAQUEZAS & VULNERABILIDADES ── */}
+                <div className="admin-nav-section">
+                  <div className="admin-nav-header">
+                    <label>⚡ Fraquezas / Vulnerabilidades (Ícone + Texto):</label>
+                    <button type="button" className="admin-add-nav-btn" onClick={handleAddWeakness}>
+                      + Adicionar Fraqueza
+                    </button>
+                  </div>
+
+                  <div className="admin-nav-list">
+                    {compWeaknesses.map((weakness, idx) => (
+                      <div key={idx} className="admin-nav-item-row">
+                        <input
+                          type="text"
+                          style={{ width: '60px', textAlign: 'center' }}
+                          value={weakness.icon || '⚡'}
+                          onChange={(e) => handleUpdateWeakness(idx, 'icon', e.target.value)}
                           placeholder="Ícone"
                         />
                         <input
                           type="text"
                           style={{ flex: 1 }}
-                          value={attr.label || ''}
-                          onChange={(e) => handleUpdateAttribute(idx, 'label', e.target.value)}
-                          placeholder="Propriedade (ex: Fogo Arcano, Óleo de Fera)"
+                          value={weakness.label || ''}
+                          onChange={(e) => handleUpdateWeakness(idx, 'label', e.target.value)}
+                          placeholder="Fraqueza (ex: Fogo Arcano, Óleo de Fera, Luz Solar)"
                         />
                         <button
                           type="button"
                           className="admin-remove-nav-btn"
-                          onClick={() => handleRemoveAttribute(idx)}
+                          onClick={() => handleRemoveWeakness(idx)}
                         >
                           ✕
                         </button>

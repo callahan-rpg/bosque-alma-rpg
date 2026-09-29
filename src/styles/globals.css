@@ -3697,47 +3697,97 @@ html, body, #root {
   opacity: 0.4;
 }
 
-.compendium-tactics-badges-container {
+.compendium-center-cards-row {
   position: relative;
   z-index: 2;
   margin-top: auto;
-  padding: 10px 16px;
-  background: rgba(24, 24, 28, 0.97);
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+
+.compendium-info-pill-card {
+  background: rgba(22, 22, 26, 0.96);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 9999px;
+  padding: 8px 18px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+  transition: all 0.2s ease;
+  min-height: 52px;
 }
 
-.compendium-tactics-title {
+.compendium-info-pill-card:hover {
+  border-color: rgba(168, 85, 247, 0.35);
+  background: rgba(26, 26, 32, 0.98);
+  transform: translateY(-2px);
+}
+
+.compendium-info-pill-title {
   font-family: var(--font-gothic);
   font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 2px;
-  color: #9ca3af;
+  letter-spacing: 1.5px;
+  color: #c7d2fe;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .compendium-badges-row {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: inline-flex;
+  gap: 6px;
+  flex-wrap: nowrap;
+  align-items: center;
 }
 
 .compendium-attribute-badge {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  color: #e5e7eb;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #f3f4f6;
+  white-space: nowrap;
+}
+
+.compendium-attribute-badge.weakness {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+}
+
+.compendium-attribute-badge.ca {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.35);
+  color: #93c5fd;
+}
+
+.compendium-attribute-badge.dimension {
+  background: rgba(168, 85, 247, 0.12);
+  border-color: rgba(168, 85, 247, 0.35);
+  color: #e9d5ff;
+}
+
+.compendium-attribute-badge .badge-icon {
+  font-size: 0.9rem;
+}
+
+.compendium-attribute-badge.weakness {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
 }
 
 .compendium-attribute-badge .badge-icon {
@@ -3770,6 +3820,9 @@ html, body, #root {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding-bottom: 12px;
   margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .compendium-lore-title {
@@ -3781,13 +3834,411 @@ html, body, #root {
   line-height: 1.2;
 }
 
+.compendium-lore-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .compendium-lore-sub {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 2px;
   color: #9ca3af;
-  display: block;
-  margin-top: 4px;
+  font-weight: 600;
+}
+
+/* 2 Campos Clicáveis (Abas Informações e Dados) */
+.compendium-lore-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.compendium-lore-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #9ca3af;
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-gothic);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.compendium-lore-tab-btn:hover {
+  background: rgba(147, 51, 234, 0.15);
+  border-color: rgba(168, 85, 247, 0.4);
+  color: #fff;
+}
+
+.compendium-lore-tab-btn.active {
+  background: rgba(147, 51, 234, 0.35);
+  border-color: #a855f7;
+  color: #fff;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.35);
+}
+
+.compendium-lore-tab-btn .lore-tab-icon {
+  font-size: 0.85rem;
+}
+
+/* ── ABA DE DADOS (5 CONTAINERS SEPARADOS, COMPACTOS, SEM SCROLL) ── */
+.compendium-stats-tab-view {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+  justify-content: flex-start;
+  overflow: hidden;
+}
+
+/* CONTAINER PADRÃO PARA CADA BLOCO DE DADOS */
+.comp-data-container {
+  background: rgba(18, 14, 26, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 7px;
+  padding: 8px 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: border-color 0.2s ease;
+}
+
+.comp-data-container:hover {
+  border-color: rgba(168, 85, 247, 0.25);
+}
+
+/* 1. CONTAINER: BARRAS DE VIDA E MANA */
+.comp-data-container.comp-bars-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 12px;
+}
+
+.comp-bar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.comp-bar-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.7rem;
+  font-family: var(--font-gothic);
+  font-weight: 700;
+}
+
+.comp-bar-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #f3f4f6;
+  letter-spacing: 0.5px;
+}
+
+.comp-bar-icon {
+  font-size: 0.75rem;
+}
+
+.comp-bar-val {
+  color: #e5e7eb;
+  font-weight: 800;
+  font-size: 0.72rem;
+  letter-spacing: 0.5px;
+}
+
+.comp-bar-track {
+  height: 5px;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.comp-bar-fill.hp {
+  height: 100%;
+  background: linear-gradient(90deg, #b91c1c, #ef4444, #f87171);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+}
+
+.comp-bar-fill.mp {
+  height: 100%;
+  background: linear-gradient(90deg, #1d4ed8, #3b82f6, #60a5fa);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+}
+
+/* 2. CONTAINER: ATRIBUTOS (FOR, DES, SAB) */
+.comp-data-container.comp-stats-container {
+  padding: 8px 12px;
+}
+
+.comp-stats-three-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.comp-stat-three-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  border-radius: 5px;
+  padding: 7px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.comp-stat-three-card.disabled {
+  opacity: 0.5;
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.three-stat-icon {
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.three-stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.three-stat-label {
+  font-family: var(--font-gothic);
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: #a78bfa;
+  letter-spacing: 0.5px;
+}
+
+.three-stat-val {
+  font-size: 0.88rem;
+  font-weight: 800;
+  font-family: var(--font-gothic);
+  color: #fff;
+  text-shadow: 0 0 6px rgba(168, 85, 247, 0.4);
+}
+
+.three-stat-val.na {
+  font-size: 0.62rem;
+  color: #9ca3af;
+  font-weight: 600;
+  text-shadow: none;
+  font-style: italic;
+}
+
+/* 3. CONTAINER: ECOLOGIA, DIMENSÕES, RISCO, ACASALAMENTO & HABITAT */
+.comp-data-container.comp-eco-container {
+  padding: 8px 12px;
+}
+
+.comp-eco-row {
+  display: flex;
+  gap: 6px;
+}
+
+.comp-eco-row:not(:last-child) {
+  margin-bottom: 6px;
+}
+
+.comp-eco-pill {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 5px;
+  padding: 5px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.comp-eco-pill.risk-pill {
+  flex: 1.1;
+}
+
+.comp-eco-label {
+  font-size: 0.55rem;
+  font-family: var(--font-gothic);
+  font-weight: 700;
+  color: #9ca3af;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.comp-eco-val {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #f3f4f6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.comp-skull-rating {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.68rem;
+}
+
+.comp-skull-rating .skull-icon.filled {
+  filter: drop-shadow(0 0 3px #ef4444);
+  opacity: 1;
+}
+
+.comp-skull-rating .skull-icon.empty {
+  opacity: 0.2;
+  filter: grayscale(1);
+}
+
+/* 4. CONTAINER: HABILIDADES (2 PASSIVAS E 1 ATIVA) */
+.comp-data-container.comp-skills-container {
+  padding: 8px 12px;
+}
+
+.comp-skills-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.comp-skill-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 5px;
+  padding: 6px 8px;
+}
+
+.comp-skill-row.active {
+  background: rgba(234, 179, 8, 0.04);
+  border-color: rgba(234, 179, 8, 0.25);
+}
+
+.comp-skill-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.comp-skill-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #f3f4f6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.comp-skill-tag {
+  font-family: var(--font-gothic);
+  font-size: 0.52rem;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  margin-left: auto;
+}
+
+.comp-skill-tag.passive {
+  background: rgba(59, 130, 246, 0.18);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+}
+
+.comp-skill-tag.active {
+  background: rgba(234, 179, 8, 0.2);
+  color: #fde047;
+  border: 1px solid rgba(234, 179, 8, 0.4);
+}
+
+.comp-skill-desc {
+  font-size: 0.62rem;
+  color: #9ca3af;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 5. CONTAINER: ESPÓLIOS / DROPS */
+.comp-data-container.comp-drops-container {
+  padding: 8px 12px;
+}
+
+.comp-drops-compact-block {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.comp-drops-compact-title {
+  font-family: var(--font-gothic);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: var(--accent-purple-light);
+}
+
+.comp-drops-chips-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  max-height: 44px;
+  overflow: hidden;
+}
+
+.comp-drop-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 0.65rem;
+}
+
+.drop-chip-icon {
+  font-size: 0.7rem;
+}
+
+.drop-chip-name {
+  color: #f3f4f6;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.drop-chip-chance {
+  color: #c084fc;
+  font-size: 0.58rem;
+}
+
+.comp-drops-empty-text {
+  font-size: 0.64rem;
+  color: #6b7280;
+  font-style: italic;
 }
 
 .compendium-lore-content-scroll {
@@ -4485,5 +4936,48 @@ html, body, #root {
   padding: 2px 7px;
   border-radius: 4px;
   letter-spacing: 0.5px;
+}
+
+/* ── Admin: Inputs de Atributos de Ficha ── */
+.admin-stats-inputs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.admin-stat-input-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 8px 10px;
+  align-items: center;
+}
+
+.admin-stat-input-box .stat-icon {
+  font-size: 1.1rem;
+}
+
+.admin-stat-input-box label {
+  font-family: var(--font-gothic);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #9ca3af;
+}
+
+.admin-stat-input-box input {
+  width: 100%;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 800;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  color: #fff;
+  border-radius: 4px;
+  padding: 4px 6px;
 }
 

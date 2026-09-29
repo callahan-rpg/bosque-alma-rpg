@@ -158,6 +158,13 @@ export default function Compendium() {
     return categoryEntries.find(e => e.id === selectedId) || categoryEntries[0] || null
   }, [categoryEntries, selectedId])
 
+  const [activeLoreTab, setActiveLoreTab] = useState('info') // 'info' | 'stats'
+
+  // Reseta a aba para 'info' ao trocar de entrada
+  useEffect(() => {
+    setActiveLoreTab('info')
+  }, [selectedId, activeCategory])
+
   // Navegação entre categorias
   const handlePrevCategory = () => {
     const prevIdx = (currentCatIndex - 1 + CATEGORIES.length) % CATEGORIES.length
@@ -231,8 +238,6 @@ export default function Compendium() {
               ❯
             </button>
           </div>
-
-
         </header>
 
         {/* Layout Principal de 3 Colunas (The Witcher 3) */}
@@ -287,7 +292,7 @@ export default function Compendium() {
                             <div className="compendium-item-thumb-wrapper">
                               {item.thumbnailUrl || item.imageUrl ? (
                                 <img
-                                  src={item.thumbnailUrl || item.imageUrl}
+                                   src={item.thumbnailUrl || item.imageUrl}
                                   alt=""
                                   className="compendium-item-thumb"
                                 />
@@ -309,7 +314,7 @@ export default function Compendium() {
           </aside>
 
           {/* ============================================================
-              COLUNA 2 (CENTRO): RETRATO / IMAGEM EM DESTAQUE
+              COLUNA 2 (CENTRO): RETRATO / IMAGEM EM DESTAQUE & FRAQUEZAS / ALTURA E PESO
               ============================================================ */}
           <section className="compendium-viewport-col">
             {selectedEntry ? (
@@ -329,22 +334,49 @@ export default function Compendium() {
                   </div>
                 )}
 
-                {/* Badges de Eficácia / Táticas (Estilo Witcher 3) */}
-                {selectedEntry.attributes && selectedEntry.attributes.length > 0 && (
-                  <div className="compendium-tactics-badges-container">
-                    <span className="compendium-tactics-title">
-                      {activeCategory === 'criaturas' ? 'EFICAZ EM COMBATE:' : 'PROPRIEDADES & USOS:'}
+                {/* 3 Blocos Separados Lado a Lado: Fraquezas, CA, Altura e Peso */}
+                <div className="compendium-center-cards-row">
+                  {/* Card 1: Fraquezas */}
+                  <div className="compendium-info-pill-card">
+                    <span className="compendium-info-pill-title">
+                      {activeCategory === 'criaturas' ? 'FRAQUEZAS:' : 'VULNERABILIDADES:'}
                     </span>
                     <div className="compendium-badges-row">
-                      {selectedEntry.attributes.map((attr, i) => (
-                        <div key={i} className="compendium-attribute-badge" title={attr.label}>
-                          <span className="badge-icon">{attr.icon || '✦'}</span>
-                          <span className="badge-label">{attr.label}</span>
+                      {((selectedEntry.weaknesses && selectedEntry.weaknesses.length > 0) ||
+                        (selectedEntry.attributes && selectedEntry.attributes.length > 0)) ? (
+                        (selectedEntry.weaknesses || selectedEntry.attributes || []).map((attr, i) => (
+                          <div key={i} className="compendium-attribute-badge weakness" title={attr.label}>
+                            <span className="badge-icon">{attr.icon || '🔥'}</span>
+                            <span className="badge-label">{attr.label}</span>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="compendium-attribute-badge">
+                          <span className="badge-icon">✦</span>
+                          <span className="badge-label">Nenhuma</span>
                         </div>
-                      ))}
+                      )}
                     </div>
                   </div>
-                )}
+
+                  {/* Card 2: CA (Classe de Armadura) */}
+                  <div className="compendium-info-pill-card">
+                    <span className="compendium-info-pill-title">CLASSE DE ARMADURA:</span>
+                    <div className="compendium-attribute-badge ca">
+                      <span className="badge-icon">🛡️</span>
+                      <span className="badge-label">{selectedEntry.armorClass ?? selectedEntry.ca ?? 10} CA</span>
+                    </div>
+                  </div>
+
+                  {/* Card 3: Altura e Peso */}
+                  <div className="compendium-info-pill-card">
+                    <span className="compendium-info-pill-title">ALTURA E PESO:</span>
+                    <div className="compendium-attribute-badge dimension">
+                      <span className="badge-icon">📏</span>
+                      <span className="badge-label">{selectedEntry.heightWeight || 'Não catalogado'}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             ) : (
               <div className="compendium-empty-selection">
@@ -354,61 +386,274 @@ export default function Compendium() {
           </section>
 
           {/* ============================================================
-              COLUNA 3 (DIREITA): LORE, DESCRIÇÃO E PÁGINA DO LIVRO
+              COLUNA 3 (DIREITA): LORE, DESCRIÇÃO E PÁGINA DO LIVRO COM ABAS
               ============================================================ */}
           <article className="compendium-lore-col">
             {selectedEntry ? (
               <div className="compendium-book-page">
-                {/* Título e Subtítulo */}
+                {/* Cabeçalho com Título, Família e os 2 Campos Clicáveis (Informações e Dados) */}
                 <header className="compendium-lore-header">
                   <h1 className="compendium-lore-title">{selectedEntry.name}</h1>
-                  {selectedEntry.subcategory && (
-                    <span className="compendium-lore-sub">{selectedEntry.subcategory}</span>
-                  )}
+                  
+                  <div className="compendium-lore-header-row">
+                    {selectedEntry.subcategory && (
+                      <span className="compendium-lore-sub">{selectedEntry.subcategory}</span>
+                    )}
+
+                    {/* Dois Campos Clicáveis Sinalizados */}
+                    <div className="compendium-lore-tabs">
+                      <button
+                        type="button"
+                        className={`compendium-lore-tab-btn ${activeLoreTab === 'info' ? 'active' : ''}`}
+                        onClick={() => setActiveLoreTab('info')}
+                      >
+                        <span className="lore-tab-icon">📜</span>
+                        <span>Informações</span>
+                      </button>
+                      <button
+                        type="button"
+                        className={`compendium-lore-tab-btn ${activeLoreTab === 'stats' ? 'active' : ''}`}
+                        onClick={() => setActiveLoreTab('stats')}
+                      >
+                        <span className="lore-tab-icon">📊</span>
+                        <span>Dados</span>
+                      </button>
+                    </div>
+                  </div>
                 </header>
 
-                <div className="compendium-lore-content-scroll">
-                  {/* Citação / Citação de Abertura */}
-                  {selectedEntry.quote && (
-                    <blockquote className="compendium-quote-box">
-                      <p className="compendium-quote-text">"{selectedEntry.quote}"</p>
-                      {selectedEntry.quoteAuthor && (
-                        <cite className="compendium-quote-author">
-                          — {selectedEntry.quoteAuthor}
-                        </cite>
-                      )}
-                    </blockquote>
-                  )}
-
-                  {/* Texto de Descrição / Lore */}
-                  <div className="compendium-lore-body">
-                    {selectedEntry.description ? (
-                      selectedEntry.description.split('\n\n').map((paragraph, pIdx) => (
-                        <p key={pIdx} className="compendium-lore-paragraph">
-                          {paragraph}
+                {/* CONTEÚDO DA ABA 1: INFORMAÇÕES (Texto descrito + citação lá em baixo) */}
+                {activeLoreTab === 'info' && (
+                  <div className="compendium-lore-content-scroll">
+                    {/* Texto de Descrição / Lore */}
+                    <div className="compendium-lore-body">
+                      {selectedEntry.description ? (
+                        selectedEntry.description.split('\n\n').map((paragraph, pIdx) => (
+                          <p key={pIdx} className="compendium-lore-paragraph">
+                            {paragraph}
+                          </p>
+                        ))
+                      ) : (
+                        <p className="compendium-lore-paragraph placeholder">
+                          Nenhuma anotação descritiva catalogada nos tomos de Alma.
                         </p>
-                      ))
-                    ) : (
-                      <p className="compendium-lore-paragraph placeholder">
-                        Nenhuma anotação descritiva catalogada nos tomos de Alma.
-                      </p>
+                      )}
+                    </div>
+
+                    {/* Citação / Citação posicionada lá em baixo, após a descrição */}
+                    {selectedEntry.quote && (
+                      <blockquote className="compendium-quote-box">
+                        <p className="compendium-quote-text">"{selectedEntry.quote}"</p>
+                        {selectedEntry.quoteAuthor && (
+                          <cite className="compendium-quote-author">
+                            — {selectedEntry.quoteAuthor}
+                          </cite>
+                        )}
+                      </blockquote>
+                    )}
+
+                    {/* Dicas de Combate ou Modo de Coleta */}
+                    {selectedEntry.tactics && (
+                      <div className="compendium-tactics-section">
+                        <h3 className="compendium-tactics-header">
+                          {activeCategory === 'criaturas'
+                            ? 'Comportamento & Combate'
+                            : activeCategory === 'plantas_fungos'
+                            ? 'Modo de Colheita & Perigos'
+                            : 'Preparo & Efeitos'}
+                        </h3>
+                        <p className="compendium-tactics-text">{selectedEntry.tactics}</p>
+                      </div>
                     )}
                   </div>
+                )}
 
-                  {/* Dicas de Combate ou Preparo */}
-                  {selectedEntry.tactics && (
-                    <div className="compendium-tactics-section">
-                      <h3 className="compendium-tactics-header">
-                        {activeCategory === 'criaturas'
-                          ? 'Comportamento & Combate'
-                          : activeCategory === 'plantas_fungos'
-                          ? 'Modo de Colheita & Perigos'
-                          : 'Preparo & Efeitos'}
-                      </h3>
-                      <p className="compendium-tactics-text">{selectedEntry.tactics}</p>
+                {/* CONTEÚDO DA ABA 2: DADOS (5 Containers Separados e Compactos) */}
+                {activeLoreTab === 'stats' && (
+                  <div className="compendium-stats-tab-view">
+                    {/* 1. CONTAINER: VIDA E MANA */}
+                    <div className="comp-data-container comp-bars-container">
+                      {/* Barra de Vida */}
+                      <div className="comp-bar-item hp">
+                        <div className="comp-bar-label-row">
+                          <span className="comp-bar-name">
+                            <span className="comp-bar-icon">❤️</span> VIDA
+                          </span>
+                          <span className="comp-bar-val">{selectedEntry.hp ?? 100} / {selectedEntry.hp ?? 100}</span>
+                        </div>
+                        <div className="comp-bar-track">
+                          <div className="comp-bar-fill hp" style={{ width: '100%' }} />
+                        </div>
+                      </div>
+
+                      {/* Barra de Mana */}
+                      <div className="comp-bar-item mp">
+                        <div className="comp-bar-label-row">
+                          <span className="comp-bar-name">
+                            <span className="comp-bar-icon">🔮</span> MANA
+                          </span>
+                          <span className="comp-bar-val">{selectedEntry.mp ?? 50} / {selectedEntry.mp ?? 50}</span>
+                        </div>
+                        <div className="comp-bar-track">
+                          <div className="comp-bar-fill mp" style={{ width: '100%' }} />
+                        </div>
+                      </div>
                     </div>
-                  )}
-                </div>
+
+                    {/* 2. CONTAINER: ATRIBUTOS (FORÇA, DESTREZA, SABEDORIA) */}
+                    <div className="comp-data-container comp-stats-container">
+                      <div className="comp-stats-three-grid">
+                        <div className="comp-stat-three-card">
+                          <span className="three-stat-icon">⚔️</span>
+                          <div className="three-stat-info">
+                            <span className="three-stat-label">FORÇA</span>
+                            <span className="three-stat-val">{selectedEntry.stats?.forca ?? 10}</span>
+                          </div>
+                        </div>
+
+                        <div className="comp-stat-three-card">
+                          <span className="three-stat-icon">🏹</span>
+                          <div className="three-stat-info">
+                            <span className="three-stat-label">DESTREZA</span>
+                            <span className="three-stat-val">{selectedEntry.stats?.destreza ?? 10}</span>
+                          </div>
+                        </div>
+
+                        <div className={`comp-stat-three-card ${(selectedEntry.canRationalize === false || (selectedEntry.canRationalize === undefined && selectedEntry.stats?.sabedoria == null)) ? 'disabled' : ''}`}>
+                          <span className="three-stat-icon">📜</span>
+                          <div className="three-stat-info">
+                            <span className="three-stat-label">SABEDORIA</span>
+                            {(selectedEntry.canRationalize || (selectedEntry.canRationalize === undefined && selectedEntry.stats?.sabedoria !== null && selectedEntry.stats?.sabedoria !== undefined)) ? (
+                              <span className="three-stat-val">{selectedEntry.stats?.sabedoria ?? 10}</span>
+                            ) : (
+                              <span className="three-stat-val na" title="Espécie não racional">Irracional</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 3. CONTAINER: ESPÉCIE, ALTURA/PESO, RISCO, ACASALAMENTO & HABITAT */}
+                    <div className="comp-data-container comp-eco-container">
+                      {/* Linha 1: Espécie | Altura & Peso | Risco (0-5 Crânios) */}
+                      <div className="comp-eco-row top-row">
+                        <div className="comp-eco-pill" title="Espécie / Classe">
+                          <span className="comp-eco-label">ESPÉCIE</span>
+                          <span className="comp-eco-val">
+                            {selectedEntry.species || selectedEntry.classe || selectedEntry.subcategory || 'Não catalogada'}
+                          </span>
+                        </div>
+
+                        <div className="comp-eco-pill" title="Altura e Peso">
+                          <span className="comp-eco-label">ALTURA & PESO</span>
+                          <span className="comp-eco-val">{selectedEntry.heightWeight || 'Não catalogado'}</span>
+                        </div>
+
+                        <div className="comp-eco-pill risk-pill" title={`Classificação de Risco: ${selectedEntry.riskLevel ?? 3} de 5`}>
+                          <span className="comp-eco-label">RISCO</span>
+                          <div className="comp-skull-rating">
+                            {[1, 2, 3, 4, 5].map((lvl) => {
+                              const risk = Number(selectedEntry.riskLevel ?? 3)
+                              const isFilled = lvl <= risk
+                              return (
+                                <span
+                                  key={lvl}
+                                  className={`skull-icon ${isFilled ? 'filled' : 'empty'}`}
+                                >
+                                  💀
+                                </span>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Linha 2: Época de Acasalamento | Habitat */}
+                      <div className="comp-eco-row bottom-row">
+                        <div className="comp-eco-pill" title="Época de Acasalamento">
+                          <span className="comp-eco-label">ÉPOCA DE ACASALAMENTO</span>
+                          <span className="comp-eco-val">{selectedEntry.matingSeason || 'Primavera / Outono'}</span>
+                        </div>
+
+                        <div className="comp-eco-pill" title="Habitat Natural">
+                          <span className="comp-eco-label">HABITAT</span>
+                          <span className="comp-eco-val">{selectedEntry.habitat || 'Bosque das Almas'}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 4. CONTAINER: HABILIDADES (2 PASSIVAS E 1 ATIVA) */}
+                    <div className="comp-data-container comp-skills-container">
+                      <div className="comp-skills-block">
+                        {/* Passiva 1 */}
+                        <div className="comp-skill-row passive">
+                          <div className="comp-skill-header-row">
+                            <span className="comp-skill-title">
+                              {selectedEntry.abilities?.passive1?.name || 'Vontade Indomável'}
+                            </span>
+                            <span className="comp-skill-tag passive">PASSIVA 1</span>
+                          </div>
+                          <span className="comp-skill-desc">
+                            {selectedEntry.abilities?.passive1?.desc || 'Resistência natural a efeitos adversos e intimidação.'}
+                          </span>
+                        </div>
+
+                        {/* Passiva 2 */}
+                        <div className="comp-skill-row passive">
+                          <div className="comp-skill-header-row">
+                            <span className="comp-skill-title">
+                              {selectedEntry.abilities?.passive2?.name || 'Percepção da Névoa'}
+                            </span>
+                            <span className="comp-skill-tag passive">PASSIVA 2</span>
+                          </div>
+                          <span className="comp-skill-desc">
+                            {selectedEntry.abilities?.passive2?.desc || 'Enxerga claramente através de neblinas densas e escuridão.'}
+                          </span>
+                        </div>
+
+                        {/* Ativa */}
+                        <div className="comp-skill-row active">
+                          <div className="comp-skill-header-row">
+                            <span className="comp-skill-title">
+                              {selectedEntry.abilities?.active?.name || 'Ataque Devastador'}
+                            </span>
+                            <span className="comp-skill-tag active">HABILIDADE ATIVA</span>
+                          </div>
+                          <span className="comp-skill-desc">
+                            {selectedEntry.abilities?.active?.desc || 'Desfere um golpe avassalador que quebra defesas inimigas.'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 5. CONTAINER: ESPÓLIOS / DROPS */}
+                    <div className="comp-data-container comp-drops-container">
+                      <div className="comp-drops-compact-block">
+                        <span className="comp-drops-compact-title">
+                          {activeCategory === 'criaturas' ? '🎒 ESPÓLIOS & DROPS:' : '🌿 RECURSOS EXTRAÍVEIS:'}
+                        </span>
+                        {selectedEntry.drops && selectedEntry.drops.length > 0 ? (
+                          <div className="comp-drops-chips-wrap">
+                            {selectedEntry.drops.map((drop, dIdx) => {
+                              const dropName = typeof drop === 'string' ? drop : drop.name
+                              const dropChance = typeof drop === 'object' ? drop.chance : ''
+                              const dropIcon = typeof drop === 'object' && drop.icon ? drop.icon : (activeCategory === 'plantas_fungos' ? '🌸' : '💎')
+                              return (
+                                <div key={dIdx} className="comp-drop-chip">
+                                  <span className="drop-chip-icon">{dropIcon}</span>
+                                  <span className="drop-chip-name">{dropName}</span>
+                                  {dropChance && <span className="drop-chip-chance">({dropChance})</span>}
+                                </div>
+                              )
+                            })}
+                          </div>
+                        ) : (
+                          <span className="comp-drops-empty-text">Nenhum espólio catalogado.</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="compendium-book-empty">
