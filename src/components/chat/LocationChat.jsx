@@ -298,8 +298,13 @@ export default function LocationChat({ slug, locationName }) {
               const prevLastId = lastDmMsgIdsRef.current[dm.uid]
 
               if (prevLastId && lastId !== prevLastId) {
-                if (lastMsg?.uid && lastMsg.uid !== userRef.current?.uid && soundEnabledRef.current) {
-                  playDirectMessageSound(soundVolumeRef.current)
+                if (lastMsg?.uid && lastMsg.uid !== userRef.current?.uid) {
+                  if (soundEnabledRef.current) {
+                    playDirectMessageSound(soundVolumeRef.current)
+                  }
+                  if (activeTabRef.current !== `dm_${dm.uid}`) {
+                    setUnreadDms(prev => ({ ...prev, [dm.uid]: true }))
+                  }
                 }
               }
               lastDmMsgIdsRef.current[dm.uid] = lastId
@@ -492,6 +497,10 @@ export default function LocationChat({ slug, locationName }) {
     ? zoneMessages
     : (dmMessagesMap[activeTab.replace('dm_', '')] || [])
 
+  const unreadDmSenders = useMemo(() => {
+    return openDms.filter(d => unreadDms[d.uid])
+  }, [openDms, unreadDms])
+
   const currentDmTarget = activeTab.startsWith('dm_')
     ? openDms.find(d => d.uid === activeTab.replace('dm_', ''))
     : null
@@ -574,6 +583,28 @@ export default function LocationChat({ slug, locationName }) {
               </div>
             )}
 
+            {unreadDmSenders.length > 0 && (!activeTab.startsWith('dm_') || !unreadDms[activeTab.replace('dm_', '')]) && (
+              <div className="chat-unread-dm-floating-bar">
+                <div className="chat-unread-dm-info">
+                  <span className="chat-unread-dm-pulse-icon">💬</span>
+                  <span className="chat-unread-dm-text">
+                    {unreadDmSenders.length === 1 ? (
+                      <>Você recebeu mensagem privada nova de <strong>{unreadDmSenders[0].characterName}</strong></>
+                    ) : (
+                      <>Você tem mensagens privadas não lidas de <strong>{unreadDmSenders.map(s => s.characterName).join(', ')}</strong></>
+                    )}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  className="chat-unread-dm-open-btn"
+                  onClick={() => setActiveTab(`dm_${unreadDmSenders[0].uid}`)}
+                >
+                  Abrir conversa ➔
+                </button>
+              </div>
+            )}
+
             <div className="chat-main-grid">
               <div className="chat-feed-column">
                 <ChatMessageList
@@ -641,6 +672,7 @@ export default function LocationChat({ slug, locationName }) {
                 currentUserChar={character}
                 isPrivateChat={activeTab.startsWith('dm_')}
                 privateTargetUser={currentDmTarget}
+                unreadDms={unreadDms}
                 onSelectUser={(u) => setModalUser(u)}
                 onAcceptRequest={handleAcceptRequest}
                 onDeclineRequest={handleDeclineRequest}
