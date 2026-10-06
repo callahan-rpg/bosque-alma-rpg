@@ -9,7 +9,7 @@ import {
   serverTimestamp,
 } from 'firebase/firestore'
 import { db } from '../firebase/config'
-import { useGuest } from '../contexts/GuestContext.jsx'
+import { useAuth } from '../contexts/AuthContext.jsx'
 
 const DICE_TYPES = [
   { type: 'D4',   faces: 4,   icon: '▲' },
@@ -24,7 +24,8 @@ const MAX_WIDTH  = 520
 const MIN_HEIGHT = 340
 
 export default function DiceRoller({ onClose }) {
-  const { user, character } = useGuest()
+  const { user, character, profile } = useAuth()
+  const chatDisplayName = profile?.chatName || character?.name || profile?.characterName || profile?.nick || 'Viajante'
   const [selected, setSelected] = useState(DICE_TYPES[2]) // D10 padrão
   const [count, setCount]       = useState(1)
   const [rolling, setRolling]   = useState(false)
@@ -42,14 +43,40 @@ export default function DiceRoller({ onClose }) {
   const panelRef    = useRef(null)
 
   useEffect(() => {
-    const q = query(
-      collection(db, 'dice_rolls'),
-      orderBy('timestamp', 'desc'),
-      limit(20)
-    )
-    return onSnapshot(q, (snap) =>
-      setHistory(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
-    )
+    let unsub = () => {}
+    try {
+      const q = query(
+        collection(db, 'dice_rolls'),
+        orderBy('timestamp', 'desc'),
+        limit(20)
+      )
+      unsub = onSnapshot(
+        q,
+        (snap) => {
+          const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+          setHistory(list)
+        },
+        (err) => {
+          console.warn('[DiceRoller] onSnapshot ordenado falhou, tentando fallback:', err)
+          try {
+            const qFallback = query(collection(db, 'dice_rolls'), limit(20))
+            unsub = onSnapshot(qFallback, (snap) => {
+              const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+              list.sort((a, b) => {
+                const getMs = (t) => (t?.toMillis ? t.toMillis() : t?.seconds ? t.seconds * 1000 : new Date(t || 0).getTime())
+                return getMs(b.timestamp) - getMs(a.timestamp)
+              })
+              setHistory(list)
+            })
+          } catch (e) {
+            console.error('[DiceRoller] Erro no fallback do snapshot:', e)
+          }
+        }
+      )
+    } catch (err) {
+      console.error('[DiceRoller] Falha ao iniciar escuta de rolagens:', err)
+    }
+    return () => unsub()
   }, [])
 
   const onHeaderMouseDown = useCallback((e) => {
@@ -149,7 +176,7 @@ export default function DiceRoller({ onClose }) {
     if (rolling) return
     setRolling(true)
     setResult(null)
-    await new Promise((r) => setTimeout(r, 1000))
+    await new Promise((r) => setTimeout(r, 600))
 
     const currentRolls = Array.from({ length: count }, () => Math.floor(Math.random() * selected.faces) + 1)
     const total = currentRolls.reduce((acc, v) => acc + v, 0)
@@ -159,16 +186,35 @@ export default function DiceRoller({ onClose }) {
     setResult(rollData)
     setRolling(false)
 
+    const now = new Date()
+    const newEntry = {
+      playerUid: user?.uid || 'anon',
+      uid: user?.uid || 'anon',
+      playerName: chatDisplayName,
+      characterName: chatDisplayName,
+      avatarUrl: character?.avatarUrl || '',
+      diceType: diceName,
+      dice: diceName,
+      label: diceName,
+      faces: selected.faces,
+      count,
+      rolls: currentRolls,
+      results: currentRolls,
+      result: total,
+      total,
+      timestamp: now,
+    }
+
+    // Atualização otimista imediata no histórico local
+    setHistory((prev) => [
+      { id: 'local_' + Date.now(), ...newEntry },
+      ...prev.filter((p) => !p.id.startsWith('local_')).slice(0, 19),
+    ])
+
     try {
       await addDoc(collection(db, 'dice_rolls'), {
-        playerUid:  user?.uid || 'anon',
-        playerName: character?.name || 'Viajante',
-        diceType:   diceName,
-        faces:      selected.faces,
-        count,
-        rolls:      currentRolls,
-        result:     total,
-        timestamp:  serverTimestamp(),
+        ...newEntry,
+        timestamp: serverTimestamp(),
       })
     } catch (err) {
       console.warn('[DiceRoller] Erro ao salvar rolagem no Firebase:', err)
@@ -176,8 +222,15 @@ export default function DiceRoller({ onClose }) {
   }
 
   function formatTime(ts) {
-    if (!ts) return ''
-    const d = ts.toDate ? ts.toDate() : new Date(ts)
+    if (!ts) return 'agora'
+    if (ts.toDate) {
+      return ts.toDate().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+    }
+    if (ts instanceof Date) {
+      return ts.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+    }
+    const d = new Date(ts)
+    if (isNaN(d.getTime())) return 'agora'
     return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
   }
 
@@ -284,7 +337,7 @@ export default function DiceRoller({ onClose }) {
               </div>
             )}
             <div className="dice-result-label">
-              {character?.name} · {result.diceType}
+              {chatDisplayName} · {result.diceType}
             </div>
           </>
         ) : (
@@ -314,16 +367,21 @@ export default function DiceRoller({ onClose }) {
             {history.map((entry) => {
               const faces = entry.faces || 20
               const entryCount = entry.count || 1
-              const rolls = Array.isArray(entry.rolls) ? entry.rolls : []
+              const rolls = Array.isArray(entry.rolls) ? entry.rolls : (Array.isArray(entry.results) ? entry.results : [])
+              const displayName = entry.playerName || entry.characterName || entry.nick || 'Viajante'
+              const diceLabelName = entry.diceType || entry.dice || entry.label || `${entryCount}D${faces}`
+              const totalVal = entry.result !== undefined ? entry.result : (entry.total !== undefined ? entry.total : 0)
+
               let itemClass = ''
-              if (entry.result === 1 || entry.result === entryCount) itemClass = 'crit-fail'
-              else if (entry.result === faces || entry.result === entryCount * faces) itemClass = 'crit-success'
+              if (totalVal === 1 || totalVal === entryCount) itemClass = 'crit-fail'
+              else if (totalVal === faces || totalVal === entryCount * faces) itemClass = 'crit-success'
+
               return (
                 <div key={entry.id} className="dice-history-item">
                   <div className="dice-history-main-row">
-                    <span className="dice-history-player">{entry.playerName}</span>
-                    <span className="dice-history-type">{entry.diceType}</span>
-                    <span className={`dice-history-result ${itemClass}`}>{entry.result}</span>
+                    <span className="dice-history-player">{displayName}</span>
+                    <span className="dice-history-type">{diceLabelName}</span>
+                    <span className={`dice-history-result ${itemClass}`}>{totalVal}</span>
                     <span style={{ fontSize: 10, color: 'var(--text-muted)', marginLeft: 'auto', whiteSpace: 'nowrap' }}>
                       {formatTime(entry.timestamp)}
                     </span>

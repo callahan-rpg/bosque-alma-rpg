@@ -15,6 +15,8 @@ import {
   subscribeUserInbox,
   clearUserInboxItem,
   deleteZoneMessage,
+  updateZoneMessage,
+  updatePrivateMessage,
   subscribeOnlinePresence,
   toggleReaction,
   pinZoneMessage,
@@ -417,6 +419,20 @@ export default function LocationChat({ slug, locationName }) {
     }
   }
 
+  const handleEditMessage = async (msgId, newText) => {
+    if (!user?.uid || !msgId || !newText?.trim()) return
+    if (activeTab === 'zone') {
+      if (!slug) return
+      await updateZoneMessage(slug, msgId, newText, user.uid)
+    } else if (activeTab.startsWith('dm_')) {
+      const targetUid = activeTab.replace('dm_', '')
+      const roomId = getPrivateRoomId(user.uid, targetUid)
+      if (roomId) {
+        await updatePrivateMessage(roomId, msgId, newText, user.uid)
+      }
+    }
+  }
+
   const handleToggleReaction = async (msgId, emoji) => {
     if (!user?.uid || !msgId || !emoji) return
     const charName = character?.name || character?.characterName || 'Viajante'
@@ -592,6 +608,7 @@ export default function LocationChat({ slug, locationName }) {
                   isPrivateChat={activeTab.startsWith('dm_')}
                   onSelectUser={(u) => setModalUser(u)}
                   onDeleteMessage={handleDeleteMessage}
+                  onEditMessage={handleEditMessage}
                   onPinMessage={handlePinMessage}
                   onToggleReaction={handleToggleReaction}
                   onQuote={(msg) => {

@@ -7,6 +7,9 @@ const Location = lazy(() => import('./pages/Location.jsx'))
 const Compendium = lazy(() => import('./pages/Compendium.jsx'))
 const Admin = lazy(() => import('./pages/Admin.jsx'))
 const LoginPage = lazy(() => import('./pages/LoginPage.jsx'))
+const CharacterSheet = lazy(() => import('./pages/CharacterSheet.jsx'))
+const PublicCharacters = lazy(() => import('./pages/PublicCharacters.jsx'))
+const Combat = lazy(() => import('./pages/Combat.jsx'))
 
 function DynamicDefaultRedirect() {
   const { defaultSlug } = useDefaultLocation()
@@ -49,8 +52,25 @@ export default function App() {
               {/* Compêndio do Bosque (Bestiário, Herbário e Poções) */}
               <Route path="/compendio" element={<Compendium />} />
 
+              {/* Ficha / Página do Personagem */}
+              <Route path="/personagem" element={<CharacterSheet />} />
+              <Route path="/personagem/:targetUid" element={<CharacterSheet />} />
+              <Route path="/ficha" element={<CharacterSheet />} />
+              <Route path="/character" element={<CharacterSheet />} />
+              <Route path="/character/:targetUid" element={<CharacterSheet />} />
+
+              {/* Lista / Galeria Pública de Personagens */}
+              <Route path="/personagens" element={<PublicCharacters />} />
+              <Route path="/characters" element={<PublicCharacters />} />
+              <Route path="/viajantes" element={<PublicCharacters />} />
+
+              {/* Mesa de Combate Tático em Tempo Real */}
+              <Route path="/combat" element={<Combat />} />
+              <Route path="/combate" element={<Combat />} />
+
               {/* Portal de Mestre / Painel de Admin com Senha Mestra */}
               <Route path="/soul-master" element={<Admin />} />
+              <Route path="/admin" element={<Admin />} />
 
               {/* Fallback de rotas */}
               <Route path="*" element={<DynamicDefaultRedirect />} />

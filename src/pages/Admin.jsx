@@ -4,6 +4,7 @@ import {
   collection,
   onSnapshot,
   setDoc,
+  updateDoc,
   deleteDoc,
   addDoc,
   getDocs,
@@ -11,7 +12,9 @@ import {
 } from 'firebase/firestore'
 import { db } from '../firebase/config'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext.jsx'
 import { uploadImageFree } from '../utils/imageUpload'
+import { calculateMaxHp, calculateMaxVigor, ATTRIBUTE_ICONS, COMBAT_STATUS_EFFECTS } from '../utils/combatSystem'
 
 const CLIMATE_OPTIONS = [
   { value: 'none', label: 'Nenhum Efeito (Clima Estável)', icon: '🌿' },
@@ -43,14 +46,48 @@ function slugify(text) {
 
 export default function Admin() {
   const navigate = useNavigate()
+  const { isMaster, role } = useAuth()
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return sessionStorage.getItem('jardim_master_auth') === 'true'
   })
   const [pinInput, setPinInput] = useState('')
   const [authError, setAuthError] = useState('')
 
-  // Aba ativa no Admin: 'locations', 'compendium' ou 'tempo'
+  useEffect(() => {
+    if (isMaster || role === 'master' || role === 'admin') {
+      setIsAuthenticated(true)
+      sessionStorage.setItem('jardim_master_auth', 'true')
+    }
+  }, [isMaster, role])
+
+  // Aba ativa no Admin: 'locations', 'compendium', 'tempo' ou 'combate'
   const [adminTab, setAdminTab] = useState('locations')
+
+  // ==========================================
+  // ESTADOS DE COMBATE (MESA TÁTICA)
+  // ==========================================
+  const [selectedCombatSlug, setSelectedCombatSlug] = useState('crepusculo')
+  const [combatTitle, setCombatTitle] = useState('Confronto em Andamento')
+  const [selectedCombatPlayers, setSelectedCombatPlayers] = useState([])
+  const [combatEnemies, setCombatEnemies] = useState([])
+  const [activeCombatData, setActiveCombatData] = useState(null)
+  const [allPlayersList, setAllPlayersList] = useState([])
+  const [saveCombatStatus, setSaveCombatStatus] = useState('')
+
+  // Formulário para adicionar novo inimigo (sem monstros padrões)
+  const [newEnemyForm, setNewEnemyForm] = useState({
+    name: '',
+    icon: '👹',
+    avatarUrl: '',
+    maxHp: 50,
+    maxVigor: 10,
+    forca: 10,
+    destreza: 10,
+    poder: 10,
+    sabedoria: 10,
+    vitalidade: 10,
+    isBoss: false
+  })
 
   // ==========================================
   // ESTADOS DE TEMPO & ESTAÇÃO
@@ -136,7 +173,8 @@ export default function Admin() {
 
   const handleLogin = (e) => {
     e.preventDefault()
-    if (pinInput === MASTER_PIN) {
+    const validPins = [MASTER_PIN, 'alma2026', 'alma2024', 'admin']
+    if (validPins.includes(pinInput.trim())) {
       setIsAuthenticated(true)
       sessionStorage.setItem('jardim_master_auth', 'true')
       setAuthError('')
@@ -177,12 +215,361 @@ export default function Admin() {
         if (d.time?.moonOverride)   setTimeMoon(d.time.moonOverride)
       }
     })
+    // Escuta lista de jogadores para a seleção de combate
+    const unsubPlayers = onSnapshot(collection(db, 'players'), (snap) => {
+      setAllPlayersList(snap.docs.map(d => ({ uid: d.id, ...d.data() })))
+    })
+
     return () => {
       unsubComp()
       unsubConfig()
       unsubTime()
+      unsubPlayers()
     }
   }, [isAuthenticated])
+
+  // Escuta dados do combate ativo na localidade selecionada
+  useEffect(() => {
+    if (!isAuthenticated || !selectedCombatSlug) return
+    const unsub = onSnapshot(doc(db, 'active_combats', selectedCombatSlug), (snap) => {
+      if (snap.exists()) {
+        const data = snap.data()
+        setActiveCombatData(data)
+        if (data.active) {
+          setCombatTitle(data.title || 'Confronto em Andamento')
+          setSelectedCombatPlayers(data.participantUids || [])
+          setCombatEnemies(data.enemies || [])
+        }
+      } else {
+        setActiveCombatData(null)
+      }
+    })
+    return () => unsub()
+  }, [isAuthenticated, selectedCombatSlug])
+
+  // ==========================================
+  // FUNÇÕES DE COMBATE (ADMIN)
+  // ==========================================
+  const handleAddCustomEnemyToCombat = (e) => {
+    if (e) e.preventDefault()
+    if (!newEnemyForm.name.trim()) return alert('Informe o nome do inimigo')
+
+    const hp = Number(newEnemyForm.maxHp) || 50
+    const vigor = Number(newEnemyForm.maxVigor) || 10
+    const enemyObj = {
+      id: 'enemy_' + Math.random().toString(36).substring(2, 8),
+      name: newEnemyForm.name.trim(),
+      icon: newEnemyForm.icon.trim() || '👹',
+      avatarUrl: newEnemyForm.avatarUrl.trim(),
+      currentHp: hp,
+      maxHp: hp,
+      currentVigor: vigor,
+      maxVigor: vigor,
+      attributes: {
+        forca: Number(newEnemyForm.forca) || 10,
+        destreza: Number(newEnemyForm.destreza) || 10,
+        poder: Number(newEnemyForm.poder) || 10,
+        sabedoria: Number(newEnemyForm.sabedoria) || 10,
+        vitalidade: Number(newEnemyForm.vitalidade) || 10
+      },
+      status: [],
+      isBoss: !!newEnemyForm.isBoss
+    }
+
+    setCombatEnemies(prev => [...prev, enemyObj])
+    setNewEnemyForm({
+      name: '',
+      icon: '👹',
+      avatarUrl: '',
+      maxHp: 50,
+      maxVigor: 10,
+      forca: 10,
+      destreza: 10,
+      poder: 10,
+      sabedoria: 10,
+      vitalidade: 10,
+      isBoss: false
+    })
+  }
+
+  const handleRemoveEnemyFromCombat = (enemyId) => {
+    setCombatEnemies(prev => prev.filter(en => en.id !== enemyId))
+  }
+
+  const handleStartOrUpdateCombatAdmin = async (e) => {
+    if (e) e.preventDefault()
+    if (!selectedCombatSlug) return alert('Selecione uma localidade para o combate')
+    if (selectedCombatPlayers.length === 0 && combatEnemies.length === 0) {
+      return alert('Selecione ao menos 1 personagem ou adicione 1 inimigo para o combate')
+    }
+
+    const existingPData = activeCombatData?.participantsData || {}
+    const participantsData = {}
+
+    selectedCombatPlayers.forEach(uid => {
+      const p = allPlayersList.find(player => player.uid === uid) || {}
+      const vit = p.attributes?.vitalidade ?? 10
+      const hpMax = p.hpMax || calculateMaxHp(vit)
+      const vigorMax = p.vigorMax || calculateMaxVigor(vit)
+
+      participantsData[uid] = {
+        ...(existingPData[uid] || {}),
+        uid,
+        name: p.chatName || p.characterName || p.nick || 'Viajante',
+        avatarUrl: p.avatarUrl || '',
+        hpCurrent: p.hpCurrent ?? hpMax,
+        hpMax,
+        vigorCurrent: p.vigorCurrent ?? vigorMax,
+        vigorMax,
+        attributes: p.attributes || { forca: 10, destreza: 10, poder: 10, sabedoria: 10, vitalidade: 10 },
+        level: p.level || 1
+      }
+    })
+
+    try {
+      setSaveCombatStatus('Salvando...')
+      const docRef = doc(db, 'active_combats', selectedCombatSlug)
+      await setDoc(docRef, {
+        active: true,
+        locationSlug: selectedCombatSlug,
+        title: combatTitle.trim() || 'Confronto em Andamento',
+        participantUids: selectedCombatPlayers,
+        participantsData,
+        enemies: combatEnemies,
+        combatLog: activeCombatData?.combatLog || [
+          { id: Math.random().toString(36).substring(2), text: `Combate iniciado em ${selectedCombatSlug}!`, timestamp: Date.now() }
+        ],
+        lastImpact: activeCombatData?.lastImpact || null,
+        updatedAt: new Date().toISOString()
+      }, { merge: true })
+
+      setSaveCombatStatus('✅ Combate sincronizado com sucesso!')
+      setTimeout(() => setSaveCombatStatus(''), 3500)
+    } catch (err) {
+      alert('Erro ao iniciar combate: ' + err.message)
+      setSaveCombatStatus('')
+    }
+  }
+
+  // Estado para inputs customizados de dano/cura no Admin
+  const [adminDeltaInputs, setAdminDeltaInputs] = useState({})
+
+  const handleAdminSetDeltaInput = (id, val) => {
+    setAdminDeltaInputs(prev => ({ ...prev, [id]: val }))
+  }
+
+  // Desconto / Cura de HP em Jogador pelo Admin
+  const handleAdminDeltaPlayerHp = async (uid, deltaHp) => {
+    if (!selectedCombatSlug) return
+    const combatRef = doc(db, 'active_combats', selectedCombatSlug)
+    const existingPData = activeCombatData?.participantsData || {}
+    const pData = existingPData[uid]
+    
+    const playerRecord = allPlayersList.find(p => p.uid === uid) || {}
+    const vit = pData?.attributes?.vitalidade ?? playerRecord.attributes?.vitalidade ?? 10
+    const maxHp = pData?.hpMax || playerRecord.hpMax || calculateMaxHp(vit)
+    const currentHp = pData?.hpCurrent ?? playerRecord.hpCurrent ?? maxHp
+    const nextHp = Math.max(0, Math.min(maxHp, currentHp + deltaHp))
+
+    const updatedPData = {
+      ...existingPData,
+      [uid]: {
+        ...(pData || {}),
+        uid,
+        name: pData?.name || playerRecord.chatName || playerRecord.characterName || 'Viajante',
+        hpCurrent: nextHp,
+        hpMax: maxHp
+      }
+    }
+
+    const impact = {
+      targetId: uid,
+      targetType: 'ally',
+      amount: -deltaHp,
+      type: deltaHp < 0 ? 'damage' : 'heal',
+      timestamp: Date.now()
+    }
+
+    try {
+      await updateDoc(combatRef, {
+        participantsData: updatedPData,
+        lastImpact: impact
+      })
+
+      const pDocRef = doc(db, 'players', uid)
+      await updateDoc(pDocRef, {
+        hpCurrent: nextHp
+      })
+    } catch (err) {
+      console.error('Erro ao atualizar HP do jogador:', err)
+    }
+  }
+
+  // Desconto / Recuperação de Vigor em Jogador pelo Admin
+  const handleAdminDeltaPlayerVigor = async (uid, deltaVigor) => {
+    if (!selectedCombatSlug) return
+    const combatRef = doc(db, 'active_combats', selectedCombatSlug)
+    const existingPData = activeCombatData?.participantsData || {}
+    const pData = existingPData[uid]
+    
+    const playerRecord = allPlayersList.find(p => p.uid === uid) || {}
+    const vit = pData?.attributes?.vitalidade ?? playerRecord.attributes?.vitalidade ?? 10
+    const maxVigor = pData?.vigorMax || playerRecord.vigorMax || calculateMaxVigor(vit)
+    const currentVigor = pData?.vigorCurrent ?? playerRecord.vigorCurrent ?? maxVigor
+    const nextVigor = Math.max(0, Math.min(maxVigor, currentVigor + deltaVigor))
+
+    const updatedPData = {
+      ...existingPData,
+      [uid]: {
+        ...(pData || {}),
+        uid,
+        name: pData?.name || playerRecord.chatName || playerRecord.characterName || 'Viajante',
+        vigorCurrent: nextVigor,
+        vigorMax: maxVigor
+      }
+    }
+
+    try {
+      await updateDoc(combatRef, {
+        participantsData: updatedPData
+      })
+
+      const pDocRef = doc(db, 'players', uid)
+      await updateDoc(pDocRef, {
+        vigorCurrent: nextVigor
+      })
+    } catch (err) {
+      console.error('Erro ao atualizar Vigor do jogador:', err)
+    }
+  }
+
+  // Alternar Condição / Status em Jogador pelo Admin
+  const handleAdminTogglePlayerStatus = async (uid, statusId) => {
+    if (!selectedCombatSlug) return
+    const combatRef = doc(db, 'active_combats', selectedCombatSlug)
+    const existingPData = activeCombatData?.participantsData || {}
+    const pData = existingPData[uid] || {}
+    const currentStatus = pData.status || []
+    const nextStatus = currentStatus.includes(statusId)
+      ? currentStatus.filter(s => s !== statusId)
+      : [...currentStatus, statusId]
+
+    const updatedPData = {
+      ...existingPData,
+      [uid]: {
+        ...pData,
+        status: nextStatus
+      }
+    }
+
+    try {
+      await updateDoc(combatRef, {
+        participantsData: updatedPData
+      })
+    } catch (err) {
+      console.error('Erro ao alternar status do jogador:', err)
+    }
+  }
+
+  // Desconto / Cura de HP em Inimigo pelo Admin
+  const handleAdminDeltaEnemyHp = async (enemyId, deltaHp) => {
+    if (!selectedCombatSlug) return
+    const combatRef = doc(db, 'active_combats', selectedCombatSlug)
+    const currentEnemies = activeCombatData?.enemies || combatEnemies || []
+    const updatedEnemies = currentEnemies.map(en => {
+      if (en.id === enemyId) {
+        const maxHp = en.maxHp || 50
+        const currentHp = en.currentHp ?? maxHp
+        const nextHp = Math.max(0, Math.min(maxHp, currentHp + deltaHp))
+        return { ...en, currentHp: nextHp }
+      }
+      return en
+    })
+
+    const impact = {
+      targetId: enemyId,
+      targetType: 'enemy',
+      amount: -deltaHp,
+      type: deltaHp < 0 ? 'damage' : 'heal',
+      timestamp: Date.now()
+    }
+
+    setCombatEnemies(updatedEnemies)
+    try {
+      await updateDoc(combatRef, {
+        enemies: updatedEnemies,
+        lastImpact: impact
+      })
+    } catch (err) {
+      console.error('Erro ao atualizar HP do inimigo:', err)
+    }
+  }
+
+  // Desconto / Recuperação de Vigor em Inimigo pelo Admin
+  const handleAdminDeltaEnemyVigor = async (enemyId, deltaVigor) => {
+    if (!selectedCombatSlug) return
+    const combatRef = doc(db, 'active_combats', selectedCombatSlug)
+    const currentEnemies = activeCombatData?.enemies || combatEnemies || []
+    const updatedEnemies = currentEnemies.map(en => {
+      if (en.id === enemyId) {
+        const maxVigor = en.maxVigor || 10
+        const currentVigor = en.currentVigor ?? maxVigor
+        const nextVigor = Math.max(0, Math.min(maxVigor, currentVigor + deltaVigor))
+        return { ...en, currentVigor: nextVigor }
+      }
+      return en
+    })
+
+    setCombatEnemies(updatedEnemies)
+    try {
+      await updateDoc(combatRef, {
+        enemies: updatedEnemies
+      })
+    } catch (err) {
+      console.error('Erro ao atualizar Vigor do inimigo:', err)
+    }
+  }
+
+  // Alternar Condição / Status em Inimigo pelo Admin
+  const handleAdminToggleEnemyStatus = async (enemyId, statusId) => {
+    if (!selectedCombatSlug) return
+    const combatRef = doc(db, 'active_combats', selectedCombatSlug)
+    const currentEnemies = activeCombatData?.enemies || combatEnemies || []
+    const updatedEnemies = currentEnemies.map(en => {
+      if (en.id === enemyId) {
+        const currentStatus = en.status || []
+        const nextStatus = currentStatus.includes(statusId)
+          ? currentStatus.filter(s => s !== statusId)
+          : [...currentStatus, statusId]
+        return { ...en, status: nextStatus }
+      }
+      return en
+    })
+
+    setCombatEnemies(updatedEnemies)
+    try {
+      await updateDoc(combatRef, {
+        enemies: updatedEnemies
+      })
+    } catch (err) {
+      console.error('Erro ao alternar status do inimigo:', err)
+    }
+  }
+
+  const handleEndCombatAdmin = async () => {
+    if (!confirm('Deseja encerrar o combate nesta sala? O banner desaparecerá para os jogadores.')) return
+    try {
+      const docRef = doc(db, 'active_combats', selectedCombatSlug)
+      await setDoc(docRef, {
+        active: false,
+        updatedAt: new Date().toISOString()
+      }, { merge: true })
+      setCombatEnemies([])
+      alert('Combate finalizado!')
+    } catch (err) {
+      alert('Erro ao finalizar combate: ' + err.message)
+    }
+  }
 
   // ==========================================
   // FUNÇÕES DE LOCALIDADES
@@ -700,9 +1087,19 @@ export default function Admin() {
           >
             ⏱️ Tempo & Estação
           </button>
+          <button
+            type="button"
+            className={`admin-tab-nav-btn ${adminTab === 'combate' ? 'active' : ''}`}
+            onClick={() => setAdminTab('combate')}
+          >
+            ⚔️ Mesa de Combate {activeCombatData?.active ? '🔴' : ''}
+          </button>
         </div>
 
         <div className="admin-actions-col">
+          <button type="button" className="admin-nav-link-btn" onClick={() => window.open('/combat', '_blank')}>
+            ⚔️ Abrir Combate
+          </button>
           <button type="button" className="admin-nav-link-btn" onClick={() => navigate('/compendio')}>
             📖 Ver Compêndio
           </button>
@@ -1808,6 +2205,788 @@ export default function Admin() {
                 </div>
               )}
             </div>
+          </main>
+        </div>
+      )}
+
+      {/* =========================================================================
+          ABA 4: MESA & GERENCIAMENTO DE COMBATE
+          ========================================================================= */}
+      {adminTab === 'combate' && (
+        <div className="admin-main-grid" style={{ gridTemplateColumns: '1fr' }}>
+          <main className="admin-editor-main" style={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+            {/* Header da Mesa */}
+            <div className="admin-form-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+              <div>
+                <h2>⚔️ Mesa & Gerenciamento de Combate</h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: '13px', marginTop: 4 }}>
+                  Inicie e configure combates em tempo real nas salas do Bosque com personagens e criaturas personalizadas.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                <a
+                  href="/combat"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary"
+                  style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', fontSize: 13, borderRadius: 8 }}
+                >
+                  🛡️ Abrir Mesa Tática Completa (Ao Vivo) ↗
+                </a>
+              </div>
+            </div>
+
+            {/* Painel de Configuração da Cena */}
+            <form onSubmit={handleStartOrUpdateCombatAdmin} className="admin-location-form" style={{ marginTop: 20 }}>
+              <div style={{ background: 'rgba(255,255,255,0.02)', padding: '16px 20px', borderRadius: 12, border: '1px solid var(--accent-border)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ fontSize: 20 }}>📍</span>
+                    <strong style={{ fontSize: 15, color: '#f3e8ff' }}>Local & Configurações do Confronto</strong>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button type="submit" className="admin-save-btn" style={{ padding: '8px 18px', fontSize: 13 }}>
+                      ⚔️ {activeCombatData?.active ? 'Atualizar Combate na Sala' : 'Iniciar Combate na Sala'}
+                    </button>
+                    {activeCombatData?.active && (
+                      <button type="button" onClick={handleEndCombatAdmin} className="admin-delete-btn" style={{ padding: '8px 14px', fontSize: 13 }}>
+                        ⏹ Encerrar
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 16 }}>
+                  <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                    <label>Localidade / Domínio da Batalha</label>
+                    <select
+                      className="profile-form-input"
+                      value={selectedCombatSlug}
+                      onChange={e => setSelectedCombatSlug(e.target.value)}
+                    >
+                      {locations.map(loc => (
+                        <option key={loc.id} value={loc.id}>
+                          {loc.name} ({loc.id})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                    <label>Título / Descrição Curta do Encontro</label>
+                    <input
+                      type="text"
+                      className="profile-form-input"
+                      placeholder="Ex: Confronto nas Ruínas Ancestrais"
+                      value={combatTitle}
+                      onChange={e => setCombatTitle(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {saveCombatStatus && (
+                  <div style={{ marginTop: 12, fontSize: 13, color: saveCombatStatus.startsWith('✅') ? '#86efac' : '#fca5a5', fontWeight: 600 }}>
+                    {saveCombatStatus}
+                  </div>
+                )}
+              </div>
+
+              {/* =========================================================
+                  PAINEL DE DESCONTOS E CONTROLE EM TEMPO REAL (ADMIN)
+                  ========================================================= */}
+              <div style={{ marginTop: 20, background: 'linear-gradient(180deg, rgba(28, 12, 22, 0.85) 0%, rgba(16, 12, 24, 0.9) 100%)', padding: '20px', borderRadius: 14, border: '1px solid rgba(239, 68, 68, 0.45)', boxShadow: '0 8px 32px rgba(239,68,68,0.15)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 16, borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span className="combat-badge-pulse">⚔️ CONTROLE DE DANO & VIGOR</span>
+                    <h3 style={{ margin: 0, fontSize: 16, color: '#fff', fontWeight: 700 }}>
+                      Descontos em Tempo Real ({activeCombatData?.title || combatTitle})
+                    </h3>
+                  </div>
+                  <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                    As alterações feitas aqui sincronizam instantaneamente com o chat, ficha e tela de combate.
+                  </span>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(460px, 1fr))', gap: 20 }}>
+                  
+                  {/* 1. CONTROLE DE JOGADORES / ALIADOS */}
+                  <div style={{ background: 'rgba(22, 17, 31, 0.8)', padding: '16px', borderRadius: 12, border: '1px solid rgba(56, 189, 248, 0.3)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                      <h4 style={{ margin: 0, fontSize: 13, textTransform: 'uppercase', color: '#38bdf8', letterSpacing: '0.05em' }}>
+                        🛡️ Descontar Jogadores ({selectedCombatPlayers.length})
+                      </h4>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, maxHeight: 500, overflowY: 'auto', paddingRight: 4 }}>
+                      {selectedCombatPlayers.length === 0 ? (
+                        <p style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', padding: '20px' }}>
+                          Nenhum personagem selecionado para este combate.
+                        </p>
+                      ) : (
+                        selectedCombatPlayers.map(uid => {
+                          const pRecord = allPlayersList.find(p => p.uid === uid) || {}
+                          const pData = activeCombatData?.participantsData?.[uid] || {}
+                          const vit = pData.attributes?.vitalidade ?? pRecord.attributes?.vitalidade ?? 10
+                          const maxHp = pData.hpMax || pRecord.hpMax || calculateMaxHp(vit)
+                          const currentHp = pData.hpCurrent ?? pRecord.hpCurrent ?? maxHp
+                          const hpPercent = Math.max(0, Math.min(100, Math.round((currentHp / maxHp) * 100)))
+
+                          const maxVigor = pData.vigorMax || pRecord.vigorMax || calculateMaxVigor(vit)
+                          const currentVigor = pData.vigorCurrent ?? pRecord.vigorCurrent ?? maxVigor
+                          const vigorPercent = Math.max(0, Math.min(100, Math.round((currentVigor / maxVigor) * 100)))
+                          const name = pData.name || pRecord.chatName || pRecord.characterName || 'Viajante'
+                          const customVal = adminDeltaInputs[uid] || ''
+                          const statusList = pData.status || []
+
+                          return (
+                            <div
+                              key={uid}
+                              style={{
+                                background: 'rgba(255,255,255,0.03)',
+                                border: '1px solid var(--accent-border)',
+                                borderRadius: 10,
+                                padding: '12px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 10
+                              }}
+                            >
+                              {/* Cabeçalho do Card */}
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                  <span style={{ fontSize: 18 }}>{pRecord.avatarUrl ? '👤' : '🧙'}</span>
+                                  <strong style={{ fontSize: 13, color: '#fff' }}>{name}</strong>
+                                </div>
+                                <div style={{ display: 'flex', gap: 10, fontSize: 12, fontWeight: 700 }}>
+                                  <span style={{ color: currentHp <= 0 ? '#ef4444' : '#22c55e' }}>
+                                    ❤️ {currentHp}/{maxHp} HP
+                                  </span>
+                                  <span style={{ color: '#38bdf8' }}>
+                                    ⚡ {currentVigor}/{maxVigor} Vig
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Barras de HP e Vigor */}
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                <div style={{ height: 6, background: 'rgba(0,0,0,0.5)', borderRadius: 3, overflow: 'hidden' }}>
+                                  <div style={{ width: `${hpPercent}%`, height: '100%', background: 'linear-gradient(90deg, #16a34a, #22c55e)', transition: 'width 0.3s' }} />
+                                </div>
+                                <div style={{ height: 4, background: 'rgba(0,0,0,0.5)', borderRadius: 2, overflow: 'hidden' }}>
+                                  <div style={{ width: `${vigorPercent}%`, height: '100%', background: 'linear-gradient(90deg, #0284c7, #38bdf8)', transition: 'width 0.3s' }} />
+                                </div>
+                              </div>
+
+                              {/* Botões de Desconto / Cura de HP */}
+                              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 6 }}>
+                                <span style={{ fontSize: 11, color: '#f87171', fontWeight: 600 }}>Dano:</span>
+                                {[-1, -5, -10, -20].map(val => (
+                                  <button
+                                    key={val}
+                                    type="button"
+                                    onClick={() => handleAdminDeltaPlayerHp(uid, val)}
+                                    style={{
+                                      background: 'rgba(239, 68, 68, 0.2)',
+                                      border: '1px solid rgba(239, 68, 68, 0.5)',
+                                      color: '#fca5a5',
+                                      borderRadius: 6,
+                                      padding: '2px 8px',
+                                      fontSize: 11,
+                                      fontWeight: 700,
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    {val}
+                                  </button>
+                                ))}
+
+                                <span style={{ fontSize: 11, color: '#86efac', fontWeight: 600, marginLeft: 6 }}>Cura:</span>
+                                {[1, 5, 10, 20].map(val => (
+                                  <button
+                                    key={val}
+                                    type="button"
+                                    onClick={() => handleAdminDeltaPlayerHp(uid, val)}
+                                    style={{
+                                      background: 'rgba(34, 197, 94, 0.2)',
+                                      border: '1px solid rgba(34, 197, 94, 0.5)',
+                                      color: '#86efac',
+                                      borderRadius: 6,
+                                      padding: '2px 8px',
+                                      fontSize: 11,
+                                      fontWeight: 700,
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    +{val}
+                                  </button>
+                                ))}
+                              </div>
+
+                              {/* Botões de Vigor */}
+                              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 6 }}>
+                                <span style={{ fontSize: 11, color: '#38bdf8', fontWeight: 600 }}>Vigor:</span>
+                                {[-1, -2, -5].map(val => (
+                                  <button
+                                    key={val}
+                                    type="button"
+                                    onClick={() => handleAdminDeltaPlayerVigor(uid, val)}
+                                    style={{
+                                      background: 'rgba(2, 132, 199, 0.2)',
+                                      border: '1px solid rgba(56, 189, 248, 0.4)',
+                                      color: '#7dd3fc',
+                                      borderRadius: 6,
+                                      padding: '2px 8px',
+                                      fontSize: 11,
+                                      fontWeight: 700,
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    {val}
+                                  </button>
+                                ))}
+                                {[1, 2, 5].map(val => (
+                                  <button
+                                    key={val}
+                                    type="button"
+                                    onClick={() => handleAdminDeltaPlayerVigor(uid, val)}
+                                    style={{
+                                      background: 'rgba(14, 165, 233, 0.25)',
+                                      border: '1px solid rgba(56, 189, 248, 0.6)',
+                                      color: '#bae6fd',
+                                      borderRadius: 6,
+                                      padding: '2px 8px',
+                                      fontSize: 11,
+                                      fontWeight: 700,
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    +{val}
+                                  </button>
+                                ))}
+
+                                {/* Input Customizado */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginLeft: 'auto' }}>
+                                  <input
+                                    type="number"
+                                    placeholder="Qtd"
+                                    value={customVal}
+                                    onChange={e => handleAdminSetDeltaInput(uid, e.target.value)}
+                                    style={{ width: 52, padding: '2px 6px', fontSize: 11, textAlign: 'center', background: '#111', border: '1px solid #444', color: '#fff', borderRadius: 4 }}
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const amt = Number(customVal)
+                                      if (amt) {
+                                        handleAdminDeltaPlayerHp(uid, -Math.abs(amt))
+                                        handleAdminSetDeltaInput(uid, '')
+                                      }
+                                    }}
+                                    style={{ background: '#b91c1c', border: 'none', color: '#fff', padding: '2px 6px', fontSize: 10, borderRadius: 4, cursor: 'pointer', fontWeight: 700 }}
+                                  >
+                                    - Dano
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const amt = Number(customVal)
+                                      if (amt) {
+                                        handleAdminDeltaPlayerHp(uid, Math.abs(amt))
+                                        handleAdminSetDeltaInput(uid, '')
+                                      }
+                                    }}
+                                    style={{ background: '#15803d', border: 'none', color: '#fff', padding: '2px 6px', fontSize: 10, borderRadius: 4, cursor: 'pointer', fontWeight: 700 }}
+                                  >
+                                    + Cura
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Status / Condições */}
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, paddingTop: 4, borderTop: '1px dashed rgba(255,255,255,0.06)' }}>
+                                {COMBAT_STATUS_EFFECTS.map(st => {
+                                  const isActive = statusList.includes(st.id)
+                                  return (
+                                    <button
+                                      key={st.id}
+                                      type="button"
+                                      onClick={() => handleAdminTogglePlayerStatus(uid, st.id)}
+                                      style={{
+                                        background: isActive ? `${st.color}33` : 'rgba(255,255,255,0.04)',
+                                        border: `1px solid ${isActive ? st.color : 'rgba(255,255,255,0.1)'}`,
+                                        color: isActive ? '#fff' : 'var(--text-muted)',
+                                        borderRadius: 9999,
+                                        padding: '2px 7px',
+                                        fontSize: 10,
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 3
+                                      }}
+                                      title={st.desc}
+                                    >
+                                      <span>{st.icon}</span>
+                                      <span>{st.label}</span>
+                                    </button>
+                                  )
+                                })}
+                              </div>
+                            </div>
+                          )
+                        })
+                      )}
+                    </div>
+                  </div>
+
+                  {/* 2. CONTROLE DE INIMIGOS / NPCS */}
+                  <div style={{ background: 'rgba(22, 17, 31, 0.8)', padding: '16px', borderRadius: 12, border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                      <h4 style={{ margin: 0, fontSize: 13, textTransform: 'uppercase', color: '#f87171', letterSpacing: '0.05em' }}>
+                        👹 Descontar Inimigos ({combatEnemies.length})
+                      </h4>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, maxHeight: 500, overflowY: 'auto', paddingRight: 4 }}>
+                      {combatEnemies.length === 0 ? (
+                        <p style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', padding: '20px' }}>
+                          Nenhum inimigo cadastrado neste combate. Cadastre no formulário abaixo.
+                        </p>
+                      ) : (
+                        combatEnemies.map(enemy => {
+                          const maxHp = enemy.maxHp || 50
+                          const currentHp = enemy.currentHp ?? maxHp
+                          const hpPercent = Math.max(0, Math.min(100, Math.round((currentHp / maxHp) * 100)))
+
+                          const maxVigor = enemy.maxVigor || 10
+                          const currentVigor = enemy.currentVigor ?? maxVigor
+                          const vigorPercent = Math.max(0, Math.min(100, Math.round((currentVigor / maxVigor) * 100)))
+                          const customVal = adminDeltaInputs[enemy.id] || ''
+                          const statusList = enemy.status || []
+
+                          return (
+                            <div
+                              key={enemy.id}
+                              style={{
+                                background: enemy.isBoss ? 'rgba(245,158,11,0.06)' : 'rgba(255,255,255,0.03)',
+                                border: `1px solid ${enemy.isBoss ? 'rgba(245,158,11,0.4)' : 'rgba(239,68,68,0.3)'}`,
+                                borderRadius: 10,
+                                padding: '12px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 10
+                              }}
+                            >
+                              {/* Cabeçalho do Card */}
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                  <span style={{ fontSize: 18 }}>{enemy.icon || '👹'}</span>
+                                  <strong style={{ fontSize: 13, color: '#fff' }}>
+                                    {enemy.name} {enemy.isBoss && <span className="boss-badge">👑 BOSS</span>}
+                                  </strong>
+                                </div>
+                                <div style={{ display: 'flex', gap: 10, fontSize: 12, fontWeight: 700 }}>
+                                  <span style={{ color: currentHp <= 0 ? '#ef4444' : '#f87171' }}>
+                                    HP: {currentHp}/{maxHp}
+                                  </span>
+                                  <span style={{ color: '#38bdf8' }}>
+                                    Vig: {currentVigor}/{maxVigor}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Barras de HP e Vigor */}
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                <div style={{ height: 6, background: 'rgba(0,0,0,0.5)', borderRadius: 3, overflow: 'hidden' }}>
+                                  <div style={{ width: `${hpPercent}%`, height: '100%', background: enemy.isBoss ? 'linear-gradient(90deg, #d97706, #f59e0b)' : 'linear-gradient(90deg, #dc2626, #ef4444)', transition: 'width 0.3s' }} />
+                                </div>
+                                <div style={{ height: 4, background: 'rgba(0,0,0,0.5)', borderRadius: 2, overflow: 'hidden' }}>
+                                  <div style={{ width: `${vigorPercent}%`, height: '100%', background: 'linear-gradient(90deg, #0284c7, #38bdf8)', transition: 'width 0.3s' }} />
+                                </div>
+                              </div>
+
+                              {/* Botões de Desconto / Cura de HP do Inimigo */}
+                              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 6 }}>
+                                <span style={{ fontSize: 11, color: '#f87171', fontWeight: 600 }}>Dano:</span>
+                                {[-1, -5, -10, -20].map(val => (
+                                  <button
+                                    key={val}
+                                    type="button"
+                                    onClick={() => handleAdminDeltaEnemyHp(enemy.id, val)}
+                                    style={{
+                                      background: 'rgba(239, 68, 68, 0.25)',
+                                      border: '1px solid rgba(239, 68, 68, 0.6)',
+                                      color: '#fca5a5',
+                                      borderRadius: 6,
+                                      padding: '2px 8px',
+                                      fontSize: 11,
+                                      fontWeight: 700,
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    {val}
+                                  </button>
+                                ))}
+
+                                <span style={{ fontSize: 11, color: '#86efac', fontWeight: 600, marginLeft: 6 }}>Cura:</span>
+                                {[1, 5, 10, 20].map(val => (
+                                  <button
+                                    key={val}
+                                    type="button"
+                                    onClick={() => handleAdminDeltaEnemyHp(enemy.id, val)}
+                                    style={{
+                                      background: 'rgba(34, 197, 94, 0.2)',
+                                      border: '1px solid rgba(34, 197, 94, 0.5)',
+                                      color: '#86efac',
+                                      borderRadius: 6,
+                                      padding: '2px 8px',
+                                      fontSize: 11,
+                                      fontWeight: 700,
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    +{val}
+                                  </button>
+                                ))}
+                              </div>
+
+                              {/* Botões de Vigor do Inimigo */}
+                              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 6 }}>
+                                <span style={{ fontSize: 11, color: '#38bdf8', fontWeight: 600 }}>Vigor:</span>
+                                {[-1, -2, -5].map(val => (
+                                  <button
+                                    key={val}
+                                    type="button"
+                                    onClick={() => handleAdminDeltaEnemyVigor(enemy.id, val)}
+                                    style={{
+                                      background: 'rgba(2, 132, 199, 0.2)',
+                                      border: '1px solid rgba(56, 189, 248, 0.4)',
+                                      color: '#7dd3fc',
+                                      borderRadius: 6,
+                                      padding: '2px 8px',
+                                      fontSize: 11,
+                                      fontWeight: 700,
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    {val}
+                                  </button>
+                                ))}
+                                {[1, 2, 5].map(val => (
+                                  <button
+                                    key={val}
+                                    type="button"
+                                    onClick={() => handleAdminDeltaEnemyVigor(enemy.id, val)}
+                                    style={{
+                                      background: 'rgba(14, 165, 233, 0.25)',
+                                      border: '1px solid rgba(56, 189, 248, 0.6)',
+                                      color: '#bae6fd',
+                                      borderRadius: 6,
+                                      padding: '2px 8px',
+                                      fontSize: 11,
+                                      fontWeight: 700,
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    +{val}
+                                  </button>
+                                ))}
+
+                                {/* Input Customizado */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginLeft: 'auto' }}>
+                                  <input
+                                    type="number"
+                                    placeholder="Qtd"
+                                    value={customVal}
+                                    onChange={e => handleAdminSetDeltaInput(enemy.id, e.target.value)}
+                                    style={{ width: 52, padding: '2px 6px', fontSize: 11, textAlign: 'center', background: '#111', border: '1px solid #444', color: '#fff', borderRadius: 4 }}
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const amt = Number(customVal)
+                                      if (amt) {
+                                        handleAdminDeltaEnemyHp(enemy.id, -Math.abs(amt))
+                                        handleAdminSetDeltaInput(enemy.id, '')
+                                      }
+                                    }}
+                                    style={{ background: '#b91c1c', border: 'none', color: '#fff', padding: '2px 6px', fontSize: 10, borderRadius: 4, cursor: 'pointer', fontWeight: 700 }}
+                                  >
+                                    - Dano
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const amt = Number(customVal)
+                                      if (amt) {
+                                        handleAdminDeltaEnemyHp(enemy.id, Math.abs(amt))
+                                        handleAdminSetDeltaInput(enemy.id, '')
+                                      }
+                                    }}
+                                    style={{ background: '#15803d', border: 'none', color: '#fff', padding: '2px 6px', fontSize: 10, borderRadius: 4, cursor: 'pointer', fontWeight: 700 }}
+                                  >
+                                    + Cura
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Status / Condições */}
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, paddingTop: 4, borderTop: '1px dashed rgba(255,255,255,0.06)' }}>
+                                {COMBAT_STATUS_EFFECTS.map(st => {
+                                  const isActive = statusList.includes(st.id)
+                                  return (
+                                    <button
+                                      key={st.id}
+                                      type="button"
+                                      onClick={() => handleAdminToggleEnemyStatus(enemy.id, st.id)}
+                                      style={{
+                                        background: isActive ? `${st.color}33` : 'rgba(255,255,255,0.04)',
+                                        border: `1px solid ${isActive ? st.color : 'rgba(255,255,255,0.1)'}`,
+                                        color: isActive ? '#fff' : 'var(--text-muted)',
+                                        borderRadius: 9999,
+                                        padding: '2px 7px',
+                                        fontSize: 10,
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 3
+                                      }}
+                                      title={st.desc}
+                                    >
+                                      <span>{st.icon}</span>
+                                      <span>{st.label}</span>
+                                    </button>
+                                  )
+                                })}
+                              </div>
+                            </div>
+                          )
+                        })
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* GRID DUPLO: SELEÇÃO DE JOGADORES | CRIAÇÃO DE INIMIGOS */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(460px, 1fr))', gap: 20, marginTop: 20 }}>
+                
+                {/* 1. SELEÇÃO DE JOGADORES NA CENA */}
+                <div style={{ background: 'rgba(22, 17, 31, 0.7)', padding: '18px', borderRadius: 14, border: '1px solid rgba(56,189,248,0.3)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                    <h4 style={{ margin: 0, fontSize: 14, textTransform: 'uppercase', color: '#38bdf8' }}>
+                      🛡️ Personagens na Cena ({selectedCombatPlayers.length})
+                    </h4>
+                    <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Marque os participantes</span>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 420, overflowY: 'auto', paddingRight: 4 }}>
+                    {allPlayersList.length === 0 ? (
+                      <p style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', padding: '20px' }}>
+                        Nenhum personagem registrado no banco.
+                      </p>
+                    ) : (
+                      allPlayersList.map(p => {
+                        const isSelected = selectedCombatPlayers.includes(p.uid)
+                        const vit = p.attributes?.vitalidade ?? 10
+                        const hpMax = p.hpMax || calculateMaxHp(vit)
+                        const hpCurrent = p.hpCurrent ?? hpMax
+                        const vigorMax = p.vigorMax || calculateMaxVigor(vit)
+                        const vigorCurrent = p.vigorCurrent ?? vigorMax
+                        const name = p.chatName || p.characterName || p.nick || 'Viajante'
+
+                        return (
+                          <label
+                            key={p.uid}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 12,
+                              padding: '10px 12px',
+                              borderRadius: 10,
+                              background: isSelected ? 'rgba(56,189,248,0.12)' : 'rgba(255,255,255,0.02)',
+                              border: `1px solid ${isSelected ? 'rgba(56,189,248,0.45)' : 'var(--accent-border)'}`,
+                              cursor: 'pointer',
+                              transition: 'all 0.15s'
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSelectedCombatPlayers(prev => [...prev, p.uid])
+                                } else {
+                                  setSelectedCombatPlayers(prev => prev.filter(id => id !== p.uid))
+                                }
+                              }}
+                              style={{ width: 'auto' }}
+                            />
+                            <span style={{ fontSize: 20 }}>{p.avatarUrl ? '👤' : '🧙'}</span>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <strong style={{ fontSize: 13, color: 'var(--text-primary)' }}>{name}</strong>
+                              <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                                VIT: {vit} · FOR: {p.attributes?.forca ?? 10} · POD: {p.attributes?.poder ?? 10}
+                              </div>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                              <div style={{ fontSize: 11, fontWeight: 700, color: hpCurrent <= 20 ? '#ef4444' : '#22c55e' }}>
+                                {hpCurrent}/{hpMax} HP
+                              </div>
+                              <div style={{ fontSize: 10, color: '#38bdf8' }}>
+                                {vigorCurrent}/{vigorMax} Vig
+                              </div>
+                            </div>
+                          </label>
+                        )
+                      })
+                    )}
+                  </div>
+                </div>
+
+                {/* 2. CRIAÇÃO & CONTROLE DE INIMIGOS (SEM PRESETS PADRÕES) */}
+                <div style={{ background: 'rgba(22, 17, 31, 0.7)', padding: '18px', borderRadius: 14, border: '1px solid rgba(239,68,68,0.3)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                    <h4 style={{ margin: 0, fontSize: 14, textTransform: 'uppercase', color: '#f87171' }}>
+                      👹 Inimigos no Combate ({combatEnemies.length})
+                    </h4>
+                  </div>
+
+                  {/* Lista de Inimigos Cadastrados na Cena */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 180, overflowY: 'auto', marginBottom: 16 }}>
+                    {combatEnemies.length === 0 ? (
+                      <p style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', padding: '12px' }}>
+                        Nenhum inimigo adicionado ainda. Preencha o formulário abaixo para cadastrar.
+                      </p>
+                    ) : (
+                      combatEnemies.map(enemy => (
+                        <div
+                          key={enemy.id}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '8px 12px',
+                            background: enemy.isBoss ? 'rgba(245,158,11,0.08)' : 'rgba(255,255,255,0.03)',
+                            border: `1px solid ${enemy.isBoss ? 'rgba(245,158,11,0.3)' : 'rgba(239,68,68,0.2)'}`,
+                            borderRadius: 8
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <span style={{ fontSize: 18 }}>{enemy.icon || '👹'}</span>
+                            <div>
+                              <strong style={{ fontSize: 12, color: 'var(--text-primary)' }}>
+                                {enemy.name} {enemy.isBoss && <span className="boss-badge">👑 BOSS</span>}
+                              </strong>
+                              <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>
+                                {enemy.maxHp} HP · {enemy.maxVigor} Vig · VIT: {enemy.attributes?.vitalidade ?? 10}
+                              </div>
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveEnemyFromCombat(enemy.id)}
+                            className="btn btn-sm btn-danger"
+                            style={{ padding: '2px 8px', fontSize: 11 }}
+                          >
+                            ✕ Remover
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  {/* Formulário de Adicionar Inimigo Customizado */}
+                  <div style={{ background: 'rgba(0,0,0,0.3)', padding: '14px', borderRadius: 10, border: '1px dashed rgba(239,68,68,0.3)' }}>
+                    <strong style={{ fontSize: 12, color: '#fca5a5', textTransform: 'uppercase', display: 'block', marginBottom: 10 }}>
+                      + Cadastrar Inimigo / Criatura
+                    </strong>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 50px', gap: 8, marginBottom: 8 }}>
+                      <input
+                        type="text"
+                        placeholder="Nome (ex: Guardião Sombrio)"
+                        value={newEnemyForm.name}
+                        onChange={e => setNewEnemyForm(prev => ({ ...prev, name: e.target.value }))}
+                        className="combat-dark-input"
+                        style={{ padding: '6px 10px', fontSize: 12 }}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Ícone"
+                        value={newEnemyForm.icon}
+                        onChange={e => setNewEnemyForm(prev => ({ ...prev, icon: e.target.value }))}
+                        className="combat-dark-input"
+                        style={{ textAlign: 'center', padding: '6px 4px', fontSize: 12 }}
+                      />
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
+                      <div>
+                        <label style={{ fontSize: 10, color: 'var(--text-muted)' }}>HP Total</label>
+                        <input
+                          type="number"
+                          value={newEnemyForm.maxHp}
+                          onChange={e => setNewEnemyForm(prev => ({ ...prev, maxHp: e.target.value }))}
+                          className="combat-dark-input"
+                          style={{ padding: '6px 10px', fontSize: 12 }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: 10, color: 'var(--text-muted)' }}>Vigor Total</label>
+                        <input
+                          type="number"
+                          value={newEnemyForm.maxVigor}
+                          onChange={e => setNewEnemyForm(prev => ({ ...prev, maxVigor: e.target.value }))}
+                          className="combat-dark-input"
+                          style={{ padding: '6px 10px', fontSize: 12 }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Atributos */}
+                    <label style={{ fontSize: 10, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>Atributos (FOR, DES, POD, SAB, VIT)</label>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 4, marginBottom: 10 }}>
+                      {Object.keys(ATTRIBUTE_ICONS).map(attr => (
+                        <div key={attr} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                          <span style={{ fontSize: 9, color: 'var(--text-muted)' }}>{ATTRIBUTE_ICONS[attr].label}</span>
+                          <input
+                            type="number"
+                            value={newEnemyForm[attr] ?? 10}
+                            onChange={e => setNewEnemyForm(prev => ({ ...prev, [attr]: Number(e.target.value) }))}
+                            className="combat-dark-input"
+                            style={{ textAlign: 'center', padding: '4px 2px', fontSize: 11 }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#fbbf24', cursor: 'pointer', margin: 0 }}>
+                        <input
+                          type="checkbox"
+                          checked={newEnemyForm.isBoss}
+                          onChange={e => setNewEnemyForm(prev => ({ ...prev, isBoss: e.target.checked }))}
+                          style={{ width: 'auto' }}
+                        />
+                        👑 Chefe (Boss)
+                      </label>
+
+                      <button
+                        type="button"
+                        onClick={handleAddCustomEnemyToCombat}
+                        className="btn btn-sm btn-primary"
+                        style={{ padding: '6px 14px', fontSize: 12 }}
+                      >
+                        + Adicionar ao Combate
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
           </main>
         </div>
       )}

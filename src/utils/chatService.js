@@ -2,6 +2,7 @@ import {
   ref,
   push,
   set,
+  update,
   remove,
   onValue,
   off,
@@ -228,6 +229,57 @@ export async function deleteZoneMessage(zoneSlug, messageId) {
 }
 
 /**
+ * Atualiza o texto de uma mensagem do chat de zona (permitido apenas pelo autor da mensagem)
+ */
+export async function updateZoneMessage(zoneSlug, messageId, newText, callerUid) {
+  if (!rtdb || !zoneSlug || !messageId || !newText?.trim() || !callerUid) return
+  const msgRef = ref(rtdb, `chat/zones/${zoneSlug}/messages/${messageId}`)
+  const snap = await get(msgRef)
+  if (!snap.exists()) return
+  const msgData = snap.val()
+  if (msgData.uid !== callerUid) {
+    console.warn('[chatService] Bloqueado: apenas o autor pode editar sua própria mensagem.')
+    return
+  }
+  const cleanText = newText.trim().slice(0, 500)
+  await update(msgRef, {
+    text: cleanText,
+    edited: true,
+    editedAt: serverTimestamp()
+  })
+}
+
+/**
+ * Deleta uma mensagem privada (DM)
+ */
+export async function deletePrivateMessage(roomId, messageId) {
+  if (!rtdb || !roomId || !messageId) return
+  const msgRef = ref(rtdb, `chat/private/${roomId}/messages/${messageId}`)
+  await remove(msgRef)
+}
+
+/**
+ * Atualiza o texto de uma mensagem privada (permitido apenas pelo autor da mensagem)
+ */
+export async function updatePrivateMessage(roomId, messageId, newText, callerUid) {
+  if (!rtdb || !roomId || !messageId || !newText?.trim() || !callerUid) return
+  const msgRef = ref(rtdb, `chat/private/${roomId}/messages/${messageId}`)
+  const snap = await get(msgRef)
+  if (!snap.exists()) return
+  const msgData = snap.val()
+  if (msgData.uid !== callerUid) {
+    console.warn('[chatService] Bloqueado: apenas o autor pode editar sua própria mensagem.')
+    return
+  }
+  const cleanText = newText.trim().slice(0, 500)
+  await update(msgRef, {
+    text: cleanText,
+    edited: true,
+    editedAt: serverTimestamp()
+  })
+}
+
+/**
  * Fixa uma mensagem na locação
  */
 export async function pinZoneMessage(zoneSlug, messageObj) {
@@ -262,14 +314,18 @@ export function subscribePinnedMessage(zoneSlug, callback) {
 }
 
 /**
- * Alterna reação de emoji em uma mensagem
+ * Alterna reação de emoji em uma mensagem (suporta qualquer emoji unicode)
  */
 export async function toggleReaction(zoneSlugOrRoomId, messageId, emoji, uid, characterName = 'Viajante', isPrivate = false) {
   if (!rtdb || !zoneSlugOrRoomId || !messageId || !emoji || !uid) return
   try {
+    // Sanitiza para evitar que caracteres proibidos do RTDB (. $ # [ ] /) quebrem a rota
+    const safeEmojiKey = String(emoji).replace(/[.#$[\]/]/g, '').trim()
+    if (!safeEmojiKey) return
+
     const basePath = isPrivate
-      ? `chat/private/${zoneSlugOrRoomId}/messages/${messageId}/reactions/${emoji}/${uid}`
-      : `chat/zones/${zoneSlugOrRoomId}/messages/${messageId}/reactions/${emoji}/${uid}`
+      ? `chat/private/${zoneSlugOrRoomId}/messages/${messageId}/reactions/${safeEmojiKey}/${uid}`
+      : `chat/zones/${zoneSlugOrRoomId}/messages/${messageId}/reactions/${safeEmojiKey}/${uid}`
 
     const rxRef = ref(rtdb, basePath)
     const snap = await get(rxRef)

@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { getCachedAvatar } from '../../utils/avatarCache'
+import ChatEmojiPickerPopover from './ChatEmojiPickerPopover.jsx'
 
-const AVAILABLE_REACTIONS = ['👍', '❤️', '😂', '💀', '✨', '🔥']
+const QUICK_REACTIONS = ['👍', '❤️', '😂', '💀', '✨', '🔥', '⚔️', '🛡️']
 
 function formatRelativeTime(timestamp) {
   if (!timestamp) return ''
@@ -118,6 +119,7 @@ export default function ChatMessageList({
   isPrivateChat = false,
   onSelectUser,
   onDeleteMessage,
+  onEditMessage,
   onPinMessage,
   onToggleReaction,
   onQuote,
@@ -126,6 +128,14 @@ export default function ChatMessageList({
 }) {
   const scrollRef = useRef(null)
   const [contextMenu, setContextMenu] = useState(null)
+
+  // Estado de Edição de Mensagem
+  const [editingMsgId, setEditingMsgId] = useState(null)
+  const [editingText, setEditingText] = useState('')
+  const editTextareaRef = useRef(null)
+
+  // Estado do Seletor Completo de Emojis para Reação
+  const [emojiPickerTarget, setEmojiPickerTarget] = useState(null) // { msgId, x, y }
 
   const knownNames = useMemo(() => {
     const names = new Set()
@@ -152,16 +162,18 @@ export default function ChatMessageList({
   }
 
   useEffect(() => {
-    scrollToBottom()
-    const rAF = requestAnimationFrame(scrollToBottom)
-    const t1 = setTimeout(scrollToBottom, 50)
-    const t2 = setTimeout(scrollToBottom, 150)
-    return () => {
-      cancelAnimationFrame(rAF)
-      clearTimeout(t1)
-      clearTimeout(t2)
+    if (!editingMsgId) {
+      scrollToBottom()
+      const rAF = requestAnimationFrame(scrollToBottom)
+      const t1 = setTimeout(scrollToBottom, 50)
+      const t2 = setTimeout(scrollToBottom, 150)
+      return () => {
+        cancelAnimationFrame(rAF)
+        clearTimeout(t1)
+        clearTimeout(t2)
+      }
     }
-  }, [visibleMessages])
+  }, [visibleMessages, editingMsgId])
 
   useEffect(() => {
     scrollToBottom()
@@ -183,6 +195,78 @@ export default function ChatMessageList({
     }
   }, [])
 
+  // Foco no textarea de edição ao abrir
+  useEffect(() => {
+    if (editingMsgId && editTextareaRef.current) {
+      editTextareaRef.current.focus()
+      // Posiciona o cursor no final
+      editTextareaRef.current.selectionStart = editTextareaRef.current.value.length
+      editTextareaRef.current.selectionEnd = editTextareaRef.current.value.length
+    }
+  }, [editingMsgId])
+
+  const handleStartEdit = (msg) => {
+    if (!currentUser?.uid || msg.uid !== currentUser.uid) return
+    setEditingMsgId(msg.id)
+    setEditingText(msg.text || '')
+    setContextMenu(null)
+  }
+
+  const handleCancelEdit = () => {
+    setEditingMsgId(null)
+    setEditingText('')
+  }
+
+  const handleSaveEdit = async (msgId, authorUid) => {
+    if (!editingText.trim()) return
+    if (!currentUser?.uid || authorUid !== currentUser.uid) return
+    if (onEditMessage) {
+      await onEditMessage(msgId, editingText)
+    }
+    setEditingMsgId(null)
+    setEditingText('')
+  }
+
+  const handleEditKeyDown = (e, msgId, authorUid) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSaveEdit(msgId, authorUid)
+    } else if (e.key === 'Escape') {
+      e.preventDefault()
+      handleCancelEdit()
+    }
+  }
+
+  const handleOpenEmojiPicker = (e, msgId) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const container = scrollRef.current
+    if (!container) return
+
+    const containerRect = container.getBoundingClientRect()
+    const clickX = e.clientX - containerRect.left
+    const clickY = e.clientY - containerRect.top + container.scrollTop
+
+    const popoverWidth = 320
+    const popoverHeight = 360
+
+    let x = clickX - 100
+    let y = clickY - 200
+
+    if (x + popoverWidth > container.clientWidth - 10) {
+      x = Math.max(10, container.clientWidth - popoverWidth - 10)
+    }
+    if (x < 10) x = 10
+
+    if (y < container.scrollTop + 10) {
+      y = container.scrollTop + 10
+    }
+
+    setEmojiPickerTarget({ msgId, x, y })
+    setContextMenu(null)
+  }
+
   const handleContextMenu = (e, msg) => {
     e.preventDefault()
     e.stopPropagation()
@@ -194,8 +278,8 @@ export default function ChatMessageList({
     const clickX = e.clientX - containerRect.left
     const clickY = e.clientY - containerRect.top + container.scrollTop
 
-    const menuWidth = 220
-    const menuHeight = 120
+    const menuWidth = 240
+    const menuHeight = 220
 
     let x = clickX + 4
     let y = clickY + 4
@@ -230,6 +314,8 @@ export default function ChatMessageList({
           const isMsgAdmin = msg.role === 'admin'
           const isNpc = msg.role === 'npc' || msg.isNpc || msg.uid?.startsWith('npc_')
           const reactions = msg.reactions || {}
+          const isEditing = editingMsgId === msg.id
+          const canEdit = (isMe || isAdmin) && !isSystem && !isEvent
 
           const mentionsMe = myCharacterName && msg.text && msg.text.toLowerCase().includes(`@${myCharacterName.toLowerCase()}`)
 
@@ -282,7 +368,7 @@ export default function ChatMessageList({
           return (
             <div
               key={msg.id}
-              className={`chat-msg-row ${isMe ? 'is-me' : ''} ${isMsgAdmin ? 'is-admin' : ''} ${isNpc ? 'is-npc' : ''} ${mentionsMe ? 'is-mentioned' : ''} ${isPrivateChat ? 'is-dm-row' : ''}`}
+              className={`chat-msg-row ${isMe ? 'is-me' : ''} ${isMsgAdmin ? 'is-admin' : ''} ${isNpc ? 'is-npc' : ''} ${mentionsMe ? 'is-mentioned' : ''} ${isPrivateChat ? 'is-dm-row' : ''} ${isEditing ? 'is-editing' : ''}`}
               onContextMenu={(e) => handleContextMenu(e, msg)}
             >
               <button
@@ -346,10 +432,57 @@ export default function ChatMessageList({
                 </div>
 
                 <div className="chat-msg-body-wrapper">
-                  <span className="chat-msg-body">{formatText(msg.text, myCharacterName, knownNames)}</span>
+                  {isEditing ? (
+                    <div className="chat-msg-edit-box">
+                      <textarea
+                        ref={editTextareaRef}
+                        className="chat-msg-edit-textarea"
+                        value={editingText}
+                        maxLength={500}
+                        onChange={(e) => setEditingText(e.target.value)}
+                        onKeyDown={(e) => handleEditKeyDown(e, msg.id, msg.uid)}
+                        rows={2}
+                      />
+                      <div className="chat-msg-edit-footer">
+                        <span className="chat-msg-edit-hint">
+                          <strong>Enter</strong> para salvar • <strong>Esc</strong> para cancelar • {editingText.length}/500
+                        </span>
+                        <div className="chat-msg-edit-buttons">
+                          <button
+                            type="button"
+                            className="chat-msg-edit-btn cancel"
+                            onClick={handleCancelEdit}
+                          >
+                            Cancelar
+                          </button>
+                          <button
+                            type="button"
+                            className="chat-msg-edit-btn save"
+                            onClick={() => handleSaveEdit(msg.id, msg.uid)}
+                            disabled={!editingText.trim()}
+                          >
+                            Salvar
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <span className="chat-msg-body">
+                      {formatText(msg.text, myCharacterName, knownNames)}
+                      {msg.edited && (
+                        <span
+                          className="chat-msg-edited-tag"
+                          title={msg.editedAt ? `Editada em ${formatFullDateTime(msg.editedAt)}` : 'Mensagem editada'}
+                        >
+                          (editada)
+                        </span>
+                      )}
+                    </span>
+                  )}
                 </div>
 
-                {hasReactions && (
+                {/* Linha de Reações Existentes */}
+                {!isEditing && hasReactions && (
                   <div className="chat-msg-meta-row">
                     {Object.entries(reactions).map(([emoji, uidsMap]) => {
                       const count = Object.keys(uidsMap || {}).length
@@ -384,6 +517,7 @@ export default function ChatMessageList({
         })
       )}
 
+      {/* Menu de Contexto (Botão Direito) */}
       {contextMenu && (
         <div
           className="chat-context-menu"
@@ -400,29 +534,51 @@ export default function ChatMessageList({
 
           <div className="chat-context-divider" />
 
+          {/* Reações Rápidas + Botão de Mais Emojis */}
           {onToggleReaction && (
-            <div className="chat-context-reactions-row">
-              {AVAILABLE_REACTIONS.map((emoji) => {
-                const isReacted = contextMenu.msg.reactions?.[emoji]?.[currentUser?.uid]
-                return (
-                  <button
-                    key={emoji}
-                    type="button"
-                    className={`chat-context-reaction-btn ${isReacted ? 'active' : ''}`}
-                    onClick={() => {
-                      onToggleReaction(contextMenu.msg.id, emoji)
-                      setContextMenu(null)
-                    }}
-                    title={`Reagir com ${emoji}`}
-                  >
-                    {emoji}
-                  </button>
-                )
-              })}
-            </div>
+            <>
+              <div className="chat-context-reactions-row">
+                {QUICK_REACTIONS.map((emoji) => {
+                  const isReacted = contextMenu.msg.reactions?.[emoji]?.[currentUser?.uid]
+                  return (
+                    <button
+                      key={emoji}
+                      type="button"
+                      className={`chat-context-reaction-btn ${isReacted ? 'active' : ''}`}
+                      onClick={() => {
+                        onToggleReaction(contextMenu.msg.id, emoji)
+                        setContextMenu(null)
+                      }}
+                      title={`Reagir com ${emoji}`}
+                    >
+                      {emoji}
+                    </button>
+                  )
+                })}
+              </div>
+              <button
+                type="button"
+                className="chat-context-menu-item"
+                onClick={(e) => {
+                  handleOpenEmojiPicker(e, contextMenu.msg.id)
+                }}
+              >
+                <span>✨ Escolher qualquer emoji...</span>
+              </button>
+              <div className="chat-context-divider" />
+            </>
           )}
 
-          <div className="chat-context-divider" />
+          {/* Opção de Editar — Apenas o próprio autor */}
+          {(contextMenu.msg.uid === currentUser?.uid) && onEditMessage && (
+            <button
+              type="button"
+              className="chat-context-menu-item"
+              onClick={() => handleStartEdit(contextMenu.msg)}
+            >
+              <span>✏️ Editar mensagem</span>
+            </button>
+          )}
 
           {onQuote && (
             <button
@@ -467,6 +623,22 @@ export default function ChatMessageList({
             </>
           )}
         </div>
+      )}
+
+      {/* Popover Global de Escolha de Qualquer Emoji para Reação */}
+      {emojiPickerTarget && (
+        <ChatEmojiPickerPopover
+          title="Reagir com qualquer emoji"
+          position={{ x: emojiPickerTarget.x, y: emojiPickerTarget.y }}
+          chatTheme={chatTheme}
+          onSelectEmoji={(emoji) => {
+            if (onToggleReaction) {
+              onToggleReaction(emojiPickerTarget.msgId, emoji)
+            }
+            setEmojiPickerTarget(null)
+          }}
+          onClose={() => setEmojiPickerTarget(null)}
+        />
       )}
     </div>
   )

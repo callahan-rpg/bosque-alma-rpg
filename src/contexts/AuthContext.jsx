@@ -31,12 +31,53 @@ export function AuthProvider({ children }) {
       if (snap.exists()) {
         setProfile(snap.data())
       } else {
-        // Primeiro login: cria perfil base
+        // Primeiro login: cria ficha base padrão
         const defaultProfile = {
           uid: fbUser.uid,
           nick: fbUser.displayName || 'Viajante',
           characterName: fbUser.displayName || 'Viajante',
           avatarUrl: '',
+          race: 'Humano',
+          level: 1,
+          hpCurrent: 100,
+          hpMax: 100,
+          vigorCurrent: 15,
+          vigorMax: 15,
+          attributes: {
+            forca: 10,
+            destreza: 10,
+            poder: 10,
+            sabedoria: 10,
+            vitalidade: 10
+          },
+          individuality: {
+            name: '',
+            description: ''
+          },
+          grimoireUrl: '',
+          inventory: [
+            {
+              id: 'item_1',
+              name: 'Adaga de Aço',
+              qty: 1,
+              description: 'Lâmina inicial balanceada.',
+              icon: '🗡️'
+            },
+            {
+              id: 'item_2',
+              name: 'Poção de Vigor',
+              qty: 2,
+              description: 'Restaura a estamina e vigor em combate.',
+              icon: '🧪'
+            },
+            {
+              id: 'item_3',
+              name: 'Ração de Caça',
+              qty: 3,
+              description: 'Provisões para longas jornadas.',
+              icon: '🥩'
+            }
+          ],
           role: 'player',
           createdAt: serverTimestamp(),
         }
@@ -59,6 +100,13 @@ export function AuthProvider({ children }) {
     setProfile((prev) => ({ ...prev, ...updates }))
   }
 
+  /**
+   * Desloga o usuário atual.
+   */
+  const handleLogout = async () => {
+    await logout()
+  }
+
   // Interface compatível com o GuestContext existente
   const value = {
     // Estado de carregamento (undefined = ainda verificando auth)
@@ -74,14 +122,16 @@ export function AuthProvider({ children }) {
     // Interface legada compatível com useGuest()
     user: firebaseUser ? { uid: firebaseUser.uid } : null,
     character: {
-      name: profile?.characterName || profile?.nick || 'Viajante',
+      // chatName é o apelido usado no chat, independente da ficha do personagem
+      name: profile?.chatName || profile?.characterName || profile?.nick || 'Viajante',
       avatarUrl: profile?.avatarUrl || '',
     },
     role: profile?.role || 'player',
     isMaster: profile?.role === 'master',
 
-    // Atualiza perfil
+    // Atualiza perfil e logout
     updateProfile,
+    logout: handleLogout,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

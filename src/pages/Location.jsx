@@ -67,6 +67,7 @@ export default function Location() {
 
       {/* HUD Menu Superior Arredondado */}
       <HUD
+        locationSlug={currentSlug}
         locationName={loc.name}
         weatherCondition={loc.weatherCondition || 'none'}
         minTemp={loc.minTemp}

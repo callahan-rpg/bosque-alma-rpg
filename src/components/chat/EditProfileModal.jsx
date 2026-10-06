@@ -1,17 +1,32 @@
 import { useState } from 'react'
+import { useAuth } from '../../contexts/AuthContext.jsx'
 
 export default function EditProfileModal({ profile, onSave, onClose }) {
-  const [name, setName] = useState(profile?.name || '')
-  const [avatarUrl, setAvatarUrl] = useState(profile?.avatarUrl || '')
+  const { profile: authProfile } = useAuth()
+
+  // Nome do chat (independente da ficha): prefere chatName, cai no characterName
+  const currentChatName = authProfile?.chatName || authProfile?.characterName || authProfile?.nick || profile?.name || ''
+  const currentAvatarUrl = authProfile?.avatarUrl || profile?.avatarUrl || ''
+
+  const [chatName, setChatName] = useState(currentChatName)
+  const [avatarUrl, setAvatarUrl] = useState(currentAvatarUrl)
+
+  const sheetName = authProfile?.characterName || authProfile?.nick || 'Viajante'
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (!name.trim()) return
+    if (!chatName.trim()) return
+
+    // Salva apenas chatName e avatarUrl — não altera characterName (ficha)
     onSave({
-      name: name.trim(),
+      chatName: chatName.trim(),
       avatarUrl: avatarUrl.trim()
     })
     onClose()
+  }
+
+  const handleResetToSheetName = () => {
+    setChatName(sheetName)
   }
 
   return (
@@ -20,7 +35,7 @@ export default function EditProfileModal({ profile, onSave, onClose }) {
         <div className="chat-user-modal-header">
           <div className="chat-user-modal-title">
             <span className="chat-user-status-dot online" />
-            <span className="chat-user-header-name">Configurar Identidade</span>
+            <span className="chat-user-header-name">Configurar Identidade do Chat</span>
           </div>
           <button type="button" className="chat-user-modal-close" onClick={onClose} title="Fechar">
             ✕
@@ -40,16 +55,34 @@ export default function EditProfileModal({ profile, onSave, onClose }) {
           </div>
 
           <div className="profile-form-group">
-            <label className="profile-form-label">Seu Nome / Personagem:</label>
+            <label className="profile-form-label">
+              Nome exibido no Chat:
+              <span className="profile-chatname-hint">
+                (independente da ficha do personagem)
+              </span>
+            </label>
             <input
               type="text"
               className="profile-form-input"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={chatName}
+              onChange={(e) => setChatName(e.target.value)}
               placeholder="Ex: Alma, Valerius, Elora..."
               maxLength={24}
               required
             />
+            {sheetName !== chatName && (
+              <button
+                type="button"
+                className="profile-reset-name-btn"
+                onClick={handleResetToSheetName}
+                title={`Usar o nome da ficha: ${sheetName}`}
+              >
+                ↩ Usar nome da ficha ({sheetName})
+              </button>
+            )}
+            <small className="profile-chatname-info">
+              📜 Nome da ficha: <strong>{sheetName}</strong> — não será alterado aqui
+            </small>
           </div>
 
           <div className="profile-form-group">
@@ -65,7 +98,7 @@ export default function EditProfileModal({ profile, onSave, onClose }) {
 
           <div className="chat-user-modal-actions">
             <button type="submit" className="chat-action-btn primary">
-              Salvar Identidade
+              Salvar Identidade do Chat
             </button>
             <button type="button" className="chat-action-btn secondary" onClick={onClose}>
               Cancelar
