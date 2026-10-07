@@ -29,27 +29,32 @@ export async function sendFriendRequest(fromUser, toUser) {
 export async function acceptFriendRequest(currentUserId, currentUserData, senderUid, senderData) {
   if (!currentUserId || !senderUid) return
 
-  // 1. Amigo adicionado na lista do visitante atual
-  const myFriendRef = doc(db, 'chat_friends', currentUserId, 'friends', senderUid)
-  await setDoc(myFriendRef, {
-    friendUid: senderUid,
-    friendName: senderData?.senderName || senderData?.name || 'Visitante',
-    friendAvatarUrl: senderData?.senderAvatarUrl || senderData?.avatarUrl || null,
-    since: serverTimestamp()
-  })
+  try {
+    // 1. Amigo adicionado na lista do visitante atual
+    const myFriendRef = doc(db, 'chat_friends', currentUserId, 'friends', senderUid)
+    await setDoc(myFriendRef, {
+      friendUid: senderUid,
+      friendName: senderData?.senderName || senderData?.characterName || senderData?.name || 'Visitante',
+      friendAvatarUrl: senderData?.senderAvatarUrl || senderData?.avatarUrl || null,
+      since: serverTimestamp()
+    })
 
-  // 2. Visitante atual adicionado na lista do amigo
-  const otherFriendRef = doc(db, 'chat_friends', senderUid, 'friends', currentUserId)
-  await setDoc(otherFriendRef, {
-    friendUid: currentUserId,
-    friendName: currentUserData?.characterName || currentUserData?.name || 'Visitante',
-    friendAvatarUrl: currentUserData?.avatarUrl || null,
-    since: serverTimestamp()
-  })
+    // 2. Visitante atual adicionado na lista do amigo
+    const otherFriendRef = doc(db, 'chat_friends', senderUid, 'friends', currentUserId)
+    await setDoc(otherFriendRef, {
+      friendUid: currentUserId,
+      friendName: currentUserData?.characterName || currentUserData?.name || 'Visitante',
+      friendAvatarUrl: currentUserData?.avatarUrl || null,
+      since: serverTimestamp()
+    })
 
-  // 3. Remove a solicitação pendente
-  const requestRef = doc(db, 'chat_friends', currentUserId, 'requests', senderUid)
-  await deleteDoc(requestRef)
+    // 3. Remove a solicitação pendente
+    const requestRef = doc(db, 'chat_friends', currentUserId, 'requests', senderUid)
+    await deleteDoc(requestRef)
+  } catch (err) {
+    console.error('[friendsService] Erro ao aceitar pedido de amizade:', err)
+    throw err
+  }
 }
 
 /**
