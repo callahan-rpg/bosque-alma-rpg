@@ -158,6 +158,7 @@ export default function CharacterPopupModal({
 
   const hpPercent = Math.min(100, Math.max(0, Math.round((hpCurrent / Math.max(1, hpMax)) * 100)))
   const vigorPercent = Math.min(100, Math.max(0, Math.round((vigorCurrent / Math.max(1, vigorMax)) * 100)))
+  const narrationComment = fullData?.narrationComment || fullData?.comment || targetUser?.narrationComment || targetUser?.comment || ''
 
   const individualityName = fullData?.individuality?.name || targetUser?.individuality?.name || ''
 
@@ -287,6 +288,17 @@ export default function CharacterPopupModal({
 
       {/* Barras de Status Vitais: HP e Vigor */}
       <div className="char-popup-stats-section">
+        {/* Comentário da Narração (Acima da Barra de Vida) */}
+        {narrationComment && (
+          <div className="char-popup-narration-comment-box" title="Comentário da Narração">
+            <span className="comment-box-icon">💬</span>
+            <div className="comment-box-content">
+              <span className="comment-box-title">Narração</span>
+              <span className="comment-box-text">"{narrationComment}"</span>
+            </div>
+          </div>
+        )}
+
         {/* Barra de Vida */}
         <div className="char-popup-bar-item">
           <div className="char-popup-bar-labels">

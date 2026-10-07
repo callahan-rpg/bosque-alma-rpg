@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { getCachedAvatar } from '../../utils/avatarCache'
 import ChatEmojiPickerPopover from './ChatEmojiPickerPopover.jsx'
+import { isGifOrImageUrl } from '../../utils/gifService'
 
 const QUICK_REACTIONS = ['👍', '❤️', '😂', '💀', '✨', '🔥', '⚔️', '🛡️']
 
@@ -465,6 +466,35 @@ export default function ChatMessageList({
                           </button>
                         </div>
                       </div>
+                    </div>
+                  ) : isGifOrImageUrl(msg.text) || msg.type === 'gif' ? (
+                    <div className="chat-msg-gif-container">
+                      <img
+                        src={msg.text}
+                        alt="GIF"
+                        className="chat-msg-gif-image"
+                        loading="lazy"
+                        onLoad={scrollToBottom}
+                        onClick={() => window.open(msg.text, '_blank', 'noopener,noreferrer')}
+                        title="Clique para abrir em tamanho original"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none'
+                          if (e.currentTarget.nextSibling) {
+                            e.currentTarget.nextSibling.style.display = 'inline'
+                          }
+                        }}
+                      />
+                      <span className="chat-msg-gif-error" style={{ display: 'none' }}>
+                        🎬 [GIF: {msg.text}]
+                      </span>
+                      {msg.edited && (
+                        <span
+                          className="chat-msg-edited-tag"
+                          title={msg.editedAt ? `Editada em ${formatFullDateTime(msg.editedAt)}` : 'Mensagem editada'}
+                        >
+                          (editada)
+                        </span>
+                      )}
                     </div>
                   ) : (
                     <span className="chat-msg-body">

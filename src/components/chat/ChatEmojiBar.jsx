@@ -6,7 +6,7 @@ const QUICK_EMOJIS = [
   '🌸', '🌙', '🕯️', '🔮', '📜', '🩸', '🎲', '🔥', '🕷️', '🛡️', '👍', '❤️'
 ]
 
-export default function ChatEmojiBar({ onSelectEmoji, rightAction, chatTheme = 'dark' }) {
+export default function ChatEmojiBar({ onSelectEmoji, onSelectGif, rightAction, chatTheme = 'dark' }) {
   const [showFullPicker, setShowFullPicker] = useState(false)
 
   return (
@@ -16,9 +16,9 @@ export default function ChatEmojiBar({ onSelectEmoji, rightAction, chatTheme = '
           type="button"
           className="chat-emoji-more-btn"
           onClick={() => setShowFullPicker(prev => !prev)}
-          title="Abrir seletor completo de emojis"
+          title="Abrir seletor de emojis e GIFs"
         >
-          ✨ Mais Emojis
+          ✨ Emojis e gifs
         </button>
 
         {QUICK_EMOJIS.map((emoji, idx) => (
@@ -42,11 +42,16 @@ export default function ChatEmojiBar({ onSelectEmoji, rightAction, chatTheme = '
 
       {showFullPicker && (
         <ChatEmojiPickerPopover
-          title="Inserir Emoji no Chat"
-          customInputPlaceholder="Digite ou cole qualquer emoji para inserir..."
+          title="Emojis e GIFs"
+          allowGifs={true}
+          customInputPlaceholder="Digite ou cole qualquer emoji..."
           chatTheme={chatTheme}
           onSelectEmoji={(emoji) => {
             onSelectEmoji(emoji)
+            setShowFullPicker(false)
+          }}
+          onSelectGif={(gifUrl) => {
+            onSelectGif?.(gifUrl)
             setShowFullPicker(false)
           }}
           onClose={() => setShowFullPicker(false)}

@@ -353,9 +353,88 @@ export default function Admin() {
 
   // Estado para inputs customizados de dano/cura no Admin
   const [adminDeltaInputs, setAdminDeltaInputs] = useState({})
+  // Estado para comentários de narração em tempo real no Admin
+  const [adminPlayerComments, setAdminPlayerComments] = useState({})
+  const [adminEnemyComments, setAdminEnemyComments] = useState({})
 
   const handleAdminSetDeltaInput = (id, val) => {
     setAdminDeltaInputs(prev => ({ ...prev, [id]: val }))
+  }
+
+  const handleAdminChangePlayerComment = (uid, text) => {
+    setAdminPlayerComments(prev => ({ ...prev, [uid]: text }))
+  }
+
+  const handleAdminSavePlayerComment = async (uid) => {
+    const pData = activeCombatData?.participantsData?.[uid] || {}
+    const pRecord = allPlayersList.find(p => p.uid === uid) || {}
+    const currentVal = pData.comment || activeCombatData?.participantComments?.[uid] || pRecord.narrationComment || ''
+    const text = (adminPlayerComments[uid] !== undefined ? adminPlayerComments[uid] : currentVal).trim()
+    
+    if (selectedCombatSlug) {
+      const combatRef = doc(db, 'active_combats', selectedCombatSlug)
+      const existingPData = activeCombatData?.participantsData || {}
+      const curP = existingPData[uid] || {}
+      const existingComments = activeCombatData?.participantComments || {}
+
+      const updatedPData = {
+        ...existingPData,
+        [uid]: {
+          ...curP,
+          comment: text
+        }
+      }
+
+      try {
+        await updateDoc(combatRef, {
+          participantsData: updatedPData,
+          participantComments: {
+            ...existingComments,
+            [uid]: text
+          }
+        })
+      } catch (err) {
+        console.error('Erro ao salvar comentário de combate:', err)
+      }
+    }
+
+    try {
+      const playerRef = doc(db, 'players', uid)
+      await updateDoc(playerRef, {
+        narrationComment: text
+      })
+    } catch (err) {
+      console.error('Erro ao salvar comentário no perfil do jogador:', err)
+    }
+  }
+
+  const handleAdminChangeEnemyComment = (enemyId, text) => {
+    setAdminEnemyComments(prev => ({ ...prev, [enemyId]: text }))
+  }
+
+  const handleAdminSaveEnemyComment = async (enemyId) => {
+    if (!selectedCombatSlug) return
+    const currentEnemies = activeCombatData?.enemies || combatEnemies || []
+    const targetEnemy = currentEnemies.find(e => e.id === enemyId)
+    const currentVal = targetEnemy?.turnComment || targetEnemy?.comment || ''
+    const text = (adminEnemyComments[enemyId] !== undefined ? adminEnemyComments[enemyId] : currentVal).trim()
+
+    const combatRef = doc(db, 'active_combats', selectedCombatSlug)
+    const updatedEnemies = currentEnemies.map(en => {
+      if (en.id === enemyId) {
+        return { ...en, turnComment: text, comment: text }
+      }
+      return en
+    })
+
+    setCombatEnemies(updatedEnemies)
+    try {
+      await updateDoc(combatRef, {
+        enemies: updatedEnemies
+      })
+    } catch (err) {
+      console.error('Erro ao salvar comentário do inimigo:', err)
+    }
   }
 
   // Desconto / Cura de HP em Jogador pelo Admin
@@ -2369,6 +2448,52 @@ export default function Admin() {
                                 </div>
                               </div>
 
+                              {/* Campo de Comentário da Narração (Acima da Barra de Vida) */}
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, background: 'rgba(251, 191, 36, 0.05)', padding: '6px 8px', borderRadius: 8, border: '1px solid rgba(251, 191, 36, 0.22)' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                  <label style={{ fontSize: 10, color: '#fbbf24', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                                    💬 Comentário da Narração
+                                  </label>
+                                  <span style={{ fontSize: 9, color: 'var(--text-muted)' }}>Acima da barra de vida</span>
+                                </div>
+                                <div style={{ display: 'flex', gap: 6 }}>
+                                  <input
+                                    type="text"
+                                    placeholder="Ex: Atordoado pelo feitiço, sangrando..."
+                                    value={adminPlayerComments[uid] !== undefined ? adminPlayerComments[uid] : (pData.comment || activeCombatData?.participantComments?.[uid] || pRecord.narrationComment || '')}
+                                    onChange={e => handleAdminChangePlayerComment(uid, e.target.value)}
+                                    onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAdminSavePlayerComment(uid); } }}
+                                    onBlur={() => handleAdminSavePlayerComment(uid)}
+                                    style={{
+                                      flex: 1,
+                                      background: 'rgba(0, 0, 0, 0.55)',
+                                      border: '1px solid rgba(251, 191, 36, 0.3)',
+                                      color: '#fef08a',
+                                      borderRadius: 4,
+                                      padding: '4px 8px',
+                                      fontSize: 11,
+                                      fontStyle: 'italic'
+                                    }}
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => handleAdminSavePlayerComment(uid)}
+                                    style={{
+                                      background: 'rgba(251, 191, 36, 0.2)',
+                                      border: '1px solid rgba(251, 191, 36, 0.5)',
+                                      color: '#fde047',
+                                      borderRadius: 4,
+                                      padding: '2px 8px',
+                                      fontSize: 10,
+                                      fontWeight: 700,
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    Salvar
+                                  </button>
+                                </div>
+                              </div>
+
                               {/* Barras de HP e Vigor */}
                               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                                 <div style={{ height: 6, background: 'rgba(0,0,0,0.5)', borderRadius: 3, overflow: 'hidden' }}>
@@ -2593,6 +2718,52 @@ export default function Admin() {
                                   <span style={{ color: '#38bdf8' }}>
                                     Vig: {currentVigor}/{maxVigor}
                                   </span>
+                                </div>
+                              </div>
+
+                              {/* Campo de Comentário da Narração do Inimigo (Acima da Barra de Vida) */}
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, background: 'rgba(239, 68, 68, 0.05)', padding: '6px 8px', borderRadius: 8, border: '1px solid rgba(239, 68, 68, 0.22)' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                  <label style={{ fontSize: 10, color: '#fca5a5', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                                    💬 Comentário da Narração
+                                  </label>
+                                  <span style={{ fontSize: 9, color: 'var(--text-muted)' }}>Acima da barra de vida</span>
+                                </div>
+                                <div style={{ display: 'flex', gap: 6 }}>
+                                  <input
+                                    type="text"
+                                    placeholder="Ex: Rosnando com fúria, conjurando feitiço..."
+                                    value={adminEnemyComments[enemy.id] !== undefined ? adminEnemyComments[enemy.id] : (enemy.turnComment || enemy.comment || '')}
+                                    onChange={e => handleAdminChangeEnemyComment(enemy.id, e.target.value)}
+                                    onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAdminSaveEnemyComment(enemy.id); } }}
+                                    onBlur={() => handleAdminSaveEnemyComment(enemy.id)}
+                                    style={{
+                                      flex: 1,
+                                      background: 'rgba(0, 0, 0, 0.55)',
+                                      border: '1px solid rgba(239, 68, 68, 0.3)',
+                                      color: '#fca5a5',
+                                      borderRadius: 4,
+                                      padding: '4px 8px',
+                                      fontSize: 11,
+                                      fontStyle: 'italic'
+                                    }}
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => handleAdminSaveEnemyComment(enemy.id)}
+                                    style={{
+                                      background: 'rgba(239, 68, 68, 0.2)',
+                                      border: '1px solid rgba(239, 68, 68, 0.5)',
+                                      color: '#fca5a5',
+                                      borderRadius: 4,
+                                      padding: '2px 8px',
+                                      fontSize: 10,
+                                      fontWeight: 700,
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    Salvar
+                                  </button>
                                 </div>
                               </div>
 

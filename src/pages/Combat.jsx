@@ -695,10 +695,12 @@ export default function CombatPage() {
                                 )}
                               </div>
 
-                              {comment && (
-                                <p style={{ fontSize: 11, color: '#fbbf24', fontStyle: 'italic', margin: '2px 0 6px' }}>
-                                  💬 "{comment}"
-                                </p>
+                              {/* Comentário de Narração (Acima da Barra de Vida) */}
+                              {(comment || char.comment || char.narrationComment) && (
+                                <div className="combat-narrative-comment-bubble" style={{ margin: '4px 0 8px' }} title="Comentário da Narração">
+                                  <span className="comment-bubble-icon">💬</span>
+                                  <span className="comment-bubble-text">"{comment || char.comment || char.narrationComment}"</span>
+                                </div>
                               )}
 
                               {/* Barra de Vida */}
@@ -886,10 +888,12 @@ export default function CombatPage() {
                                 )}
                               </div>
 
-                              {enemy.turnComment && (
-                                <p style={{ fontSize: 11, color: '#fca5a5', fontStyle: 'italic', margin: '2px 0 6px' }}>
-                                  💬 "{enemy.turnComment}"
-                                </p>
+                              {/* Comentário de Narração do Inimigo (Acima da Barra de Vida) */}
+                              {(enemy.turnComment || enemy.comment) && (
+                                <div className="combat-narrative-comment-bubble enemy" style={{ margin: '4px 0 8px' }} title="Comentário da Narração">
+                                  <span className="comment-bubble-icon">💬</span>
+                                  <span className="comment-bubble-text">"{enemy.turnComment || enemy.comment}"</span>
+                                </div>
                               )}
 
                               {/* Barra de HP do Inimigo */}

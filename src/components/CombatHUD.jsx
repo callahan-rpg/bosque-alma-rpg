@@ -121,6 +121,7 @@ export default function CombatHUD({ locationSlug }) {
                 const isTargetOfImpact = impactAnimation?.targetId === char.uid
                 const floatList = floatingTexts.filter(f => f.targetId === char.uid)
                 const isDown = currentHp <= 0
+                const comment = char.comment || combat?.participantComments?.[char.uid] || char.narrationComment || ''
 
                 return (
                   <div
@@ -147,6 +148,14 @@ export default function CombatHUD({ locationSlug }) {
                           <strong className="combat-card-name">{char.name}</strong>
                           {isDown && <span className="dead-tag">💀 INCONSCIENTE</span>}
                         </div>
+
+                        {/* Comentário de Narração (Acima da Barra de Vida) */}
+                        {comment && (
+                          <div className="combat-narrative-comment-bubble" title="Comentário da Narração">
+                            <span className="comment-bubble-icon">💬</span>
+                            <span className="comment-bubble-text">"{comment}"</span>
+                          </div>
+                        )}
 
                         {/* Barra de HP */}
                         <div className="combat-hp-wrap">
@@ -247,6 +256,7 @@ export default function CombatHUD({ locationSlug }) {
                   const isTargetOfImpact = impactAnimation?.targetId === enemy.id
                   const floatList = floatingTexts.filter(f => f.targetId === enemy.id)
                   const isDead = currentHp <= 0
+                  const enemyComment = enemy.turnComment || enemy.comment || ''
 
                   return (
                     <div
@@ -277,6 +287,14 @@ export default function CombatHUD({ locationSlug }) {
                             </strong>
                             {isDead && <span className="dead-tag">💀 DERROTADO</span>}
                           </div>
+
+                          {/* Comentário de Narração do Inimigo (Acima da Barra de Vida) */}
+                          {enemyComment && (
+                            <div className="combat-narrative-comment-bubble enemy" title="Comentário da Narração">
+                              <span className="comment-bubble-icon">💬</span>
+                              <span className="comment-bubble-text">"{enemyComment}"</span>
+                            </div>
+                          )}
 
                           {/* Barra de HP do Inimigo */}
                           <div className="combat-hp-wrap">

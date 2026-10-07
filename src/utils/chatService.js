@@ -43,7 +43,7 @@ export function getPrivateRoomId(uid1, uid2) {
 export async function sendZoneMessage(zoneSlug, userObj, text, type = 'normal') {
   if (!rtdb || !zoneSlug || !userObj?.uid || !text?.trim()) return
 
-  const cleanText = text.trim().slice(0, 280)
+  const cleanText = text.trim().slice(0, 1000)
   const messagesRef = ref(rtdb, `chat/zones/${zoneSlug}/messages`)
   const newMsgRef = push(messagesRef)
 
@@ -63,13 +63,13 @@ export async function sendZoneMessage(zoneSlug, userObj, text, type = 'normal') 
 /**
  * Envia mensagem privada (DM) e atualiza a inbox do destinatário para notificação instantânea
  */
-export async function sendPrivateMessage(senderUid, targetUid, userObj, text) {
+export async function sendPrivateMessage(senderUid, targetUid, userObj, text, type = 'private') {
   if (!rtdb || !senderUid || !targetUid || !text?.trim()) return
 
   const roomId = getPrivateRoomId(senderUid, targetUid)
   if (!roomId) return
 
-  const cleanText = text.trim().slice(0, 500)
+  const cleanText = text.trim().slice(0, 1000)
   const messagesRef = ref(rtdb, `chat/private/${roomId}/messages`)
   const newMsgRef = push(messagesRef)
 
@@ -79,7 +79,7 @@ export async function sendPrivateMessage(senderUid, targetUid, userObj, text) {
     characterName: userObj?.characterName || 'Visitante',
     avatarUrl: userObj?.avatarUrl || null,
     text: cleanText,
-    type: 'private',
+    type,
     timestamp: serverTimestamp()
   }
 

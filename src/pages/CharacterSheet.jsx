@@ -62,6 +62,8 @@ export default function CharacterSheet() {
   const level = charData?.level || 1
   const avatarUrl = charData?.avatarUrl || ''
 
+  const narrationComment = charData?.narrationComment || charData?.comment || ''
+
   const attributes = {
     forca: charData?.attributes?.forca ?? 10,
     destreza: charData?.attributes?.destreza ?? 10,
@@ -186,6 +188,17 @@ export default function CharacterSheet() {
                 <span className="char-level-badge">NÍVEL {level}</span>
               </div>
               <h2 className="char-name-heading">{name}</h2>
+
+              {/* Comentário da Narração (Acima da Barra de Vida) */}
+              {narrationComment && (
+                <div className="char-narration-comment-box" title="Comentário da Narração">
+                  <span className="char-narration-comment-icon">💬</span>
+                  <div className="char-narration-comment-content">
+                    <span className="char-narration-comment-title">Narração / Estado</span>
+                    <span className="char-narration-comment-text">"{narrationComment}"</span>
+                  </div>
+                </div>
+              )}
 
               {/* Barra de Vida (HP) */}
               <div className="char-resource-bar-group">

@@ -412,6 +412,25 @@ export default function LocationChat({ slug, locationName }) {
     }
   }
 
+  // Envio automático de GIF
+  const handleSendGif = async (gifUrl) => {
+    if (!user?.uid || !gifUrl) return
+
+    const userObj = {
+      uid: user.uid,
+      characterName: character?.name || 'Viajante',
+      avatarUrl: character?.avatarUrl || null,
+      role: role || 'player'
+    }
+
+    if (activeTab === 'zone') {
+      await sendZoneMessage(slug, userObj, gifUrl, 'gif')
+    } else if (activeTab.startsWith('dm_')) {
+      const targetUid = activeTab.replace('dm_', '')
+      await sendPrivateMessage(user.uid, targetUid, userObj, gifUrl, 'gif')
+    }
+  }
+
   const handleDeleteMessage = async (msgId) => {
     if (!isAdmin || !slug || !msgId) return
     if (window.confirm('Apagar este registro do bosque?')) {
@@ -682,6 +701,8 @@ export default function LocationChat({ slug, locationName }) {
           <div className="chat-controls-row">
             <ChatEmojiBar
               onSelectEmoji={handleSelectEmoji}
+              onSelectGif={handleSendGif}
+              chatTheme={chatTheme}
               rightAction={
                 <button
                   type="button"
