@@ -2874,7 +2874,16 @@ export default function Admin() {
                           }}
                         >
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ fontSize: 18 }}>{enemy.icon || '👹'}</span>
+                            {enemy.avatarUrl ? (
+                              <img
+                                src={enemy.avatarUrl}
+                                alt={enemy.name}
+                                style={{ width: 32, height: 32, borderRadius: 6, objectFit: 'cover', border: '1px solid rgba(239,68,68,0.35)', flexShrink: 0 }}
+                                onError={e => { e.target.style.display = 'none' }}
+                              />
+                            ) : (
+                              <span style={{ fontSize: 18 }}>{enemy.icon || '👹'}</span>
+                            )}
                             <div>
                               <strong style={{ fontSize: 12, color: 'var(--text-primary)' }}>
                                 {enemy.name} {enemy.isBoss && <span className="boss-badge">👑 BOSS</span>}
@@ -2920,6 +2929,33 @@ export default function Admin() {
                         onChange={e => setNewEnemyForm(prev => ({ ...prev, icon: e.target.value }))}
                         className="combat-dark-input"
                         style={{ textAlign: 'center', padding: '6px 4px', fontSize: 12 }}
+                      />
+                    </div>
+
+                    {/* URL da Foto / Avatar do Inimigo */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                      {newEnemyForm.avatarUrl && (
+                        <img
+                          src={newEnemyForm.avatarUrl}
+                          alt="Preview"
+                          style={{
+                            width: 38,
+                            height: 38,
+                            borderRadius: 6,
+                            objectFit: 'cover',
+                            border: '1px solid rgba(239,68,68,0.4)',
+                            flexShrink: 0
+                          }}
+                          onError={e => { e.target.style.display = 'none' }}
+                        />
+                      )}
+                      <input
+                        type="url"
+                        placeholder="URL da foto/avatar do inimigo (opcional)"
+                        value={newEnemyForm.avatarUrl}
+                        onChange={e => setNewEnemyForm(prev => ({ ...prev, avatarUrl: e.target.value }))}
+                        className="combat-dark-input"
+                        style={{ flex: 1, padding: '6px 10px', fontSize: 12 }}
                       />
                     </div>
 

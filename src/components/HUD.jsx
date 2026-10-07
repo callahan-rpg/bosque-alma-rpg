@@ -107,7 +107,7 @@ export default function HUD({ locationSlug, locationName, weatherCondition, minT
           <button
             type="button"
             className="hud-icon-btn"
-            onClick={() => navigate('/personagens')}
+            onClick={() => window.open('/personagens', '_blank', 'noopener,noreferrer')}
             title="Galeria Pública de Personagens do Bosque"
           >
             👥
