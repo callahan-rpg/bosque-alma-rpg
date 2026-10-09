@@ -133,30 +133,32 @@ function checkIngredientInInventory(inventory, ingName, reqQty = 1) {
 }
 
 const POTION_COLOR_NAMES = {
-  '#b45309': 'Âmbar Dourado',
+  '#b45309': 'Âmbar',
   '#10b981': 'Esmeralda',
-  '#dc2626': 'Rubi / Vitalidade',
-  '#2563eb': 'Safira Arcana',
-  '#9333ea': 'Ametista Mística',
-  '#06b6d4': 'Ciano Espectral',
+  '#dc2626': 'Rubi',
+  '#2563eb': 'Safira',
+  '#9333ea': 'Ametista',
+  '#06b6d4': 'Ciano',
   '#94a3b8': 'Prateado',
-  '#1e293b': 'Ônix Sombrio',
-  '#f59e0b': 'Ouro Solar',
-  '#881337': 'Carmesim Noturno',
+  '#1e293b': 'Ônix',
+  '#f59e0b': 'Dourado',
+  '#881337': 'Carmesim',
 }
 
 export function formatPotionColorLabel(colorVal) {
   if (!colorVal) return 'Esmeralda'
   const lower = colorVal.trim().toLowerCase()
   if (POTION_COLOR_NAMES[lower]) return POTION_COLOR_NAMES[lower]
-  if (lower.includes('ambar') || lower.includes('dourado') || lower.includes('ouro')) return 'Âmbar Dourado'
-  if (lower.includes('rubi') || lower.includes('vermelh') || lower.includes('sangue')) return 'Rubi Sanguíneo'
-  if (lower.includes('safira') || lower.includes('azul') || lower.includes('mana')) return 'Safira Arcana'
-  if (lower.includes('esmeralda') || lower.includes('verde') || lower.includes('cura')) return 'Esmeralda'
-  if (lower.includes('ametista') || lower.includes('roxo') || lower.includes('violeta')) return 'Ametista Mística'
-  if (lower.includes('ciano') || lower.includes('espectral') || lower.includes('gelo')) return 'Ciano Espectral'
+  if (lower.includes('ambar')) return 'Âmbar'
+  if (lower.includes('dourado') || lower.includes('ouro')) return 'Dourado'
+  if (lower.includes('rubi') || lower.includes('vermelh') || lower.includes('sangue')) return 'Rubi'
+  if (lower.includes('safira') || lower.includes('azul') || lower.includes('mana')) return 'Safira'
+  if (lower.includes('esmeralda') || lower.includes('verde')) return 'Esmeralda'
+  if (lower.includes('ametista') || lower.includes('roxo') || lower.includes('violeta')) return 'Ametista'
+  if (lower.includes('ciano') || lower.includes('gelo') || lower.includes('espectral')) return 'Ciano'
   if (lower.includes('prata') || lower.includes('prateado') || lower.includes('cinza')) return 'Prateado'
-  if (lower.includes('onix') || lower.includes('preto') || lower.includes('sombra') || lower.includes('trevas')) return 'Ônix Sombrio'
+  if (lower.includes('onix') || lower.includes('preto') || lower.includes('sombra') || lower.includes('trevas')) return 'Ônix'
+  if (lower.includes('carmesim') || lower.includes('vinho')) return 'Carmesim'
   return colorVal
 }
 
@@ -443,8 +445,7 @@ export default function PotionCraftingModal({ onClose }) {
           <div className="potion-modal-title-block">
             <span className="potion-modal-rune">⚗️</span>
             <div>
-              <h2 className="potion-modal-title">Laboratorio de Alquimia</h2>
-              <p className="potion-modal-subtitle">Ossena — Preparacoes Alquimicas do Vale dos Ossos</p>
+              <h2 className="potion-modal-title">Laboratório de Alquimia</h2>
             </div>
           </div>
           <button type="button" className="potion-modal-close-btn" onClick={onClose}>✕</button>

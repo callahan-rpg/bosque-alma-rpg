@@ -15,16 +15,16 @@ import { uploadImageFree } from '../../utils/imageUpload'
 
 // Paleta de cores para o caldeirão
 const POTION_COLOR_PRESETS = [
-  { name: 'Âmbar Dourado (Óleo/Resina)', value: '#b45309' },
-  { name: 'Esmeralda Tóxica / Cura Natural', value: '#10b981' },
-  { name: 'Rubi / Vitalidade Sanguínea', value: '#dc2626' },
-  { name: 'Safira Arcana / Mana', value: '#2563eb' },
-  { name: 'Ametista Mística / Ilusão', value: '#9333ea' },
-  { name: 'Ciano Espectral / Véu', value: '#06b6d4' },
-  { name: 'Prateado / Aço e Ossena', value: '#94a3b8' },
-  { name: 'Ônix / Sombra e Corrosão', value: '#1e293b' },
-  { name: 'Ouro Solar / Consagração', value: '#f59e0b' },
-  { name: 'Carmesim Noturno', value: '#881337' },
+  { name: 'Âmbar', value: '#b45309' },
+  { name: 'Esmeralda', value: '#10b981' },
+  { name: 'Rubi', value: '#dc2626' },
+  { name: 'Safira', value: '#2563eb' },
+  { name: 'Ametista', value: '#9333ea' },
+  { name: 'Ciano', value: '#06b6d4' },
+  { name: 'Prateado', value: '#94a3b8' },
+  { name: 'Ônix', value: '#1e293b' },
+  { name: 'Dourado', value: '#f59e0b' },
+  { name: 'Carmesim', value: '#881337' },
 ]
 
 const INGREDIENT_TYPES = [
