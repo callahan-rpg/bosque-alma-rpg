@@ -4,6 +4,7 @@ import { collection, onSnapshot, query, orderBy, doc, setDoc, serverTimestamp } 
 import { db } from '../firebase/config'
 import HUD from '../components/HUD.jsx'
 import { uploadImageFree } from '../utils/imageUpload'
+import { formatPotionColorLabel } from '../components/PotionCraftingModal.jsx'
 
 const CATEGORIES = [
   { id: 'criaturas', label: 'CRIATURAS', subtitle: 'Bestiário do Bosque', icon: '🐺' },
@@ -368,49 +369,96 @@ export default function Compendium() {
                   </div>
                 )}
 
-                {/* 3 Blocos Separados Lado a Lado: Fraquezas, CA, Altura e Peso */}
-                <div className="compendium-center-cards-row">
-                  {/* Card 1: Fraquezas */}
-                  <div className="compendium-info-pill-card">
-                    <span className="compendium-info-pill-title">
-                      {activeCategory === 'criaturas' ? 'FRAQUEZAS:' : 'VULNERABILIDADES:'}
-                    </span>
-                    <div className="compendium-badges-row">
-                      {((selectedEntry.weaknesses && selectedEntry.weaknesses.length > 0) ||
-                        (selectedEntry.attributes && selectedEntry.attributes.length > 0)) ? (
-                        (selectedEntry.weaknesses || selectedEntry.attributes || []).map((attr, i) => (
-                          <div key={i} className="compendium-attribute-badge weakness" title={attr.label}>
-                            <span className="badge-icon">{attr.icon || '🔥'}</span>
-                            <span className="badge-label">{attr.label}</span>
-                          </div>
-                        ))
-                      ) : (
-                        <div className="compendium-attribute-badge">
-                          <span className="badge-icon">✦</span>
-                          <span className="badge-label">Nenhuma</span>
+                {/* 3 Blocos — Adaptados por Categoria */}
+                {activeCategory === 'pocoes' ? (
+                  // Layout especial para Pocoes
+                  <div className="compendium-center-cards-row potion-cards-row">
+                    {/* Icone e cor */}
+                    <div className="compendium-info-pill-card">
+                      <span className="compendium-info-pill-title">POÇÃO:</span>
+                      <div className="compendium-attribute-badge potion-icon-badge" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span className="badge-icon" style={{ fontSize: '1.4rem' }}>{selectedEntry.potionIcon || '🧪'}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          {selectedEntry.potionColor && (
+                            <span
+                              style={{
+                                width: 10,
+                                height: 10,
+                                borderRadius: '50%',
+                                backgroundColor: selectedEntry.potionColor.startsWith('#') || selectedEntry.potionColor.startsWith('rgb') ? selectedEntry.potionColor : '#10b981',
+                                boxShadow: `0 0 6px ${selectedEntry.potionColor.startsWith('#') || selectedEntry.potionColor.startsWith('rgb') ? selectedEntry.potionColor : '#10b981'}`,
+                                display: 'inline-block'
+                              }}
+                            />
+                          )}
+                          <span className="badge-label">{formatPotionColorLabel(selectedEntry.potionColor)}</span>
                         </div>
-                      )}
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Card 2: CA (Classe de Armadura) */}
-                  <div className="compendium-info-pill-card">
-                    <span className="compendium-info-pill-title">CLASSE DE ARMADURA:</span>
-                    <div className="compendium-attribute-badge ca">
-                      <span className="badge-icon">🛡️</span>
-                      <span className="badge-label">{selectedEntry.armorClass ?? selectedEntry.ca ?? 10} CA</span>
+                    {/* Categoria alquimica */}
+                    <div className="compendium-info-pill-card">
+                      <span className="compendium-info-pill-title">CATEGORIA:</span>
+                      <div className="compendium-attribute-badge">
+                        <span className="badge-icon">⚗️</span>
+                        <span className="badge-label">{selectedEntry.potionCategory || selectedEntry.subcategory || 'Alquimia'}</span>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Card 3: Altura e Peso */}
-                  <div className="compendium-info-pill-card">
-                    <span className="compendium-info-pill-title">ALTURA E PESO:</span>
-                    <div className="compendium-attribute-badge dimension">
-                      <span className="badge-icon">📏</span>
-                      <span className="badge-label">{selectedEntry.heightWeight || 'Não catalogado'}</span>
+                    {/* Rendimento */}
+                    <div className="compendium-info-pill-card">
+                      <span className="compendium-info-pill-title">RENDIMENTO:</span>
+                      <div className="compendium-attribute-badge">
+                        <span className="badge-icon">📦</span>
+                        <span className="badge-label">{selectedEntry.potionYield || '1 frasco'}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  // Layout padrao (criaturas / plantas)
+                  <div className="compendium-center-cards-row">
+                    {/* Card 1: Fraquezas */}
+                    <div className="compendium-info-pill-card">
+                      <span className="compendium-info-pill-title">
+                        {activeCategory === 'criaturas' ? 'FRAQUEZAS:' : 'VULNERABILIDADES:'}
+                      </span>
+                      <div className="compendium-badges-row">
+                        {((selectedEntry.weaknesses && selectedEntry.weaknesses.length > 0) ||
+                          (selectedEntry.attributes && selectedEntry.attributes.length > 0)) ? (
+                          (selectedEntry.weaknesses || selectedEntry.attributes || []).map((attr, i) => (
+                            <div key={i} className="compendium-attribute-badge weakness" title={attr.label}>
+                              <span className="badge-icon">{attr.icon || '🔥'}</span>
+                              <span className="badge-label">{attr.label}</span>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="compendium-attribute-badge">
+                            <span className="badge-icon">✦</span>
+                            <span className="badge-label">Nenhuma</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Card 2: CA (Classe de Armadura) */}
+                    <div className="compendium-info-pill-card">
+                      <span className="compendium-info-pill-title">CLASSE DE ARMADURA:</span>
+                      <div className="compendium-attribute-badge ca">
+                        <span className="badge-icon">🛡️</span>
+                        <span className="badge-label">{selectedEntry.armorClass ?? selectedEntry.ca ?? 10} CA</span>
+                      </div>
+                    </div>
+
+                    {/* Card 3: Altura e Peso */}
+                    <div className="compendium-info-pill-card">
+                      <span className="compendium-info-pill-title">ALTURA E PESO:</span>
+                      <div className="compendium-attribute-badge dimension">
+                        <span className="badge-icon">📏</span>
+                        <span className="badge-label">{selectedEntry.heightWeight || 'Nao catalogado'}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="compendium-empty-selection">
@@ -494,9 +542,45 @@ export default function Compendium() {
                             ? 'Comportamento & Combate'
                             : activeCategory === 'plantas_fungos'
                             ? 'Modo de Colheita & Perigos'
-                            : 'Preparo & Efeitos'}
+                            : 'Preparo & Efeitos Alquimicos'}
                         </h3>
                         <p className="compendium-tactics-text">{selectedEntry.tactics}</p>
+                      </div>
+                    )}
+
+                    {/* Ingredientes (apenas para pocoes) */}
+                    {activeCategory === 'pocoes' && selectedEntry.ingredients && (
+                      <div className="compendium-tactics-section">
+                        <h3 className="compendium-tactics-header">🌿 Ingredientes</h3>
+                        <ul className="compendium-ingredients-list">
+                          {selectedEntry.ingredients.split('\n').filter(l => l.trim()).map((ing, i) => (
+                            <li key={i} className="compendium-ingredient-item">
+                              {ing.replace(/^[-•·*\d.]+\s*/, '').trim()}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Modo de preparo (apenas para pocoes) */}
+                    {activeCategory === 'pocoes' && selectedEntry.preparation && (
+                      <div className="compendium-tactics-section">
+                        <h3 className="compendium-tactics-header">🔥 Modo de Preparo</h3>
+                        <ol className="compendium-preparation-list">
+                          {selectedEntry.preparation.split('\n').filter(l => l.trim()).map((step, i) => (
+                            <li key={i} className="compendium-prep-step">
+                              {step.replace(/^\d+\.\s*/, '').trim()}
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
+                    )}
+
+                    {/* Aviso de atencao (apenas para pocoes) */}
+                    {activeCategory === 'pocoes' && selectedEntry.attention && (
+                      <div className="compendium-tactics-section" style={{ background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.18)', borderRadius: '8px', padding: '10px 12px' }}>
+                        <h3 className="compendium-tactics-header" style={{ color: '#fbbf24' }}>⚠️ Atencao</h3>
+                        <p className="compendium-tactics-text" style={{ fontStyle: 'italic', color: 'rgba(251,191,36,0.85)' }}>{selectedEntry.attention}</p>
                       </div>
                     )}
                   </div>

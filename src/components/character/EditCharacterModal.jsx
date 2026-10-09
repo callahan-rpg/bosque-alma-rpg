@@ -1,4 +1,6 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
+import { collection, onSnapshot } from 'firebase/firestore'
+import { db } from '../../firebase/config'
 import { calculateMaxHp, calculateMaxVigor } from '../../utils/characterStats'
 
 const ITEM_ICONS = ['🗡️', '⚔️', '🏹', '🛡️', '🧪', '🥩', '💍', '👑', '📜', '🗝️', '💎', '🪙', '🌿', '🔮', '🎒', '🪓']
@@ -47,6 +49,30 @@ export default function EditCharacterModal({ profile, onSave, onClose }) {
 
   const [activeTab, setActiveTab] = useState('general') // 'general', 'attributes', 'individuality', 'inventory'
   const [saving, setSaving] = useState(false)
+  const [alchemyIngredients, setAlchemyIngredients] = useState([])
+  const [selectedCatalogIngId, setSelectedCatalogIngId] = useState('')
+
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, 'alchemy_ingredients'), (snap) => {
+      setAlchemyIngredients(snap.docs.map(d => ({ id: d.id, ...d.data() })))
+    }, (err) => console.error(err))
+    return () => unsub()
+  }, [])
+
+  const handlePickCatalogIngredient = (ingId) => {
+    if (!ingId) return
+    const ing = alchemyIngredients.find(i => i.id === ingId)
+    if (!ing) return
+    setEditingItemIndex(null)
+    setItemForm({
+      name: ing.name || '',
+      qty: 1,
+      description: ing.description || (ing.habitat ? `Origem: ${ing.habitat}` : 'Ingrediente alquímico.'),
+      icon: ing.icon || '🌿'
+    })
+    setShowItemForm(true)
+    setSelectedCatalogIngId('')
+  }
 
   const handleAttrChange = (key, val) => {
     const num = Math.max(0, parseInt(val, 10) || 0)
@@ -419,13 +445,32 @@ export default function EditCharacterModal({ profile, onSave, onClose }) {
               <div className="char-edit-tab-content">
                 <div className="char-inv-header-row">
                   <span className="char-inv-count-badge">{inventory.length} Itens na Mochila</span>
-                  <button
-                    type="button"
-                    className="char-inv-add-btn"
-                    onClick={handleOpenNewItem}
-                  >
-                    + Adicionar Item
-                  </button>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                    {alchemyIngredients.length > 0 && (
+                      <select
+                        value={selectedCatalogIngId}
+                        onChange={(e) => {
+                          setSelectedCatalogIngId(e.target.value)
+                          handlePickCatalogIngredient(e.target.value)
+                        }}
+                        style={{ fontSize: 12, padding: '4px 8px', maxWidth: 200 }}
+                      >
+                        <option value="">🌿 + Do Catálogo Alquímico...</option>
+                        {alchemyIngredients.map(ing => (
+                          <option key={ing.id} value={ing.id}>
+                            {ing.icon || '🌿'} {ing.name} ({ing.rarity || 'comum'})
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                    <button
+                      type="button"
+                      className="char-inv-add-btn"
+                      onClick={handleOpenNewItem}
+                    >
+                      + Novo Item Livre
+                    </button>
+                  </div>
                 </div>
 
                 {showItemForm && (

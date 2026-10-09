@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, getDoc, setDoc, onSnapshot, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase/config'
 import { auth, onAuthChange } from '../firebase/auth'
 
@@ -14,24 +14,28 @@ export function AuthProvider({ children }) {
   const [firebaseUser, setFirebaseUser] = useState(undefined) // undefined = carregando
   const [profile, setProfile] = useState(null)
 
-  // Observa estado do Firebase Auth
+  // Observa estado do Firebase Auth e sincroniza perfil em tempo real
   useEffect(() => {
-    const unsub = onAuthChange(async (fbUser) => {
+    let profileUnsub = null
+
+    const unsubAuth = onAuthChange(async (fbUser) => {
       setFirebaseUser(fbUser)
+
+      if (profileUnsub) {
+        profileUnsub()
+        profileUnsub = null
+      }
 
       if (!fbUser) {
         setProfile(null)
         return
       }
 
-      // Carrega ou cria perfil estendido no Firestore
       const profileRef = doc(db, 'players', fbUser.uid)
+      
+      // Cria ficha base caso ainda não exista
       const snap = await getDoc(profileRef)
-
-      if (snap.exists()) {
-        setProfile(snap.data())
-      } else {
-        // Primeiro login: cria ficha base padrão
+      if (!snap.exists()) {
         const defaultProfile = {
           uid: fbUser.uid,
           nick: fbUser.displayName || 'Viajante',
@@ -82,11 +86,20 @@ export function AuthProvider({ children }) {
           createdAt: serverTimestamp(),
         }
         await setDoc(profileRef, defaultProfile)
-        setProfile(defaultProfile)
       }
+
+      // Escuta mudanças no perfil/inventário em tempo real
+      profileUnsub = onSnapshot(profileRef, (docSnap) => {
+        if (docSnap.exists()) {
+          setProfile(docSnap.data())
+        }
+      }, (err) => console.error('[AuthContext] Erro no listener do perfil:', err))
     })
 
-    return unsub
+    return () => {
+      unsubAuth()
+      if (profileUnsub) profileUnsub()
+    }
   }, [])
 
   /**

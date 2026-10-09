@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useDefaultLocation } from '../hooks/useDefaultLocation'
 import { calculateMaxHp, calculateMaxVigor } from '../utils/characterStats'
 import EditCharacterModal from '../components/character/EditCharacterModal'
+import AddIngredientModal from '../components/character/AddIngredientModal'
 
 export default function CharacterSheet() {
   const { targetUid } = useParams()
@@ -18,6 +19,7 @@ export default function CharacterSheet() {
   const [charData, setCharData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [showEditModal, setShowEditModal] = useState(false)
+  const [showAddIngredientModal, setShowAddIngredientModal] = useState(false)
 
   // Carrega ficha do usuário atual ou de outro jogador
   useEffect(() => {
@@ -101,6 +103,37 @@ export default function CharacterSheet() {
   const handleSaveProfile = async (updates) => {
     await updateProfile(updates)
     setCharData(prev => ({ ...prev, ...updates }))
+  }
+
+  const handleAddIngredientToInventory = async (ingredient, quantity = 1) => {
+    const currentInv = Array.isArray(charData?.inventory) ? [...charData.inventory] : []
+    const normalizedName = (ingredient.name || '').trim().toLowerCase()
+    
+    // Verifica se já possui o item na mochila
+    const existingIndex = currentInv.findIndex(item => (item.name || '').trim().toLowerCase() === normalizedName)
+    
+    let nextInv
+    if (existingIndex >= 0) {
+      nextInv = [...currentInv]
+      const existingItem = nextInv[existingIndex]
+      const currentQty = parseInt(existingItem.qty, 10) || 1
+      nextInv[existingIndex] = {
+        ...existingItem,
+        qty: currentQty + quantity
+      }
+    } else {
+      const newItem = {
+        id: `ing_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+        name: ingredient.name.trim(),
+        qty: quantity,
+        description: ingredient.description || 'Ingrediente alquímico.',
+        icon: ingredient.icon || '🌿',
+        type: 'alquimia'
+      }
+      nextInv = [...currentInv, newItem]
+    }
+
+    await handleSaveProfile({ inventory: nextInv })
   }
 
   if (loading) {
@@ -322,14 +355,24 @@ export default function CharacterSheet() {
                 <span className="ornate-line right" />
               </div>
               {isMySheet && (
-                <button
-                  type="button"
-                  className="char-inv-quick-add-btn"
-                  onClick={() => setShowEditModal(true)}
-                  title="Gerenciar itens da mochila"
-                >
-                  + Gerenciar Mochila
-                </button>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                  <button
+                    type="button"
+                    className="char-inv-ingredient-btn"
+                    onClick={() => setShowAddIngredientModal(true)}
+                    title="Adicionar ingredientes alquímicos cadastrados no catálogo"
+                  >
+                    🌿 + Ingredientes Alquímicos
+                  </button>
+                  <button
+                    type="button"
+                    className="char-inv-quick-add-btn"
+                    onClick={() => setShowEditModal(true)}
+                    title="Gerenciar itens da mochila"
+                  >
+                    + Gerenciar Mochila
+                  </button>
+                </div>
               )}
             </div>
 
@@ -366,12 +409,21 @@ export default function CharacterSheet() {
         </section>
       </main>
 
-      {/* Modal de Edição */}
+      {/* Modal de Edição Geral */}
       {showEditModal && isMySheet && (
         <EditCharacterModal
           profile={charData}
           onSave={handleSaveProfile}
           onClose={() => setShowEditModal(false)}
+        />
+      )}
+
+      {/* Modal de Catálogo de Ingredientes Alquímicos */}
+      {showAddIngredientModal && isMySheet && (
+        <AddIngredientModal
+          inventory={inventory}
+          onAddIngredient={handleAddIngredientToInventory}
+          onClose={() => setShowAddIngredientModal(false)}
         />
       )}
     </div>

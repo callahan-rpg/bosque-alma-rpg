@@ -6,6 +6,7 @@ import EditProfileModal from './chat/EditProfileModal.jsx'
 import CharacterPopupModal from './character/CharacterPopupModal.jsx'
 import SettingsModal from './SettingsModal.jsx'
 import WeatherWidget from './WeatherWidget.jsx'
+import PotionCraftingModal from './PotionCraftingModal.jsx'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { useDefaultLocation } from '../hooks/useDefaultLocation'
 import { useNavigate } from 'react-router-dom'
@@ -18,6 +19,7 @@ export default function HUD({ locationSlug, locationName, weatherCondition, minT
   const [showProfile, setShowProfile] = useState(false)
   const [showCharPopup, setShowCharPopup] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
+  const [showPotionCrafting, setShowPotionCrafting] = useState(false)
   const [hasActiveCombat, setHasActiveCombat] = useState(false)
 
   // Escuta se existe algum combate ativo no momento
@@ -124,6 +126,15 @@ export default function HUD({ locationSlug, locationName, weatherCondition, minT
 
           <button
             type="button"
+            className={`hud-icon-btn hud-potion-btn ${showPotionCrafting ? 'active' : ''}`}
+            onClick={() => setShowPotionCrafting(p => !p)}
+            title="Laboratório de Alquimia — Fabricar Poções"
+          >
+            ⚗️
+          </button>
+
+          <button
+            type="button"
             className={`hud-icon-btn ${showDice ? 'active' : ''}`}
             onClick={() => setShowDice(p => !p)}
             title="Oráculo dos Dados"
@@ -166,6 +177,8 @@ export default function HUD({ locationSlug, locationName, weatherCondition, minT
       </header>
 
       {showDice && <DiceRoller onClose={() => setShowDice(false)} />}
+
+      {showPotionCrafting && <PotionCraftingModal onClose={() => setShowPotionCrafting(false)} />}
 
       {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
 

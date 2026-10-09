@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { uploadImageFree } from '../utils/imageUpload'
 import { calculateMaxHp, calculateMaxVigor, ATTRIBUTE_ICONS, COMBAT_STATUS_EFFECTS } from '../utils/combatSystem'
+import AlchemyAdminPanel from '../components/admin/AlchemyAdminPanel.jsx'
 
 const CLIMATE_OPTIONS = [
   { value: 'none', label: 'Nenhum Efeito (Clima Estável)', icon: '🌿' },
@@ -168,6 +169,18 @@ export default function Admin() {
   const [compendiumGlobalBg, setCompendiumGlobalBg] = useState('')
   const [uploadingGlobalBg, setUploadingGlobalBg] = useState(false)
   const [saveGlobalBgStatus, setSaveGlobalBgStatus] = useState('')
+
+  // ==========================================
+  // ESTADOS ESPECÍFICOS DE POÇÕES
+  // ==========================================
+  const [compPotionIcon, setCompPotionIcon] = useState('🧪')
+  const [compPotionColor, setCompPotionColor] = useState('')
+  const [compPotionCategory, setCompPotionCategory] = useState('')
+  const [compPotionYield, setCompPotionYield] = useState('1 frasco')
+  const [compPotionEffect, setCompPotionEffect] = useState('')
+  const [compPotionIngredients, setCompPotionIngredients] = useState('')
+  const [compPotionPreparation, setCompPotionPreparation] = useState('')
+  const [compPotionAttention, setCompPotionAttention] = useState('')
 
   const MASTER_PIN = import.meta.env.VITE_ADMIN_PIN || 'alma2026'
 
@@ -828,6 +841,15 @@ export default function Admin() {
       vitalidade: 10
     })
     setCompDrops([])
+    // Potion fields
+    setCompPotionIcon('🧪')
+    setCompPotionColor('')
+    setCompPotionCategory('')
+    setCompPotionYield('1 frasco')
+    setCompPotionEffect('')
+    setCompPotionIngredients('')
+    setCompPotionPreparation('')
+    setCompPotionAttention('')
   }
 
   const selectCompEntryForEdit = (entry) => {
@@ -865,6 +887,15 @@ export default function Admin() {
       vitalidade: entry.stats?.vitalidade ?? 10,
     })
     setCompDrops(entry.drops || [])
+    // Potion fields
+    setCompPotionIcon(entry.potionIcon || '🧪')
+    setCompPotionColor(entry.potionColor || '')
+    setCompPotionCategory(entry.potionCategory || '')
+    setCompPotionYield(entry.potionYield || '1 frasco')
+    setCompPotionEffect(entry.effect || '')
+    setCompPotionIngredients(entry.ingredients || '')
+    setCompPotionPreparation(entry.preparation || '')
+    setCompPotionAttention(entry.attention || '')
   }
 
   const handleUploadCompImg = async (e) => {
@@ -965,6 +996,15 @@ export default function Admin() {
           active: { name: compActiveName.trim(), desc: compActiveDesc.trim() },
         },
         drops: compDrops.filter(d => (typeof d === 'string' ? d.trim() : d.name?.trim())),
+        // Potion-specific fields
+        potionIcon: compCategory === 'pocoes' ? (compPotionIcon.trim() || '🧪') : undefined,
+        potionColor: compCategory === 'pocoes' ? compPotionColor.trim() : undefined,
+        potionCategory: compCategory === 'pocoes' ? compPotionCategory.trim() : undefined,
+        potionYield: compCategory === 'pocoes' ? compPotionYield.trim() : undefined,
+        effect: compCategory === 'pocoes' ? compPotionEffect.trim() : undefined,
+        ingredients: compCategory === 'pocoes' ? compPotionIngredients.trim() : undefined,
+        preparation: compCategory === 'pocoes' ? compPotionPreparation.trim() : undefined,
+        attention: compCategory === 'pocoes' ? compPotionAttention.trim() : undefined,
         updatedAt: serverTimestamp()
       }
 
@@ -1172,6 +1212,13 @@ export default function Admin() {
             onClick={() => setAdminTab('combate')}
           >
             ⚔️ Mesa de Combate {activeCombatData?.active ? '🔴' : ''}
+          </button>
+          <button
+            type="button"
+            className={`admin-tab-nav-btn ${adminTab === 'alchemy' ? 'active' : ''}`}
+            onClick={() => setAdminTab('alchemy')}
+          >
+            ⚗️ Alquimia & Poções
           </button>
         </div>
 
@@ -1939,6 +1986,108 @@ export default function Admin() {
                     </div>
                   </div>
                 </div>
+
+                {/* ── SEÇÃO EXCLUSIVA PARA POÇÕES ── */}
+                {compCategory === 'pocoes' && (
+                  <div className="admin-nav-section" style={{ borderColor: 'rgba(139, 206, 100, 0.25)', background: 'rgba(139, 206, 100, 0.04)' }}>
+                    <div className="admin-nav-header">
+                      <label>⚗️ Campos Exclusivos de Poção / Alquimia:</label>
+                    </div>
+
+                    {/* Linha 1: Ícone, Cor e Rendimento */}
+                    <div className="admin-form-row">
+                      <div className="admin-form-group" style={{ flex: '0 0 120px' }}>
+                        <label>🧪 Ícone da Poção (Emoji):</label>
+                        <input
+                          type="text"
+                          value={compPotionIcon}
+                          onChange={(e) => setCompPotionIcon(e.target.value)}
+                          placeholder="ex: 🧪 ⚗️ 🫙 🍶"
+                          style={{ textAlign: 'center', fontSize: '1.4rem' }}
+                        />
+                      </div>
+                      <div className="admin-form-group" style={{ flex: 1 }}>
+                        <label>🎨 Coloração / Aparência:</label>
+                        <input
+                          type="text"
+                          value={compPotionColor}
+                          onChange={(e) => setCompPotionColor(e.target.value)}
+                          placeholder="ex: Âmbar-esverdeada, transparente, rubi..."
+                        />
+                      </div>
+                      <div className="admin-form-group" style={{ flex: 1 }}>
+                        <label>🏷️ Categoria Alquímica:</label>
+                        <input
+                          type="text"
+                          value={compPotionCategory}
+                          onChange={(e) => setCompPotionCategory(e.target.value)}
+                          placeholder="ex: Óleo Alquímico — Conservação"
+                        />
+                      </div>
+                      <div className="admin-form-group" style={{ flex: '0 0 130px' }}>
+                        <label>📦 Rendimento:</label>
+                        <input
+                          type="text"
+                          value={compPotionYield}
+                          onChange={(e) => setCompPotionYield(e.target.value)}
+                          placeholder="ex: 1 frasco"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Efeito */}
+                    <div className="admin-form-group">
+                      <label>✨ Efeito (Resumo do que a poção faz):</label>
+                      <textarea
+                        rows={2}
+                        value={compPotionEffect}
+                        onChange={(e) => setCompPotionEffect(e.target.value)}
+                        placeholder="ex: Protege um objeto metálico, reduzindo os efeitos de ferrugem, umidade e desgaste superficial..."
+                      />
+                    </div>
+
+                    {/* Ingredientes */}
+                    <div className="admin-form-group">
+                      <label>🌿 Ingredientes (um por linha):</label>
+                      <textarea
+                        rows={5}
+                        value={compPotionIngredients}
+                        onChange={(e) => setCompPotionIngredients(e.target.value)}
+                        placeholder={`70ml de Óleo de Semente Pálida\n2 ramos de Alecrim do Ossuário\n1 colher de Pó de Calcita Branca\n1 pitada de Sal Branco do Vale`}
+                        style={{ fontFamily: 'monospace', fontSize: '0.83rem' }}
+                      />
+                      <small style={{ color: 'var(--text-muted)' }}>
+                        Cada linha é um ingrediente. Serão verificados automaticamente contra o inventário do jogador no laboratório de alquimia.
+                      </small>
+                    </div>
+
+                    {/* Modo de Preparo */}
+                    <div className="admin-form-group">
+                      <label>🔥 Modo de Preparo (passos numerados, um por linha):</label>
+                      <textarea
+                        rows={6}
+                        value={compPotionPreparation}
+                        onChange={(e) => setCompPotionPreparation(e.target.value)}
+                        placeholder={`1. Aqueça o óleo em fogo baixo até liberar aroma.\n2. Adicione o alecrim picado e infusione por 5 minutos.\n3. Acrescente o pó de calcita aos poucos.\n4. Finalize com o sal e mexa por 1 minuto.\n5. Coe e armazene em frasco de vidro escuro.`}
+                        style={{ fontFamily: 'monospace', fontSize: '0.83rem' }}
+                      />
+                      <small style={{ color: 'var(--text-muted)' }}>
+                        Esses passos serão animados no laboratório de alquimia durante a fabricação.
+                      </small>
+                    </div>
+
+                    {/* Aviso / Atenção */}
+                    <div className="admin-form-group">
+                      <label>⚠️ Aviso / Atenção (Observações importantes):</label>
+                      <textarea
+                        rows={2}
+                        value={compPotionAttention}
+                        onChange={(e) => setCompPotionAttention(e.target.value)}
+                        placeholder="ex: O óleo deve ser aplicado sobre superfícies limpas e secas. Se utilizado sobre metal já enferrujado..."
+                      />
+                    </div>
+                  </div>
+                )}
 
                 {/* ── LORE, DESCRIÇÃO E CITAÇÃO ── */}
                 <div className="admin-form-row">
@@ -3196,6 +3345,13 @@ export default function Admin() {
             </form>
           </main>
         </div>
+      )}
+
+      {/* =========================================================================
+          ABA 5: ALQUIMIA, RECEITAS DE POÇÕES & CATÁLOGO DE INGREDIENTES
+          ========================================================================= */}
+      {adminTab === 'alchemy' && (
+        <AlchemyAdminPanel />
       )}
     </div>
   )
