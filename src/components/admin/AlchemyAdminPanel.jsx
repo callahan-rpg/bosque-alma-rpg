@@ -1039,7 +1039,7 @@ export default function AlchemyAdminPanel() {
                           <strong>{ing.name}</strong>
                         </div>
                         <small style={{ color: rarityObj.color }}>
-                          {rarityObj.label} • {ing.value ?? 0} moedas
+                          {rarityObj.label}
                         </small>
                       </div>
                       <button
@@ -1136,16 +1136,6 @@ export default function AlchemyAdminPanel() {
                       value={ingHabitat}
                       onChange={(e) => setIngHabitat(e.target.value)}
                       placeholder="ex: Brejos e minas inundadas de Koskovic"
-                    />
-                  </div>
-
-                  <div className="admin-form-group" style={{ flex: 0.6 }}>
-                    <label>Valor (Moedas):</label>
-                    <input
-                      type="number"
-                      min="0"
-                      value={ingValue}
-                      onChange={(e) => setIngValue(e.target.value)}
                     />
                   </div>
 

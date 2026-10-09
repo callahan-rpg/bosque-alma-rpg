@@ -738,14 +738,15 @@ export default function PotionCraftingModal({ onClose }) {
               <div className="potion-recipe-scroll">
                 <div className="potion-recipe-header">
                   <div className="potion-recipe-icon-frame">
-                    <span className="potion-recipe-big-icon">{selectedPotion.potionIcon || '🧪'}</span>
-                    {selectedPotion.imageUrl && (
+                    {selectedPotion.imageUrl ? (
                       <img
                         src={selectedPotion.imageUrl}
                         alt={selectedPotion.name}
                         className="potion-recipe-img"
                         onError={(e) => { e.currentTarget.style.display = 'none' }}
                       />
+                    ) : (
+                      <span className="potion-recipe-big-icon">{selectedPotion.potionIcon || '🧪'}</span>
                     )}
                   </div>
                   <h3 className="potion-recipe-name">{selectedPotion.name}</h3>

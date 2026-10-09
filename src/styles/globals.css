@@ -9996,12 +9996,12 @@ html, body, #root {
   animation: runeFloat 3s ease-in-out infinite;
 }
 .potion-recipe-img {
-  width: 80px;
-  height: 80px;
+  width: 140px;
+  height: 140px;
   object-fit: cover;
-  border-radius: 10px;
-  border: 1px solid rgba(139, 206, 100, 0.2);
-  margin-top: 8px;
+  border-radius: 12px;
+  border: 2px solid rgba(139, 206, 100, 0.35);
+  box-shadow: 0 0 20px rgba(100, 220, 120, 0.3);
 }
 .potion-recipe-name {
   font-family: var(--font-gothic);
