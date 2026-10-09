@@ -10000,8 +10000,6 @@ html, body, #root {
   height: 140px;
   object-fit: cover;
   border-radius: 12px;
-  border: 2px solid rgba(139, 206, 100, 0.35);
-  box-shadow: 0 0 20px rgba(100, 220, 120, 0.3);
 }
 .potion-recipe-name {
   font-family: var(--font-gothic);
