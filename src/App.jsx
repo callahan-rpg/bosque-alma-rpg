@@ -2,6 +2,8 @@ import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext.jsx'
 import { useDefaultLocation } from './hooks/useDefaultLocation'
+import { LocationTransitionProvider } from './contexts/LocationTransitionContext.jsx'
+import LocationTransitionOverlay from './components/transitions/LocationTransitionOverlay.jsx'
 
 const Location = lazy(() => import('./pages/Location.jsx'))
 const Compendium = lazy(() => import('./pages/Compendium.jsx'))
@@ -40,43 +42,46 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <AuthGuard>
-          <Suspense fallback={<div className="loading-screen"><span className="loading-dot" /></div>}>
-            <Routes>
-              {/* Rota inicial leva direto para a Localidade Padrão configurada pelo Mestre */}
-              <Route path="/" element={<DynamicDefaultRedirect />} />
+        <LocationTransitionProvider>
+          <LocationTransitionOverlay />
+          <AuthGuard>
+            <Suspense fallback={<div className="loading-screen"><span className="loading-dot" /></div>}>
+              <Routes>
+                {/* Rota inicial leva direto para a Localidade Padrão configurada pelo Mestre */}
+                <Route path="/" element={<DynamicDefaultRedirect />} />
 
-              {/* Visualização de Domínios e Localidades com Chat */}
-              <Route path="/location/:slug" element={<Location />} />
+                {/* Visualização de Domínios e Localidades com Chat */}
+                <Route path="/location/:slug" element={<Location />} />
 
-              {/* Compêndio do Bosque (Bestiário, Herbário e Poções) */}
-              <Route path="/compendio" element={<Compendium />} />
+                {/* Compêndio do Bosque (Bestiário, Herbário e Poções) */}
+                <Route path="/compendio" element={<Compendium />} />
 
-              {/* Ficha / Página do Personagem */}
-              <Route path="/personagem" element={<CharacterSheet />} />
-              <Route path="/personagem/:targetUid" element={<CharacterSheet />} />
-              <Route path="/ficha" element={<CharacterSheet />} />
-              <Route path="/character" element={<CharacterSheet />} />
-              <Route path="/character/:targetUid" element={<CharacterSheet />} />
+                {/* Ficha / Página do Personagem */}
+                <Route path="/personagem" element={<CharacterSheet />} />
+                <Route path="/personagem/:targetUid" element={<CharacterSheet />} />
+                <Route path="/ficha" element={<CharacterSheet />} />
+                <Route path="/character" element={<CharacterSheet />} />
+                <Route path="/character/:targetUid" element={<CharacterSheet />} />
 
-              {/* Lista / Galeria Pública de Personagens */}
-              <Route path="/personagens" element={<PublicCharacters />} />
-              <Route path="/characters" element={<PublicCharacters />} />
-              <Route path="/viajantes" element={<PublicCharacters />} />
+                {/* Lista / Galeria Pública de Personagens */}
+                <Route path="/personagens" element={<PublicCharacters />} />
+                <Route path="/characters" element={<PublicCharacters />} />
+                <Route path="/viajantes" element={<PublicCharacters />} />
 
-              {/* Mesa de Combate Tático em Tempo Real */}
-              <Route path="/combat" element={<Combat />} />
-              <Route path="/combate" element={<Combat />} />
+                {/* Mesa de Combate Tático em Tempo Real */}
+                <Route path="/combat" element={<Combat />} />
+                <Route path="/combate" element={<Combat />} />
 
-              {/* Portal de Mestre / Painel de Admin com Senha Mestra */}
-              <Route path="/soul-master" element={<Admin />} />
-              <Route path="/admin" element={<Admin />} />
+                {/* Portal de Mestre / Painel de Admin com Senha Mestra */}
+                <Route path="/soul-master" element={<Admin />} />
+                <Route path="/admin" element={<Admin />} />
 
-              {/* Fallback de rotas */}
-              <Route path="*" element={<DynamicDefaultRedirect />} />
-            </Routes>
-          </Suspense>
-        </AuthGuard>
+                {/* Fallback de rotas */}
+                <Route path="*" element={<DynamicDefaultRedirect />} />
+              </Routes>
+            </Suspense>
+          </AuthGuard>
+        </LocationTransitionProvider>
       </BrowserRouter>
     </AuthProvider>
   )

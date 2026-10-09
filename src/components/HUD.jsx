@@ -97,6 +97,7 @@ export default function HUD({ locationSlug, locationName, weatherCondition, minT
             </button>
           )}
 
+
           <button
             type="button"
             className={`hud-icon-btn ${showSettings ? 'active' : ''}`}

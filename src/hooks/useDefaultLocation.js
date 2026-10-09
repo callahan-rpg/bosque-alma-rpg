@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { doc, onSnapshot } from 'firebase/firestore'
 import { db } from '../firebase/config'
 
-export const DEFAULT_FALLBACK_SLUG = 'crepusculo'
+export const DEFAULT_FALLBACK_SLUG = 'jardim-do-crepusculo'
 
 /**
  * Hook para obter a localidade padrão/inicial do Bosque configurada pelo Mestre.

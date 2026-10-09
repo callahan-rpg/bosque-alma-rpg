@@ -355,7 +355,7 @@ export function setPresence(uid, characterObj, locationObj, role = 'player') {
         uid,
         characterName: characterObj?.name || 'Visitante',
         avatarUrl: characterObj?.avatarUrl || null,
-        locationSlug: locationObj?.slug || 'crepusculo',
+        locationSlug: locationObj?.slug || 'jardim-do-crepusculo',
         locationName: locationObj?.name || 'Jardim do Crepúsculo',
         role,
         lastSeen: serverTimestamp()

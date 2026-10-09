@@ -13,7 +13,7 @@ export default function ChatPresenceSync({ user, character, location, role, acti
       return
     }
 
-    const locSlug = location?.slug || 'crepusculo'
+    const locSlug = location?.slug || 'jardim-do-crepusculo'
     const locName = location?.name || 'Jardim do Crepúsculo'
 
     const cleanup = setPresence(

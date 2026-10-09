@@ -8,60 +8,105 @@ import WeatherEffects from '../components/WeatherEffects.jsx'
 import AmbientSoundPlayer from '../components/AmbientSoundPlayer.jsx'
 import FantasyNavButton from '../components/FantasyNavButton.jsx'
 
-// Localidade padrão de fallback (Jardim do Crepúsculo com botões paralelos)
+import { useLocationTransition } from '../contexts/LocationTransitionContext.jsx'
+
+// Localidade padrão de fallback (Jardim do Crepúsculo)
 const FALLBACK_LOCATION = {
-  name: 'Pátio da Cabana - Crepúsculo',
-  slug: 'crepusculo',
-  description: 'O coração do bosque mágico de Alma Koskovic. O ar é suave e perfumado por flores raras.',
+  name: 'Jardim do Crepúsculo',
+  slug: 'jardim-do-crepusculo',
+  description: 'O coração do bosque mágico de Alma Koskovic.',
   backgroundImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1600&auto=format&fit=crop&q=80',
   weatherCondition: 'none',
   locationSound: '',
-  navigationButtons: [
-    { label: 'Chalés / Estufas', targetSlug: 'estufas', position: 'left' },
-    { label: 'Entrar na Cabana', targetSlug: 'cabana-alma', position: 'right' },
-    { label: 'Campos do Sul', targetSlug: 'jardim-noite', position: 'right' },
-  ]
+  navigationButtons: []
 }
+
+// Cache global em memória para localidades já carregadas (elimina qualquer piscada ou recarregamento indevido)
+const globalLocationsCache = {}
 
 export default function Location() {
   const { slug } = useParams()
   const navigate = useNavigate()
-  const currentSlug = slug || 'crepusculo'
+  const currentSlug = slug || 'jardim-do-crepusculo'
 
-  const [locationData, setLocationData] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const {
+    startTransition,
+    isTransitioning,
+    transitionEffect,
+    transitionPhase,
+  } = useLocationTransition()
+
+  const [locationData, setLocationData] = useState(() => globalLocationsCache[currentSlug] || null)
+  const [loading, setLoading] = useState(!globalLocationsCache[currentSlug])
 
   useEffect(() => {
-    setLoading(true)
+    // Se já estiver em cache, usa imediatamente para a transição ser 100% contínua
+    if (globalLocationsCache[currentSlug]) {
+      setLocationData(globalLocationsCache[currentSlug])
+      setLoading(false)
+    }
+
     const locRef = doc(db, 'locations', currentSlug)
 
     const unsub = onSnapshot(locRef, (snap) => {
       if (snap.exists()) {
-        setLocationData({ slug: snap.id, ...snap.data() })
+        const data = { slug: snap.id, ...snap.data() }
+        globalLocationsCache[currentSlug] = data
+        setLocationData(data)
       } else {
-        setLocationData({
+        const fallback = {
           ...FALLBACK_LOCATION,
           slug: currentSlug,
-          name: currentSlug === 'crepusculo' ? FALLBACK_LOCATION.name : `Domínio: ${currentSlug}`,
-        })
+          name: currentSlug === 'jardim-do-crepusculo' ? FALLBACK_LOCATION.name : `Domínio: ${currentSlug}`,
+          navigationButtons: []
+        }
+        globalLocationsCache[currentSlug] = fallback
+        setLocationData(fallback)
       }
       setLoading(false)
     }, (err) => {
       console.warn('[Location] Erro ao ler localidade:', err)
-      setLocationData({ ...FALLBACK_LOCATION, slug: currentSlug })
+      const fallback = { ...FALLBACK_LOCATION, slug: currentSlug }
+      setLocationData(fallback)
       setLoading(false)
     })
 
     return () => unsub()
   }, [currentSlug])
 
-  const loc = locationData || FALLBACK_LOCATION
+  const loc = locationData || globalLocationsCache[currentSlug] || {
+    ...FALLBACK_LOCATION,
+    slug: currentSlug,
+    name: currentSlug === 'jardim-do-crepusculo' ? FALLBACK_LOCATION.name : `Domínio: ${currentSlug}`
+  }
 
   const navLeft = (loc.navigationButtons || []).filter(b => b.position === 'left')
   const navRight = (loc.navigationButtons || []).filter(b => b.position !== 'left')
 
+  const handleNavigate = (btn) => {
+    const effect = btn.transitionEffect
+    // Só usa a transição visual se houver efeito explicitamente configurado no botão
+    if (effect && effect !== '') {
+      startTransition(btn.targetSlug, effect, { locationName: btn.label })
+    } else {
+      // Sem transição configurada: navega direto para o local-alvo
+      navigate(`/location/${btn.targetSlug}`)
+    }
+  }
+
+  // Define classe CSS animada no container principal para engolir ou emergir elementos suavemente
+  const transitionClass = isTransitioning
+    ? (transitionEffect === 'water_whirlpool'
+        ? (transitionPhase === 'swallowing' || transitionPhase === 'switching' ? 'whirlpool-swallowing' : 'whirlpool-emerging')
+        : transitionEffect === 'portal_arcane'
+        ? (transitionPhase === 'swallowing' || transitionPhase === 'switching' ? 'arcane-swallowing' : 'arcane-emerging')
+        : transitionEffect === 'mystic_mist'
+        ? (transitionPhase === 'swallowing' || transitionPhase === 'switching' ? 'mist-swallowing' : 'mist-emerging')
+        : (transitionPhase === 'swallowing' || transitionPhase === 'switching' ? 'whirlpool-swallowing' : 'whirlpool-emerging'))
+    : ''
+
   return (
-    <div className="location-page-container">
+    <div className={`location-page-container ${isTransitioning ? 'is-transitioning' : ''}`}>
       {/* Player de Trilha Sonora */}
       <AmbientSoundPlayer locationSoundUrl={loc.locationSound || ''} />
 
@@ -79,7 +124,7 @@ export default function Location() {
       {/* Imagem de Fundo e Overlay */}
       {loc.backgroundImage && (
         <div
-          className="location-bg-layer"
+          className={`location-bg-layer ${transitionClass}`}
           style={{ backgroundImage: `url("${loc.backgroundImage}")` }}
         />
       )}
@@ -88,8 +133,8 @@ export default function Location() {
       {/* Efeitos de Clima Específicos */}
       <WeatherEffects condition={loc.weatherCondition || 'none'} enabled={true} />
 
-      {/* Conteúdo Principal com Botões de Navegação Paralelos ao Chat */}
-      <div className="location-content">
+      {/* Conteúdo Principal com Botões de Navegação Paralelos ao Chat (Engolidos no Vórtice) */}
+      <div className={`location-content ${transitionClass}`}>
         <div className="location-main">
           {/* Botões de saída (Esquerda) */}
           <div className="nav-buttons-left">
@@ -97,7 +142,7 @@ export default function Location() {
               <FantasyNavButton
                 key={i}
                 label={btn.label}
-                onClick={() => navigate(`/location/${btn.targetSlug}`)}
+                onClick={() => handleNavigate(btn)}
               />
             ))}
           </div>
@@ -117,12 +162,13 @@ export default function Location() {
               <FantasyNavButton
                 key={i}
                 label={btn.label}
-                onClick={() => navigate(`/location/${btn.targetSlug}`)}
+                onClick={() => handleNavigate(btn)}
               />
             ))}
           </div>
         </div>
       </div>
+
     </div>
   )
 }

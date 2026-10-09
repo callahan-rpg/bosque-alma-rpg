@@ -1,0 +1,780 @@
+/* ==========================================================================
+   SISTEMA DE TRANSIÇÕES ENTRE DOMÍNIOS & PORTAL REDEMOINHO D'ÁGUA
+   ========================================================================== */
+
+/* ─── EFEITO DE ENGOLIR A TELA (WHIRLPOOL SWALLOW & EMERGE) ─── */
+.location-content.whirlpool-swallowing,
+.location-main.whirlpool-swallowing,
+.location-bg-layer.whirlpool-swallowing,
+.whirlpool-swallow-target {
+  animation: whirlpoolSwallow 1.8s cubic-bezier(0.38, 0.05, 0.2, 1) forwards !important;
+  transform-origin: center center !important;
+  pointer-events: none !important;
+  user-select: none !important;
+  will-change: transform, opacity, filter;
+}
+
+.location-content.whirlpool-emerging,
+.location-main.whirlpool-emerging,
+.location-bg-layer.whirlpool-emerging,
+.whirlpool-emerge-target {
+  animation: whirlpoolEmerge 1.7s cubic-bezier(0.12, 0.9, 0.25, 1) forwards !important;
+  transform-origin: center center !important;
+  will-change: transform, opacity, filter;
+}
+
+@keyframes whirlpoolSwallow {
+  0% {
+    transform: scale(1) rotate(0deg);
+    filter: blur(0px) brightness(1) saturate(1) hue-rotate(0deg);
+    opacity: 1;
+  }
+  20% {
+    transform: scale(0.97) rotate(18deg);
+    filter: blur(1px) brightness(1.08) saturate(1.15) hue-rotate(15deg);
+    opacity: 0.98;
+  }
+  45% {
+    transform: scale(0.78) rotate(110deg);
+    filter: blur(3px) brightness(1.25) saturate(1.5) hue-rotate(60deg);
+    opacity: 0.88;
+  }
+  70% {
+    transform: scale(0.42) rotate(320deg);
+    filter: blur(6px) brightness(1.5) saturate(2) hue-rotate(140deg);
+    opacity: 0.6;
+  }
+  88% {
+    transform: scale(0.14) rotate(580deg);
+    filter: blur(10px) brightness(1.9) saturate(2.6) hue-rotate(200deg);
+    opacity: 0.25;
+  }
+  100% {
+    transform: scale(0) rotate(760deg);
+    filter: blur(16px) brightness(2.2) saturate(3) hue-rotate(220deg);
+    opacity: 0;
+  }
+}
+
+@keyframes whirlpoolEmerge {
+  0% {
+    transform: scale(0.04) rotate(-480deg);
+    filter: blur(14px) brightness(1.9) saturate(2.4) hue-rotate(210deg);
+    opacity: 0;
+  }
+  25% {
+    transform: scale(0.38) rotate(-210deg);
+    filter: blur(7px) brightness(1.45) saturate(1.7) hue-rotate(110deg);
+    opacity: 0.55;
+  }
+  60% {
+    transform: scale(0.82) rotate(-45deg);
+    filter: blur(2.5px) brightness(1.15) saturate(1.25) hue-rotate(30deg);
+    opacity: 0.9;
+  }
+  85% {
+    transform: scale(1.015) rotate(-2deg);
+    filter: blur(0.5px) brightness(1.03) saturate(1.05) hue-rotate(5deg);
+    opacity: 0.99;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    filter: blur(0px) brightness(1) saturate(1) hue-rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* Outros Efeitos de Transição na Tela */
+.location-content.arcane-swallowing,
+.location-bg-layer.arcane-swallowing {
+  animation: arcaneSwallow 1.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  pointer-events: none;
+}
+.location-content.arcane-emerging,
+.location-bg-layer.arcane-emerging {
+  animation: arcaneEmerge 1.5s cubic-bezier(0.15, 1, 0.3, 1) forwards;
+}
+
+@keyframes arcaneSwallow {
+  0% { transform: scale(1) rotate(0deg); filter: hue-rotate(0deg) blur(0px); opacity: 1; }
+  50% { transform: scale(0.65) rotate(120deg); filter: hue-rotate(140deg) brightness(1.5) blur(4px); opacity: 0.75; }
+  100% { transform: scale(0) rotate(360deg); filter: hue-rotate(280deg) brightness(2.2) blur(12px); opacity: 0; }
+}
+
+@keyframes arcaneEmerge {
+  0% { transform: scale(0.05) rotate(-240deg); filter: hue-rotate(280deg) brightness(2.2) blur(12px); opacity: 0; }
+  60% { transform: scale(0.85) rotate(-30deg); filter: hue-rotate(60deg) brightness(1.2) blur(2px); opacity: 0.9; }
+  100% { transform: scale(1) rotate(0deg); filter: hue-rotate(0deg) brightness(1) blur(0px); opacity: 1; }
+}
+
+.location-content.mist-swallowing,
+.location-bg-layer.mist-swallowing {
+  animation: mistFadeOut 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  pointer-events: none;
+}
+.location-content.mist-emerging,
+.location-bg-layer.mist-emerging {
+  animation: mistFadeIn 1.5s cubic-bezier(0.15, 1, 0.3, 1) forwards;
+}
+@keyframes mistFadeOut {
+  0% { opacity: 1; filter: blur(0px); }
+  50% { opacity: 0.6; filter: blur(5px) brightness(0.9); }
+  100% { opacity: 0; filter: blur(16px) brightness(0.6); }
+}
+@keyframes mistFadeIn {
+  0% { opacity: 0; filter: blur(16px) brightness(0.6); }
+  60% { opacity: 0.85; filter: blur(3px) brightness(0.95); }
+  100% { opacity: 1; filter: blur(0px) brightness(1); }
+}
+
+/* ─── OVERLAY FULLSCREEN DE TRANSIÇÃO ─── */
+.location-transition-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999999;
+  pointer-events: all;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: overlayFadeIn 0.45s ease-out forwards;
+}
+
+@keyframes overlayFadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.location-transition-overlay.phase-emerging {
+  animation: overlayFadeOut 0.7s ease-in-out 1.05s forwards;
+}
+
+@keyframes overlayFadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; pointer-events: none; }
+}
+
+/* 1. Redemoinho d'Água Overlay */
+.whirlpool-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: radial-gradient(circle at center, rgba(3, 15, 38, 0.6) 0%, rgba(2, 6, 23, 0.85) 100%);
+}
+
+.whirlpool-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.whirlpool-svg-vortex {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(700px, 90vw);
+  height: min(700px, 90vw);
+  pointer-events: none;
+}
+
+.vortex-spiral-svg {
+  width: 100%;
+  height: 100%;
+  animation: rotateWhirlpoolVortex 3.5s linear infinite;
+  transform-origin: center center;
+}
+
+@keyframes rotateWhirlpoolVortex {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.08); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+.vortex-arm {
+  stroke-dasharray: 200 40;
+  animation: vortexArmSpin 2s linear infinite;
+}
+.vortex-arm.arm-1 { animation-duration: 1.8s; }
+.vortex-arm.arm-2 { animation-duration: 2.2s; }
+.vortex-arm.arm-3 { animation-duration: 1.5s; }
+.vortex-arm.arm-4 { animation-duration: 2.6s; }
+
+@keyframes vortexArmSpin {
+  0% { stroke-dashoffset: 0; opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { stroke-dashoffset: -240; opacity: 0.8; }
+}
+
+.whirlpool-water-caustics {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(56, 189, 248, 0.18) 0%, transparent 65%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: causticsPulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes causticsPulse {
+  0% { opacity: 0.4; transform: scale(0.95); }
+  100% { opacity: 0.9; transform: scale(1.15); }
+}
+
+/* 2. Vórtice Arcano */
+.arcane-portal-container {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(30, 10, 60, 0.9) 0%, rgba(6, 2, 16, 0.95) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.arcane-rune-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px dashed #c084fc;
+  box-shadow: 0 0 25px rgba(192, 132, 252, 0.5);
+}
+.arcane-rune-ring.outer-ring {
+  width: 500px;
+  height: 500px;
+  animation: rotateClockwise 8s linear infinite;
+}
+.arcane-rune-ring.middle-ring {
+  width: 340px;
+  height: 340px;
+  border-color: #e879f9;
+  animation: rotateCounterClockwise 5s linear infinite;
+}
+.arcane-rune-ring.inner-ring {
+  width: 180px;
+  height: 180px;
+  border-color: #a855f7;
+  animation: rotateClockwise 3s linear infinite;
+}
+.arcane-singularity-core {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0%, #a855f7 50%, #3b0764 100%);
+  box-shadow: 0 0 50px #c084fc, 0 0 100px #9333ea;
+  animation: corePulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes rotateClockwise {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes rotateCounterClockwise {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+@keyframes corePulse {
+  0% { transform: scale(0.85); }
+  100% { transform: scale(1.25); }
+}
+
+/* 3. Névoa Mística */
+.mystic-mist-container {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+}
+.mist-fog-layer {
+  position: absolute;
+  inset: -50%;
+  background: radial-gradient(ellipse at center, rgba(148, 163, 184, 0.4) 0%, rgba(30, 41, 59, 0.6) 50%, transparent 80%);
+}
+.mist-fog-layer.layer-1 { animation: mistDrift 12s linear infinite; }
+.mist-fog-layer.layer-2 { animation: mistDriftReverse 10s linear infinite; }
+
+@keyframes mistDrift {
+  0% { transform: translate(-10%, -10%) rotate(0deg); }
+  100% { transform: translate(10%, 10%) rotate(360deg); }
+}
+@keyframes mistDriftReverse {
+  0% { transform: translate(10%, -10%) rotate(360deg); }
+  100% { transform: translate(-10%, 10%) rotate(0deg); }
+}
+
+/* 4. Vendaval de Folhas */
+.leaf-storm-container {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(6, 78, 59, 0.7) 0%, rgba(2, 44, 34, 0.9) 100%);
+  overflow: hidden;
+}
+.swirling-leaf {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24px;
+  height: 14px;
+  border-radius: 12px 2px;
+  background: #34d399;
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.6);
+  animation: leafOrbit 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: calc(var(--i) * -0.08s);
+}
+.swirling-leaf.leaf-2 { background: #fbbf24; border-radius: 2px 12px; }
+.swirling-leaf.leaf-3 { background: #10b981; }
+.swirling-leaf.leaf-4 { background: #f59e0b; }
+
+@keyframes leafOrbit {
+  0% {
+    transform: rotate(0deg) translateX(450px) rotate(0deg) scale(1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: rotate(720deg) translateX(0px) rotate(360deg) scale(0.1);
+    opacity: 0;
+  }
+}
+
+/* 5. Fenda de Relâmpago */
+.lightning-flash-container {
+  position: absolute;
+  inset: 0;
+  background: #020617;
+}
+.lightning-glow-screen {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(224, 242, 254, 0.9) 0%, rgba(56, 189, 248, 0.8) 40%, rgba(15, 23, 42, 0.95) 100%);
+  animation: lightningFlicker 0.6s ease-in-out;
+}
+@keyframes lightningFlicker {
+  0% { opacity: 0; }
+  15% { opacity: 1; }
+  30% { opacity: 0.3; }
+  45% { opacity: 1; }
+  75% { opacity: 0.8; }
+  100% { opacity: 0; }
+}
+
+/* 6. Fade Simples */
+.simple-fade-screen {
+  position: absolute;
+  inset: 0;
+  background: #09070d;
+  animation: simpleFade 0.6s ease-in-out alternate;
+}
+@keyframes simpleFade {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Badge de Local-Alvo durante a transição */
+.transition-location-badge {
+  position: absolute;
+  bottom: 40px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 24px;
+  background: rgba(10, 15, 30, 0.75);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: 9999px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.3);
+  backdrop-filter: blur(10px);
+  color: #e0f2fe;
+  font-family: 'Cinzel', serif, system-ui;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  animation: badgeFloating 2s ease-in-out infinite alternate;
+  z-index: 10;
+}
+
+.transition-location-badge .badge-rune {
+  color: #38bdf8;
+  font-size: 1.1rem;
+}
+.transition-location-badge strong {
+  color: #7dd3fc;
+  font-weight: 600;
+}
+
+@keyframes badgeFloating {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-6px); }
+}
+
+/* ─── MODAL SELETOR DE PORTAL E TRANSIÇÕES ─── */
+.portal-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 4, 9, 0.8);
+  backdrop-filter: blur(8px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.portal-modal-card {
+  background: linear-gradient(135deg, rgba(20, 16, 32, 0.96) 0%, rgba(13, 10, 22, 0.98) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), 0 0 30px rgba(124, 58, 237, 0.2);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 760px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: #f1f5f9;
+}
+
+.portal-modal-header {
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.portal-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.portal-title-rune {
+  font-size: 1.8rem;
+  filter: drop-shadow(0 0 8px #38bdf8);
+}
+
+.portal-modal-title h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-family: 'Cinzel', serif, system-ui;
+  color: #f8fafc;
+  letter-spacing: 0.5px;
+}
+
+.portal-modal-title p {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.portal-modal-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.portal-modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.portal-modal-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.portal-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.portal-group-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.portal-group-label span {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #e2e8f0;
+}
+
+.portal-group-label small {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+/* Grid de Efeitos */
+.portal-effects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.portal-effect-card {
+  background: rgba(30, 24, 48, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  color: inherit;
+}
+
+.portal-effect-card:hover {
+  background: rgba(45, 34, 72, 0.8);
+  border-color: rgba(56, 189, 248, 0.5);
+  transform: translateY(-2px);
+}
+
+.portal-effect-card.selected {
+  background: linear-gradient(135deg, rgba(8, 47, 73, 0.75) 0%, rgba(30, 27, 75, 0.85) 100%);
+  border-color: #38bdf8;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.3);
+}
+
+.effect-icon-box {
+  font-size: 1.6rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.5));
+}
+
+.effect-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+
+.effect-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+.effect-desc {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  line-height: 1.3;
+}
+
+.effect-selected-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 0.85rem;
+  color: #38bdf8;
+  font-weight: bold;
+}
+
+/* Lista de Locais */
+.portal-locations-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.portal-loc-card {
+  background: rgba(26, 20, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.portal-loc-card:hover {
+  background: rgba(40, 30, 65, 0.8);
+  border-color: rgba(168, 85, 247, 0.4);
+}
+
+.portal-loc-card.selected {
+  background: linear-gradient(135deg, rgba(88, 28, 135, 0.6) 0%, rgba(20, 16, 35, 0.85) 100%);
+  border-color: #a855f7;
+  box-shadow: 0 0 14px rgba(168, 85, 247, 0.35);
+}
+
+.portal-loc-card.is-current {
+  opacity: 0.7;
+}
+
+.loc-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.loc-rune {
+  font-size: 1.1rem;
+}
+
+.loc-card-title-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.loc-card-title-group strong {
+  font-size: 0.9rem;
+  color: #f8fafc;
+}
+
+.loc-slug-tag {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  font-family: monospace;
+}
+
+.current-loc-badge {
+  font-size: 0.7rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #cbd5e1;
+}
+
+.loc-card-desc {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #94a3b8;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.portal-loading-locs {
+  padding: 24px;
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* Rodapé do Modal */
+.portal-modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.portal-btn-test {
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.portal-btn-test:hover {
+  background: rgba(56, 189, 248, 0.25);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+}
+
+.portal-btn-cancel {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.portal-btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.portal-btn-confirm {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  border: 1px solid #38bdf8;
+  color: #ffffff;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+  transition: all 0.2s;
+}
+
+.portal-btn-confirm:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
+  transform: translateY(-1px);
+}
+
+.portal-btn-confirm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Botão de Portal no HUD */
+.hud-portal-btn {
+  border-color: rgba(56, 189, 248, 0.4) !important;
+  color: #7dd3fc !important;
+}
+
+.hud-portal-btn:hover {
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.4) !important;
+}
+
+/* Botão de Testar Transição no Admin */
+.admin-test-trans-btn {
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #7dd3fc;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s;
+}
+
+.admin-test-trans-btn:hover {
+  background: rgba(56, 189, 248, 0.3);
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+}

@@ -16,6 +16,7 @@ import { useAuth } from '../contexts/AuthContext.jsx'
 import { uploadImageFree } from '../utils/imageUpload'
 import { calculateMaxHp, calculateMaxVigor, ATTRIBUTE_ICONS, COMBAT_STATUS_EFFECTS } from '../utils/combatSystem'
 import AlchemyAdminPanel from '../components/admin/AlchemyAdminPanel.jsx'
+import { useLocationTransition, TRANSITION_EFFECTS } from '../contexts/LocationTransitionContext.jsx'
 
 const CLIMATE_OPTIONS = [
   { value: 'none', label: 'Nenhum Efeito (Clima Estável)', icon: '🌿' },
@@ -48,6 +49,7 @@ function slugify(text) {
 export default function Admin() {
   const navigate = useNavigate()
   const { isMaster, role } = useAuth()
+  const { startTransition } = useLocationTransition()
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return sessionStorage.getItem('jardim_master_auth') === 'true'
   })
@@ -67,7 +69,7 @@ export default function Admin() {
   // ==========================================
   // ESTADOS DE COMBATE (MESA TÁTICA)
   // ==========================================
-  const [selectedCombatSlug, setSelectedCombatSlug] = useState('crepusculo')
+  const [selectedCombatSlug, setSelectedCombatSlug] = useState('jardim-do-crepusculo')
   const [combatTitle, setCombatTitle] = useState('Confronto em Andamento')
   const [selectedCombatPlayers, setSelectedCombatPlayers] = useState([])
   const [combatEnemies, setCombatEnemies] = useState([])
@@ -105,7 +107,7 @@ export default function Admin() {
   // ==========================================
   // ESTADOS DE LOCALIDADES & CONFIGURAÇÕES GLOBAIS
   // ==========================================
-  const [defaultLocation, setDefaultLocation] = useState('crepusculo')
+  const [defaultLocation, setDefaultLocation] = useState('jardim-do-crepusculo')
   const [saveDefaultLocStatus, setSaveDefaultLocStatus] = useState('')
   const [locations, setLocations] = useState([])
   const [selectedLoc, setSelectedLoc] = useState(null)
@@ -121,6 +123,7 @@ export default function Admin() {
   const [formMinTemp, setFormMinTemp] = useState('')
   const [formMaxTemp, setFormMaxTemp] = useState('')
   const [formWindSpeed, setFormWindSpeed] = useState('')
+  const [formTransitionEffect, setFormTransitionEffect] = useState('water_whirlpool')
   const [formNavButtons, setFormNavButtons] = useState([])
 
   // ==========================================
@@ -677,6 +680,7 @@ export default function Admin() {
     setFormMinTemp('')
     setFormMaxTemp('')
     setFormWindSpeed('')
+    setFormTransitionEffect('')
     setFormNavButtons([])
   }
 
@@ -699,7 +703,13 @@ export default function Admin() {
         : (loc.temperature !== undefined && loc.temperature !== null ? Number(loc.temperature) + 4 : '')
     )
     setFormWindSpeed(loc.windSpeed || loc.wind || '')
-    setFormNavButtons(loc.navigationButtons || [])
+    setFormTransitionEffect(loc.transitionEffect || '')
+    setFormNavButtons((loc.navigationButtons || []).map(b => ({
+      label: b.label || '',
+      targetSlug: b.targetSlug || '',
+      position: b.position || 'right',
+      transitionEffect: b.transitionEffect || ''
+    })))
   }
 
   const handleUploadLocBg = async (e) => {
@@ -717,7 +727,7 @@ export default function Admin() {
   }
 
   const handleAddNavButton = (pos = 'right') => {
-    setFormNavButtons(prev => [...prev, { label: 'Ir para...', targetSlug: '', position: pos }])
+    setFormNavButtons(prev => [...prev, { label: 'Ir para...', targetSlug: '', position: pos, transitionEffect: '' }])
   }
 
   const handleUpdateNavButton = (index, field, value) => {
@@ -749,13 +759,21 @@ export default function Admin() {
         backgroundImage: formBg.trim(),
         locationSound: formSound.trim(),
         weatherCondition: formClimate,
+        transitionEffect: formTransitionEffect || '',
         minTemp: formMinTemp !== '' ? Number(formMinTemp) : null,
         maxTemp: formMaxTemp !== '' ? Number(formMaxTemp) : null,
         temperature: (formMinTemp !== '' && formMaxTemp !== '')
           ? Math.round((Number(formMinTemp) + Number(formMaxTemp)) / 2)
           : (formMinTemp !== '' ? Number(formMinTemp) : (formMaxTemp !== '' ? Number(formMaxTemp) : null)),
         windSpeed: formWindSpeed.trim() || null,
-        navigationButtons: formNavButtons.filter(b => b.targetSlug.trim()),
+        navigationButtons: formNavButtons
+          .filter(b => b.targetSlug && b.targetSlug.trim())
+          .map(b => ({
+            label: b.label || '',
+            targetSlug: b.targetSlug.trim(),
+            position: b.position || 'right',
+            transitionEffect: b.transitionEffect || ''
+          })),
         updatedAt: Date.now()
       }
 
@@ -1267,8 +1285,8 @@ export default function Admin() {
                   onChange={(e) => handleSetDefaultLocation(e.target.value)}
                   style={{ fontSize: 12, padding: '6px 8px' }}
                 >
-                  <option value="crepusculo">Pátio da Cabana (crepusculo)</option>
-                  {locations.filter(l => l.id !== 'crepusculo').map(l => (
+                  <option value="jardim-do-crepusculo">Jardim do Crepúsculo (jardim-do-crepusculo)</option>
+                  {locations.filter(l => l.id !== 'jardim-do-crepusculo').map(l => (
                     <option key={l.id} value={l.id}>
                       {l.name || l.id} ({l.id})
                     </option>
@@ -1513,6 +1531,47 @@ export default function Admin() {
                   />
                 </div>
 
+                {/* Efeito de Transição da Tela desta Localidade */}
+                <div className="admin-form-group" style={{ background: 'rgba(56, 189, 248, 0.04)', border: '1px solid rgba(56, 189, 248, 0.25)', borderRadius: 10, padding: 14 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <label style={{ fontWeight: 600, color: '#e0f2fe', margin: 0 }}>
+                      🌀 Efeito de Transição da Tela ao Viajar para este Local:
+                    </label>
+                    <button
+                      type="button"
+                      className="admin-test-trans-btn"
+                      onClick={() => startTransition(formSlug || 'jardim-do-crepusculo', formTransitionEffect, { locationName: formName || formSlug || 'Localidade' })}
+                      title="Testar a animação de transição configurada para este local"
+                    >
+                      <span>▶</span> Testar Transição
+                    </button>
+                  </div>
+                  <select
+                    value={formTransitionEffect}
+                    onChange={(e) => setFormTransitionEffect(e.target.value)}
+                    style={{
+                      background: 'rgba(15, 23, 42, 0.95)',
+                      borderColor: 'rgba(56, 189, 248, 0.45)',
+                      color: '#7dd3fc',
+                      fontSize: '0.92rem',
+                      fontWeight: 500,
+                      padding: '10px 12px',
+                      borderRadius: 8,
+                      width: '100%'
+                    }}
+                  >
+                    <option value="">⛔ Sem Transição (navegar diretamente)</option>
+                    {TRANSITION_EFFECTS.map((eff) => (
+                      <option key={eff.id} value={eff.id}>
+                        {eff.icon} {eff.label} — {eff.description}
+                      </option>
+                    ))}
+                  </select>
+                  <small style={{ color: '#94a3b8', display: 'block', marginTop: 6 }}>
+                    Configuração <strong>opcional</strong>: se nenhum efeito for selecionado, os botões que apontam para este local navegarão diretamente sem animação.
+                  </small>
+                </div>
+
                 {/* Trilhas / Botões Paralelos de Navegação */}
                 <div className="admin-nav-section">
                   <div className="admin-nav-header">
@@ -1529,33 +1588,99 @@ export default function Admin() {
 
                   <div className="admin-nav-list">
                     {formNavButtons.map((btn, idx) => (
-                      <div key={idx} className="admin-nav-item-row">
+                      <div
+                        key={idx}
+                        className="admin-nav-item-row"
+                        style={{
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          gap: 8,
+                          alignItems: 'center',
+                          padding: '10px 12px',
+                          background: 'rgba(255, 255, 255, 0.03)',
+                          border: '1px solid rgba(255, 255, 255, 0.08)',
+                          borderRadius: 10,
+                          marginBottom: 8
+                        }}
+                      >
                         <select
                           value={btn.position || 'right'}
                           onChange={(e) => handleUpdateNavButton(idx, 'position', e.target.value)}
                           style={{ width: '110px' }}
+                          title="Coluna de exibição ao lado do chat"
                         >
                           <option value="left">👈 Esquerda</option>
                           <option value="right">Direita 👉</option>
                         </select>
+
                         <input
                           type="text"
-                          style={{ flex: 1 }}
+                          style={{ flex: 1.2, minWidth: '150px' }}
                           value={btn.label || ''}
                           onChange={(e) => handleUpdateNavButton(idx, 'label', e.target.value)}
                           placeholder="Texto do Botão (ex: Entrar na Cabana)"
                         />
-                        <input
-                          type="text"
-                          style={{ flex: 1 }}
-                          value={btn.targetSlug || ''}
-                          onChange={(e) => handleUpdateNavButton(idx, 'targetSlug', e.target.value)}
-                          placeholder="Slug de destino (ex: cabana-alma)"
-                        />
+
+                        {/* Seletor do Local-Alvo com Autocomplete de Localidades */}
+                        <div style={{ flex: 1, minWidth: '160px', display: 'flex' }}>
+                          <input
+                            type="text"
+                            style={{ width: '100%' }}
+                            value={btn.targetSlug || ''}
+                            onChange={(e) => handleUpdateNavButton(idx, 'targetSlug', e.target.value)}
+                            placeholder="Slug de destino"
+                            list={`nav-target-datalist-${idx}`}
+                            title="Selecione da lista ou digite o slug de destino"
+                          />
+                          <datalist id={`nav-target-datalist-${idx}`}>
+                            {locations.map((loc) => (
+                              <option key={loc.id} value={loc.id}>
+                                {loc.name ? `${loc.name} (${loc.id})` : loc.id}
+                              </option>
+                            ))}
+                          </datalist>
+                        </div>
+
+                        <select
+                          value={btn.transitionEffect || ''}
+                          onChange={(e) => handleUpdateNavButton(idx, 'transitionEffect', e.target.value)}
+                          style={{
+                            width: '210px',
+                            background: 'rgba(15, 23, 42, 0.9)',
+                            borderColor: 'rgba(56, 189, 248, 0.4)',
+                            color: '#7dd3fc',
+                            fontSize: '0.82rem'
+                          }}
+                          title="Efeito de transição da tela ao clicar no botão"
+                        >
+                          <option value="">⛔ Sem Transição</option>
+                          {TRANSITION_EFFECTS.map((eff) => (
+                            <option key={eff.id} value={eff.id}>
+                              {eff.icon} {eff.label}
+                            </option>
+                          ))}
+                        </select>
+
+                        {/* Botão de Testar Transição Imediatamente */}
+                        <button
+                          type="button"
+                          className="admin-test-trans-btn"
+                          onClick={() => {
+                            const dest = btn.targetSlug || formSlug || 'jardim-do-crepusculo'
+                            startTransition(dest, btn.transitionEffect || 'water_whirlpool', {
+                              locationName: btn.label || dest,
+                            })
+                          }}
+                          title="Testar este efeito visual de transição agora na tela"
+                        >
+                          ▶ Testar
+                        </button>
+
                         <button
                           type="button"
                           className="admin-remove-nav-btn"
                           onClick={() => handleRemoveNavButton(idx)}
+                          title="Remover botão de navegação"
                         >
                           ✕
                         </button>
