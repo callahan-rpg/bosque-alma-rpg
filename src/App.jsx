@@ -12,6 +12,7 @@ const LoginPage = lazy(() => import('./pages/LoginPage.jsx'))
 const CharacterSheet = lazy(() => import('./pages/CharacterSheet.jsx'))
 const PublicCharacters = lazy(() => import('./pages/PublicCharacters.jsx'))
 const Combat = lazy(() => import('./pages/Combat.jsx'))
+const PotionCraftingModal = lazy(() => import('./components/PotionCraftingModal.jsx'))
 
 function DynamicDefaultRedirect() {
   const { defaultSlug } = useDefaultLocation()
@@ -44,11 +45,17 @@ export default function App() {
       <BrowserRouter>
         <LocationTransitionProvider>
           <LocationTransitionOverlay />
-          <AuthGuard>
-            <Suspense fallback={<div className="loading-screen"><span className="loading-dot" /></div>}>
-              <Routes>
-                {/* Rota inicial leva direto para a Localidade Padrão configurada pelo Mestre */}
-                <Route path="/" element={<DynamicDefaultRedirect />} />
+          <Suspense fallback={<div className="loading-screen"><span className="loading-dot" /></div>}>
+            <Routes>
+              {/* Rota de pré-visualização e teste de bordas da Alquimia */}
+              <Route path="/alchemy-preview" element={<PotionCraftingModal onClose={() => {}} />} />
+
+              {/* Rotas protegidas por autenticação */}
+              <Route path="/*" element={
+                <AuthGuard>
+                  <Routes>
+                    {/* Rota inicial leva direto para a Localidade Padrão configurada pelo Mestre */}
+                    <Route path="/" element={<DynamicDefaultRedirect />} />
 
                 {/* Visualização de Domínios e Localidades com Chat */}
                 <Route path="/location/:slug" element={<Location />} />
@@ -79,11 +86,13 @@ export default function App() {
                 {/* Fallback de rotas */}
                 <Route path="*" element={<DynamicDefaultRedirect />} />
               </Routes>
-            </Suspense>
-          </AuthGuard>
-        </LocationTransitionProvider>
-      </BrowserRouter>
-    </AuthProvider>
-  )
+            </AuthGuard>
+          } />
+        </Routes>
+      </Suspense>
+    </LocationTransitionProvider>
+  </BrowserRouter>
+</AuthProvider>
+)
 }
 

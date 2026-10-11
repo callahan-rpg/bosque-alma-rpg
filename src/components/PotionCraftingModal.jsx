@@ -218,6 +218,131 @@ function PotionBottleIcon({ color = '#10b981', size = 32, glow = true }) {
   )
 }
 
+// Receitas padrão inspiradas na referência para quando o banco ainda não tiver carregado ou estiver vazio
+const FALLBACK_RECIPES = [
+  {
+    id: 'pocao_cura_menor',
+    name: 'Poção de Cura Menor',
+    subcategory: 'Vida',
+    potionColor: '#10b981',
+    imageUrl: '/assets/alchemy/potion_green_flask.jpg',
+    description: 'Uma poção básica e eficaz, muito utilizada por aventureiros. Estimula a regeneração natural do corpo e auxilia na recuperação de ferimentos leves.',
+    effect: '+50 PV',
+    effectDesc: 'Recupera pontos de vida.',
+    duration: 'Efeito instantâneo',
+    recipeIngredients: [
+      { name: 'Erva-da-luz', amount: '3x', icon: '🌿' },
+      { name: 'Cogumelo Luminar', amount: '2x', icon: '🍄' },
+      { name: 'Fragmento da Lua', amount: '1x', icon: '💎' },
+      { name: 'Água Pura', amount: '5x', icon: '💧' }
+    ],
+    methodSteps: [
+      { step: 1, action: 'Adicione as ervas', desc: 'Coloque a Erva-da-luz e o Cogumelo Luminar.', icon: '🌿' },
+      { step: 2, action: 'Aqueça lentamente', desc: 'Mantenha o fogo baixo por 3 minutos.', icon: '🔥' },
+      { step: 3, action: 'Misture o Fragmento da Lua', desc: 'Adicione o fragmento e mexa no sentido horário.', icon: '🥣' },
+      { step: 4, action: 'Finalize com água pura', desc: 'Adicione a água pura e mantenha a mistura por mais 2 minutos.', icon: '🧪' }
+    ],
+    preparationTime: '15 minutos',
+    riskLevel: 2,
+    difficultyLabel: 'Média',
+    warnings: 'Mantenha o fogo sempre baixo.\nNão utilize recipientes de metal comum.\nO uso excessivo pode causar fadiga temporária.\nNão é eficaz contra ferimentos graves.'
+  },
+  {
+    id: 'pocao_forca',
+    name: 'Poção de Força',
+    subcategory: 'Combate',
+    potionColor: '#dc2626',
+    imageUrl: '/assets/alchemy/potion_green_flask.jpg',
+    description: 'Aumenta a potência muscular e o vigor físico por um breve período de combate.',
+    effect: '+3 Força',
+    effectDesc: 'Bônus em golpes corporais.',
+    duration: '10 minutos',
+    recipeIngredients: [
+      { name: 'Raiz de Sangue', amount: '2x', icon: '🩸' },
+      { name: 'Cinza Vulcânica', amount: '1x', icon: '🌋' }
+    ],
+    methodSteps: [
+      { step: 1, action: 'Triture as raízes', desc: 'Macere até obter pó fino avermelhado.', icon: '🥣' },
+      { step: 2, action: 'Ferva vigorosamente', desc: 'Adicione cinzas e ferva por 5 minutos.', icon: '🔥' }
+    ],
+    preparationTime: '10 minutos',
+    riskLevel: 2,
+    difficultyLabel: 'Média'
+  },
+  {
+    id: 'pocao_resistencia',
+    name: 'Poção de Resistência',
+    subcategory: 'Combate',
+    potionColor: '#2563eb',
+    imageUrl: '/assets/alchemy/potion_green_flask.jpg',
+    description: 'Enrijece a pele e reduz danos recebidos em combate.',
+    effect: '+2 Defesa',
+    effectDesc: 'Absorve parte dos golpes.',
+    duration: '15 minutos',
+    recipeIngredients: [
+      { name: 'Calcita Azul', amount: '2x', icon: '🪨' },
+      { name: 'Água Pura', amount: '3x', icon: '💧' }
+    ],
+    preparationTime: '20 minutos',
+    riskLevel: 2,
+    difficultyLabel: 'Média'
+  },
+  {
+    id: 'pocao_visao_noturna',
+    name: 'Poção de Visão Noturna',
+    subcategory: 'Exploração',
+    potionColor: '#9333ea',
+    imageUrl: '/assets/alchemy/potion_green_flask.jpg',
+    description: 'Dilata a percepção sensorial, permitindo enxergar na escuridão absoluta.',
+    effect: 'Visão Noturna',
+    effectDesc: 'Visão clara em penumbra e breu.',
+    duration: '30 minutos',
+    recipeIngredients: [
+      { name: 'Cogumelo Luminar', amount: '3x', icon: '🍄' },
+      { name: 'Olho de Coruja', amount: '1x', icon: '👁️' }
+    ],
+    preparationTime: '15 minutos',
+    riskLevel: 2,
+    difficultyLabel: 'Média'
+  },
+  {
+    id: 'pocao_agilidade',
+    name: 'Poção de Agilidade',
+    subcategory: 'Combate',
+    potionColor: '#f59e0b',
+    imageUrl: '/assets/alchemy/potion_green_flask.jpg',
+    description: 'Acelera reflexos e passos em terrenos acidentados.',
+    effect: '+3 Esquiva',
+    effectDesc: 'Aumenta reflexos de evasão.',
+    duration: '10 minutos',
+    recipeIngredients: [
+      { name: 'Erva-da-luz', amount: '2x', icon: '🌿' },
+      { name: 'Óleo Rápido', amount: '1x', icon: '🫙' }
+    ],
+    preparationTime: '12 minutos',
+    riskLevel: 2,
+    difficultyLabel: 'Média'
+  },
+  {
+    id: 'pocao_antitoxina',
+    name: 'Poção Antitoxina',
+    subcategory: 'Utilidade',
+    potionColor: '#10b981',
+    imageUrl: '/assets/alchemy/potion_green_flask.jpg',
+    description: 'Neutraliza venenos e toxinas corporais de criaturas do bosque.',
+    effect: 'Purificação',
+    effectDesc: 'Cura envenenamento e toxinas.',
+    duration: 'Instantâneo',
+    recipeIngredients: [
+      { name: 'Folha de Prata', amount: '2x', icon: '🌿' },
+      { name: 'Sal Branco', amount: '1x', icon: '🧂' }
+    ],
+    preparationTime: '8 minutos',
+    riskLevel: 3,
+    difficultyLabel: 'Difícil'
+  }
+]
+
 // ─────────────────────────────────────────────────────────────
 // COMPONENTE PRINCIPAL: MODAL DE ALQUIMIA
 // ─────────────────────────────────────────────────────────────
@@ -253,8 +378,8 @@ export default function PotionCraftingModal({ onClose }) {
     return () => unsub()
   }, [])
 
-  // Poções vindas exclusivamente do banco de dados (Firestore)
-  const allPotions = dbPotions
+  // Poções vindas do banco de dados ou fallback padrão da referência
+  const allPotions = dbPotions.length > 0 ? dbPotions : FALLBACK_RECIPES
 
   // Seleciona a primeira poção automaticamente caso haja poções cadastradas
   useEffect(() => {
