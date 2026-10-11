@@ -347,6 +347,16 @@ export default function PotionCraftingModal({ onClose }) {
   // Inicia o processo de fabricação
   const handleCraftPotion = () => {
     if (!selectedPotion) return
+
+    // Verifica se tem todos os ingredientes no inventário
+    if (!canCraft) {
+      // Identifica quais ingredientes estão faltando para feedback
+      const missing = potionIngredients.filter(i => !i.hasEnough)
+      const missingNames = missing.map(i => `${i.name} (${i.ownedQty}/${i.reqQty})`).join(', ')
+      alert(`Ingredientes insuficientes:\n${missingNames}`)
+      return
+    }
+
     setCraftingState('brewing')
     if (craftTimerRef.current) clearTimeout(craftTimerRef.current)
 
@@ -438,14 +448,7 @@ export default function PotionCraftingModal({ onClose }) {
     return '⚗️'
   }
 
-  // 4 Ingredientes para exibição ao redor do caldeirão
-  const displaySlots = useMemo(() => {
-    const slots = [...potionIngredients]
-    while (slots.length < 4) {
-      slots.push({ id: `empty_${slots.length}`, name: '—', reqQty: 0, ownedQty: 0, icon: '🫧', hasEnough: true })
-    }
-    return slots.slice(0, 4)
-  }, [potionIngredients])
+
 
   return (
     <div className="alchemy-modal-backdrop" onClick={(e) => { if (e.target === e.currentTarget) onClose() }}>
@@ -573,7 +576,7 @@ export default function PotionCraftingModal({ onClose }) {
               COLUNA 2 (CENTRAL): ESTAÇÃO DE ALQUIMIA
               ============================================================ */}
           <section className="alchemy-col-station">
-            {/* Palco do Caldeirão com os 4 Slots de Ingredientes */}
+            {/* Palco do Caldeirão — apenas a imagem, sem slots de ingredientes */}
             <div className="alchemy-cauldron-stage">
               <div className="alchemy-cauldron-backdrop" />
 
@@ -584,53 +587,6 @@ export default function PotionCraftingModal({ onClose }) {
                   background: `radial-gradient(circle, ${activeLiquidColor}88 0%, transparent 70%)`
                 }}
               />
-
-              {/* Coluna Esquerda: Slots 1 e 2 */}
-              <div className="alchemy-slots-col alchemy-slots-col-left">
-                {displaySlots[0] && (
-                  <div className="alchemy-ingredient-slot" title={displaySlots[0].name}>
-                    <div className="alchemy-slot-icon-box">{displaySlots[0].icon}</div>
-                    <span className="alchemy-slot-name">{displaySlots[0].name}</span>
-                    <span className={`alchemy-slot-count ${displaySlots[0].hasEnough ? 'ok' : 'missing'}`}>
-                      {displaySlots[0].ownedQty} / {displaySlots[0].reqQty}
-                    </span>
-                  </div>
-                )}
-                {displaySlots[1] && (
-                  <div className="alchemy-ingredient-slot" title={displaySlots[1].name}>
-                    <div className="alchemy-slot-icon-box">{displaySlots[1].icon}</div>
-                    <span className="alchemy-slot-name">{displaySlots[1].name}</span>
-                    <span className={`alchemy-slot-count ${displaySlots[1].hasEnough ? 'ok' : 'missing'}`}>
-                      {displaySlots[1].ownedQty} / {displaySlots[1].reqQty}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Zona central livre para visualização do caldeirão e fogo */}
-              <div className="alchemy-cauldron-center-zone" />
-
-              {/* Coluna Direita: Slots 3 e 4 */}
-              <div className="alchemy-slots-col alchemy-slots-col-right">
-                {displaySlots[2] && (
-                  <div className="alchemy-ingredient-slot" title={displaySlots[2].name}>
-                    <div className="alchemy-slot-icon-box">{displaySlots[2].icon}</div>
-                    <span className="alchemy-slot-name">{displaySlots[2].name}</span>
-                    <span className={`alchemy-slot-count ${displaySlots[2].hasEnough ? 'ok' : 'missing'}`}>
-                      {displaySlots[2].ownedQty} / {displaySlots[2].reqQty}
-                    </span>
-                  </div>
-                )}
-                {displaySlots[3] && (
-                  <div className="alchemy-ingredient-slot" title={displaySlots[3].name}>
-                    <div className="alchemy-slot-icon-box">{displaySlots[3].icon}</div>
-                    <span className="alchemy-slot-name">{displaySlots[3].name}</span>
-                    <span className={`alchemy-slot-count ${displaySlots[3].hasEnough ? 'ok' : 'missing'}`}>
-                      {displaySlots[3].ownedQty} / {displaySlots[3].reqQty}
-                    </span>
-                  </div>
-                )}
-              </div>
 
               {/* Animação de Fabricação / Sucesso */}
               {craftingState === 'brewing' && (
@@ -699,12 +655,19 @@ export default function PotionCraftingModal({ onClose }) {
             {/* Botão de Preparo */}
             <button
               type="button"
-              className="alchemy-craft-action-btn"
+              className={`alchemy-craft-action-btn ${!canCraft && craftingState === 'idle' ? 'disabled-no-ingredients' : ''}`}
               onClick={handleCraftPotion}
               disabled={craftingState === 'brewing'}
+              title={!canCraft ? 'Ingredientes insuficientes no inventário' : 'Preparar esta poção'}
             >
               <span>⚗️</span>
-              <span>{craftingState === 'brewing' ? 'Preparando...' : 'Preparar Poção'}</span>
+              <span>
+                {craftingState === 'brewing'
+                  ? 'Preparando...'
+                  : !canCraft
+                  ? 'Ingredientes Insuficientes'
+                  : 'Preparar Poção'}
+              </span>
             </button>
           </section>
 

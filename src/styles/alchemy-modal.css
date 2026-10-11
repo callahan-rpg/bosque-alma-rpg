@@ -744,6 +744,20 @@
   text-shadow: none;
 }
 
+/* Botão quando ingredientes são insuficientes (mas não em estado brewing) */
+.alchemy-craft-action-btn.disabled-no-ingredients {
+  background: linear-gradient(180deg, #3D1A1A 0%, #2A0F0F 50%, #1A0808 100%);
+  border-color: #7F2020;
+  color: #D17070;
+  cursor: not-allowed;
+  box-shadow: 0 2px 10px rgba(127, 32, 32, 0.25);
+  text-shadow: none;
+}
+.alchemy-craft-action-btn.disabled-no-ingredients:hover {
+  transform: none;
+  box-shadow: 0 2px 10px rgba(127, 32, 32, 0.35);
+}
+
 /* ─────────────────────────────────────────────────────────────
    COLUNA 3 (DIREITA): TOMO / PERGAMINHO DE DETALHES
    ───────────────────────────────────────────────────────────── */
@@ -892,41 +906,44 @@
   line-height: 1.2;
 }
 
-/* Ingredientes Necessários (Fileira) */
+/* Ingredientes Necessários (Grid para exibir nomes completos) */
 .alchemy-req-ing-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 6px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 8px;
   margin-bottom: 12px;
 }
 
 .alchemy-req-ing-item {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 2px;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.35);
+  border: 1px solid var(--alc-parchment-border);
+  border-radius: 8px;
+  padding: 8px 6px;
 }
 
 .alchemy-req-ing-name {
-  font-size: 0.64rem;
+  font-size: 0.68rem;
   color: var(--alc-parchment-text);
   font-weight: 600;
-  max-width: 60px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.25;
+  word-break: break-word;
+  white-space: normal;
+  text-align: center;
 }
 
 .alchemy-req-ing-icon-box {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.3rem;
-  background: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.5);
   border: 1px solid var(--alc-parchment-border);
   border-radius: 6px;
 }
