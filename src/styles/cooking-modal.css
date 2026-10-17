@@ -1,0 +1,1090 @@
+/* ==========================================================================
+   SISTEMA DE COZINHA & CULINÁRIA — DESIGN DE ALTA FIDELIDADE
+   Estilo Dark Fantasy / RPG Medieval — Forja Culinária e Fogueira de Taberna
+   Baseado na interface oficial de Cozinha do Jardim/Bosque
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=MedievalSharp&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --cook-bg-main: #0c0f12;
+  --cook-bg-panel: #11171b;
+  --cook-bg-surface: #161e23;
+  --cook-bg-surface-elevated: #1b262d;
+  --cook-bg-hover: #223038;
+  --cook-bg-active: #192329;
+
+  /* Molduras Metálicas de Fantasia (Bronze, Ouro Escovado e Âmbar Quente) */
+  --cook-border-subtle: #3a2a1b;
+  --cook-border-faint: rgba(74, 55, 32, 0.45);
+  --cook-bronze-dark: #21160e;
+  --cook-bronze-rim: #3e2b1b;
+  --cook-bronze-mid: #5e4125;
+  --cook-gold-ancient: #8f682c;
+  --cook-gold-main: #c4923b;
+  --cook-gold-bright: #f0bd5a;
+  --cook-gold-glow: rgba(240, 189, 90, 0.25);
+
+  /* Tons de Fogo & Brasa */
+  --cook-ember: #ff6a00;
+  --cook-ember-glow: rgba(255, 106, 0, 0.35);
+  --cook-crimson: #e03838;
+  --cook-pv-red: #ef4444;
+  --cook-hunger-orange: #f97316;
+
+  /* Textos */
+  --cook-text-main: #f5eedf;
+  --cook-text-sec: #b8c4c7;
+  --cook-text-muted: #6f7f85;
+}
+
+/* Overlay do Modal */
+.cooking-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(4, 7, 9, 0.88);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  animation: cookFadeIn 0.28s ease-out forwards;
+}
+
+@keyframes cookFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Moldura Principal do Modal */
+.cooking-frame-container {
+  width: min(1420px, 98vw);
+  height: min(920px, 96vh);
+  background: var(--cook-bg-main);
+  border: 2px solid var(--cook-bronze-mid);
+  border-radius: 8px;
+  box-shadow:
+    0 0 0 1px #0a0704,
+    0 0 0 3px var(--cook-bronze-dark),
+    0 25px 60px rgba(0, 0, 0, 0.98),
+    0 0 35px rgba(240, 189, 90, 0.12),
+    inset 0 0 0 1px rgba(240, 189, 90, 0.28),
+    inset 0 0 0 3px #15100b,
+    inset 0 0 80px rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  font-family: 'Inter', -apple-system, sans-serif;
+  color: var(--cook-text-main);
+}
+
+/* Cantoneiras Rústicas */
+.cooking-frame-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M0 0 L32 0 L32 6 L6 6 L6 32 L0 32 Z' fill='%232a190b' stroke='%236e4d29' stroke-width='1'/%3E%3Cpath d='M2 2 L26 2 L26 4 L4 4 L4 26 L2 26 Z' fill='%23c4923b'/%3E%3Ccircle cx='10' cy='10' r='2.8' fill='%23f0bd5a' stroke='%232c1c0e' stroke-width='1'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M32 0 L0 0 L0 6 L26 6 L26 32 L32 32 Z' fill='%232a190b' stroke='%236e4d29' stroke-width='1'/%3E%3Cpath d='M30 2 L6 2 L6 4 L28 4 L28 26 L30 26 Z' fill='%23c4923b'/%3E%3Ccircle cx='22' cy='10' r='2.8' fill='%23f0bd5a' stroke='%232c1c0e' stroke-width='1'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M0 32 L32 32 L32 26 L6 26 L6 0 L0 0 Z' fill='%232a190b' stroke='%236e4d29' stroke-width='1'/%3E%3Cpath d='M2 30 L26 30 L26 28 L4 28 L4 6 L2 6 Z' fill='%23c4923b'/%3E%3Ccircle cx='10' cy='22' r='2.8' fill='%23f0bd5a' stroke='%232c1c0e' stroke-width='1'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M32 32 L0 32 L0 26 L26 26 L26 0 L32 0 Z' fill='%232a190b' stroke='%236e4d29' stroke-width='1'/%3E%3Cpath d='M30 30 L6 30 L6 28 L28 28 L28 6 L30 6 Z' fill='%23c4923b'/%3E%3Ccircle cx='22' cy='22' r='2.8' fill='%23f0bd5a' stroke='%232c1c0e' stroke-width='1'/%3E%3C/svg%3E");
+  background-position: top 0 left 0, top 0 right 0, bottom 0 left 0, bottom 0 right 0;
+  background-repeat: no-repeat;
+  background-size: 32px 32px;
+}
+
+/* Scrollbars */
+.cooking-frame-container * {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(196, 146, 59, 0.45) rgba(18, 14, 10, 0.5);
+}
+.cooking-frame-container *::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.cooking-frame-container *::-webkit-scrollbar-track {
+  background: rgba(18, 14, 10, 0.45);
+}
+.cooking-frame-container *::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #c4923b 0%, #754b21 100%);
+  border-radius: 4px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CABEÇALHO DA COZINHA (COM BANNER DE TABERNA & BARRA DE NÍVEL)
+   ───────────────────────────────────────────────────────────── */
+.cooking-header-bar {
+  position: relative;
+  height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  border-bottom: 2px solid var(--cook-bronze-mid);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.85);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.cooking-header-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('/assets/cooking/kitchen_banner.jpg');
+  background-size: cover;
+  background-position: center 30%;
+  filter: brightness(0.38) saturate(1.2);
+  z-index: 1;
+}
+
+.cooking-header-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(8,11,14,0.95) 0%, rgba(14,19,23,0.75) 50%, rgba(8,11,14,0.92) 100%);
+  z-index: 2;
+}
+
+.cooking-header-left {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cooking-logo-orb {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: linear-gradient(145deg, #2b1f13, #150f09);
+  border: 1px solid var(--cook-gold-main);
+  box-shadow: 0 0 16px rgba(240, 189, 90, 0.25), inset 0 0 8px rgba(240, 189, 90, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cooking-logo-icon {
+  font-size: 26px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+}
+
+.cooking-header-text h1 {
+  font-family: 'Cinzel', serif;
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: #fff4db;
+  letter-spacing: 1px;
+  margin: 0;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+}
+
+.cooking-header-text p {
+  margin: 3px 0 0;
+  font-size: 0.8rem;
+  color: #c9bda5;
+  letter-spacing: 0.2px;
+}
+
+/* Lado Direito do Cabeçalho */
+.cooking-header-right {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cooking-close-btn {
+  background: rgba(20, 26, 30, 0.7);
+  border: 1px solid rgba(196, 146, 59, 0.3);
+  color: #a4b3b8;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cooking-close-btn:hover {
+  background: #2a1515;
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CORPO PRINCIPAL (3 COLUNAS + PAINEL INFERIOR)
+   ───────────────────────────────────────────────────────────── */
+.cooking-body-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 310px 1fr 340px;
+  grid-template-rows: 1fr auto;
+  gap: 12px;
+  padding: 12px 14px;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 30%, #151d22 0%, #0c0f12 75%);
+}
+
+/* Painéis de Coluna */
+.cooking-col-panel {
+  background: var(--cook-bg-panel);
+  border: 1px solid var(--cook-bronze-rim);
+  border-radius: 6px;
+  box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   COLUNA ESQUERDA: INVENTÁRIO DE INGREDIENTES
+   ───────────────────────────────────────────────────────────── */
+.cooking-search-row {
+  display: flex;
+  gap: 6px;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(58, 42, 27, 0.4);
+}
+
+.cooking-search-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: rgba(9, 13, 16, 0.85);
+  border: 1px solid var(--cook-border-subtle);
+  border-radius: 4px;
+  padding: 0 8px;
+  gap: 6px;
+  min-width: 0;
+}
+
+.cooking-search-icon {
+  font-size: 0.8rem;
+  opacity: 0.6;
+}
+
+.cooking-search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #e5edf0;
+  font-size: 0.78rem;
+  padding: 6px 0;
+  min-width: 0;
+}
+
+.cooking-search-input::placeholder {
+  color: #5d6f75;
+}
+
+.cooking-filter-select {
+  background: rgba(9, 13, 16, 0.95);
+  border: 1px solid var(--cook-border-subtle);
+  color: #c4d2d6;
+  font-size: 0.78rem;
+  border-radius: 4px;
+  padding: 0 6px;
+  outline: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Grid de Itens de Ingredientes (3 Colunas Exatas, sem scroll horizontal) */
+.cooking-ingredients-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 10px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  align-content: start;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.cooking-ingredient-card {
+  aspect-ratio: 1;
+  min-width: 0;
+  box-sizing: border-box;
+  background: linear-gradient(145deg, #182228 0%, #0f1519 100%);
+  border: 1px solid #342718;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  padding: 6px 4px;
+  transition: all 0.18s ease;
+  user-select: none;
+  overflow: hidden;
+}
+
+.cooking-ingredient-card:hover {
+  border-color: var(--cook-gold-main);
+  background: linear-gradient(145deg, #24323a 0%, #161e24 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6), 0 0 8px rgba(196, 146, 59, 0.2);
+}
+
+.cooking-ingredient-card.selected-in-slot {
+  border-color: var(--cook-gold-bright);
+  box-shadow: 0 0 10px rgba(240, 189, 90, 0.4);
+}
+
+.cooking-ingredient-icon {
+  font-size: 1.55rem;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+  margin-bottom: 2px;
+}
+
+.cooking-ingredient-count {
+  position: absolute;
+  top: 3px;
+  right: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #e6c587;
+  text-shadow: 0 1px 2px #000;
+}
+
+.cooking-ingredient-name {
+  font-size: 0.66rem;
+  color: #d1d9dc;
+  text-align: center;
+  line-height: 1.1;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 2px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   COLUNA CENTRAL: ESTAÇÃO DE COZINHA (CALDEIRÃO & FOGUEIRA)
+   ───────────────────────────────────────────────────────────── */
+.cooking-station-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 14px 18px;
+  overflow-y: auto;
+  gap: 12px;
+  background: radial-gradient(circle at 50% 35%, #182329 0%, #0d1215 80%);
+}
+
+.cooking-station-header {
+  text-align: center;
+}
+
+.cooking-station-header h2 {
+  font-family: 'Cinzel', serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #f7eddb;
+  margin: 0;
+  letter-spacing: 0.8px;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+}
+
+.cooking-station-header p {
+  margin: 4px 0 0;
+  font-size: 0.78rem;
+  color: #9aa8ad;
+}
+
+/* Palco Central do Caldeirão */
+.cooking-hearth-stage {
+  position: relative;
+  width: 100%;
+  min-height: 250px;
+  max-height: 300px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 4px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(94, 65, 37, 0.4);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.9);
+}
+
+.cooking-hearth-img-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('/assets/cooking/hearth_pot.jpg');
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.72) contrast(1.1);
+  transition: filter 0.3s;
+}
+
+.cooking-hearth-stage.cooking-active .cooking-hearth-img-bg {
+  filter: brightness(0.95) contrast(1.2) saturate(1.3);
+}
+
+/* Fumaça e vapor animados sobre o caldeirão */
+.cooking-steam-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 140, 0, 0.18) 0%, transparent 65%);
+  pointer-events: none;
+  animation: cookSteamPulse 3s ease-in-out infinite;
+}
+
+@keyframes cookSteamPulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.08); }
+}
+
+/* Slots de Ingredientes ao Redor da Panela (2 à esquerda, 2 à direita) */
+.cooking-slots-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 40px;
+  pointer-events: none;
+}
+
+.cooking-slot-column {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  pointer-events: auto;
+}
+
+.cooking-hearth-slot {
+  width: 58px;
+  height: 58px;
+  background: rgba(13, 18, 22, 0.85);
+  border: 1.5px dashed var(--cook-bronze-mid);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+  position: relative;
+}
+
+.cooking-hearth-slot:hover {
+  border-color: var(--cook-gold-bright);
+  background: rgba(24, 34, 40, 0.95);
+  box-shadow: 0 0 12px rgba(240, 189, 90, 0.3);
+}
+
+.cooking-hearth-slot.filled {
+  border-style: solid;
+  border-color: var(--cook-gold-main);
+  background: linear-gradient(145deg, rgba(38, 27, 16, 0.92), rgba(18, 13, 8, 0.92));
+  box-shadow: 0 0 8px rgba(196, 146, 59, 0.25);
+}
+
+.cooking-slot-plus {
+  font-size: 1.4rem;
+  color: #63777d;
+  font-weight: 300;
+  transition: color 0.2s;
+}
+
+.cooking-hearth-slot:hover .cooking-slot-plus {
+  color: var(--cook-gold-bright);
+}
+
+.cooking-slot-icon {
+  font-size: 1.7rem;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+}
+
+.cooking-slot-qty {
+  position: absolute;
+  bottom: 2px;
+  right: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #f0bd5a;
+}
+
+.cooking-slot-remove-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #dc2626;
+  color: white;
+  font-size: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.cooking-hearth-slot:hover .cooking-slot-remove-badge {
+  opacity: 1;
+}
+
+/* Botão Central de Adicionar Ingrediente */
+.cooking-add-ing-btn {
+  position: absolute;
+  bottom: 14px;
+  background: rgba(19, 26, 31, 0.9);
+  border: 1px solid var(--cook-bronze-mid);
+  color: #eeddbb;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(6px);
+  z-index: 10;
+}
+
+.cooking-add-ing-btn:hover {
+  background: rgba(43, 30, 17, 0.95);
+  border-color: var(--cook-gold-main);
+  box-shadow: 0 0 12px rgba(240, 189, 90, 0.35);
+  color: #fff;
+}
+
+/* Seção: Método de Preparo */
+.cooking-prep-method-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cooking-section-title {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #ab9b86;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cooking-methods-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+
+.cooking-method-btn {
+  background: rgba(14, 19, 23, 0.9);
+  border: 1px solid var(--cook-border-subtle);
+  border-radius: 5px;
+  padding: 8px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #8c9fa6;
+}
+
+.cooking-method-btn:hover {
+  border-color: var(--cook-gold-ancient);
+  background: rgba(27, 36, 42, 0.9);
+  color: #d1dde0;
+}
+
+.cooking-method-btn.active {
+  background: linear-gradient(180deg, #322211 0%, #181109 100%);
+  border-color: var(--cook-gold-bright);
+  color: var(--cook-gold-bright);
+  box-shadow: 0 0 10px rgba(240, 189, 90, 0.3), inset 0 1px 0 rgba(240, 189, 90, 0.3);
+}
+
+.cooking-method-icon {
+  font-size: 1.15rem;
+}
+
+.cooking-method-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+/* Seção: Tempo de Preparo */
+.cooking-time-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(11, 16, 19, 0.6);
+  border: 1px solid rgba(58, 42, 27, 0.45);
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+.cooking-time-controls {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cooking-slider-track {
+  width: 100%;
+  accent-color: var(--cook-gold-main);
+  cursor: pointer;
+}
+
+.cooking-time-presets {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  color: #798a91;
+}
+
+.cooking-time-presets span.active {
+  color: var(--cook-gold-bright);
+  font-weight: 700;
+}
+
+.cooking-time-badge {
+  background: rgba(22, 17, 10, 0.85);
+  border: 1px solid var(--cook-bronze-mid);
+  border-radius: 6px;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.cooking-time-badge-icon {
+  font-size: 1.1rem;
+}
+
+.cooking-time-badge-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.cooking-time-badge-lbl {
+  font-size: 0.65rem;
+  color: #928471;
+}
+
+.cooking-time-badge-val {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff1d4;
+}
+
+/* Botão Principal: Preparar Receita */
+.cooking-prepare-btn {
+  background: linear-gradient(180deg, #442e17 0%, #20150a 100%);
+  border: 1.5px solid var(--cook-gold-main);
+  border-radius: 6px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  color: #fff2d6;
+  font-family: 'Cinzel', serif;
+  font-size: 0.98rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(240, 189, 90, 0.4);
+  transition: all 0.22s ease;
+}
+
+.cooking-prepare-btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, #5c3f1e 0%, #2e1d0d 100%);
+  border-color: var(--cook-gold-bright);
+  box-shadow: 0 0 16px rgba(240, 189, 90, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.cooking-prepare-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+.cooking-prepare-btn.cooking-anim {
+  animation: cookBtnPulse 1.2s infinite alternate;
+}
+
+@keyframes cookBtnPulse {
+  from { box-shadow: 0 0 8px rgba(255, 106, 0, 0.3); }
+  to { box-shadow: 0 0 20px rgba(255, 106, 0, 0.7); }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   COLUNA DIREITA: CATÁLOGO DE RECEITAS & HISTÓRICO
+   ───────────────────────────────────────────────────────────── */
+.cooking-right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.cooking-recipes-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.cooking-recipe-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+}
+
+.cooking-recipe-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(145deg, #141c21 0%, #0d1215 100%);
+  border: 1px solid var(--cook-border-subtle);
+  border-radius: 6px;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cooking-recipe-card:hover {
+  background: linear-gradient(145deg, #1c272e 0%, #12191d 100%);
+  border-color: var(--cook-gold-ancient);
+  transform: translateX(2px);
+}
+
+.cooking-recipe-card.active {
+  background: linear-gradient(145deg, #271d12 0%, #140f09 100%);
+  border-color: var(--cook-gold-bright);
+  box-shadow: 0 0 12px rgba(240, 189, 90, 0.25), inset 0 1px 0 rgba(240, 189, 90, 0.2);
+}
+
+.cooking-recipe-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid var(--cook-bronze-mid);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.7);
+  background: #1a140f;
+  flex-shrink: 0;
+}
+
+.cooking-recipe-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.cooking-recipe-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff1d4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cooking-recipe-desc {
+  font-size: 0.68rem;
+  color: #8c9ba1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+
+.cooking-recipe-stats-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+.cooking-stat-pv {
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.cooking-stat-hunger {
+  color: #f97316;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.cooking-stat-time {
+  color: #84969d;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+}
+
+/* Painel: Histórico de Cozinha */
+.cooking-history-container {
+  height: 190px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.cooking-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(58, 42, 27, 0.4);
+}
+
+.cooking-history-title {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #ab9b86;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cooking-clear-hist-btn {
+  background: transparent;
+  border: 1px solid rgba(58, 42, 27, 0.6);
+  color: #7d8f95;
+  font-size: 0.68rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cooking-clear-hist-btn:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.cooking-history-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 8px;
+}
+
+.cooking-history-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  background: rgba(14, 19, 23, 0.6);
+  border-radius: 4px;
+  border: 1px solid rgba(48, 35, 23, 0.3);
+}
+
+.cooking-hist-thumb {
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  object-fit: cover;
+  border: 1px solid #3d2b1c;
+}
+
+.cooking-hist-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.cooking-hist-name {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #e5dfd3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cooking-hist-time {
+  font-size: 0.62rem;
+  color: #6d7f85;
+}
+
+.cooking-hist-stats {
+  display: flex;
+  gap: 6px;
+  font-size: 0.66rem;
+  font-weight: 600;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   PAINEL INFERIOR: RESULTADO & EFEITOS/DESCRIÇÃO
+   ───────────────────────────────────────────────────────────── */
+.cooking-bottom-panel {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  height: 120px;
+}
+
+.cooking-bottom-card {
+  background: var(--cook-bg-panel);
+  border: 1px solid var(--cook-bronze-rim);
+  border-radius: 6px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.5);
+}
+
+.cooking-bottom-card-header {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #bcaea0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.cooking-bottom-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cooking-cloche-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  background: #161e23;
+  border: 1px solid var(--cook-border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.cooking-cloche-result-img {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1.5px solid var(--cook-gold-main);
+  box-shadow: 0 0 10px rgba(240, 189, 90, 0.35);
+  flex-shrink: 0;
+}
+
+.cooking-result-text-area {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+
+.cooking-result-main-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff2d6;
+}
+
+.cooking-result-subtext {
+  font-size: 0.73rem;
+  color: #7e8f95;
+  line-height: 1.3;
+}
+
+.cooking-result-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.cooking-action-btn-consume,
+.cooking-action-btn-store {
+  background: rgba(35, 24, 14, 0.9);
+  border: 1px solid var(--cook-gold-ancient);
+  color: #fff1d4;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cooking-action-btn-consume:hover {
+  background: rgba(65, 43, 22, 1);
+  border-color: var(--cook-gold-bright);
+}
+
+.cooking-action-btn-store:hover {
+  background: rgba(22, 33, 40, 1);
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+.cooking-details-body {
+  font-size: 0.75rem;
+  color: #92a4ab;
+  line-height: 1.4;
+}
+
+.cooking-buff-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.cooking-buff-chip {
+  background: rgba(20, 27, 32, 0.85);
+  border: 1px solid rgba(196, 146, 59, 0.35);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  color: #eeddbb;
+  font-weight: 600;
+}
+
+/* Responsividade */
+@media (max-width: 1080px) {
+  .cooking-body-grid {
+    grid-template-columns: 260px 1fr 280px;
+  }
+}

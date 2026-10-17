@@ -5746,6 +5746,19 @@ html, body, #root {
   75%       { transform: translateX(4px); }
 }
 
+.login-success {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 0.8rem;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 8px;
+  color: #6ee7b7;
+  font-size: 0.82rem;
+  animation: loginCardAppear 0.3s ease;
+}
+
 .login-btn-primary {
   display: flex;
   align-items: center;

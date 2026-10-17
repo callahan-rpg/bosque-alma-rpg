@@ -7,6 +7,8 @@ import CharacterPopupModal from './character/CharacterPopupModal.jsx'
 import SettingsModal from './SettingsModal.jsx'
 import WeatherWidget from './WeatherWidget.jsx'
 import PotionCraftingModal from './PotionCraftingModal.jsx'
+import CookingCraftingModal from './CookingCraftingModal.jsx'
+import TamagotchiModal from './TamagotchiModal.jsx'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { useDefaultLocation } from '../hooks/useDefaultLocation'
 import { useNavigate } from 'react-router-dom'
@@ -20,6 +22,8 @@ export default function HUD({ locationSlug, locationName, weatherCondition, minT
   const [showCharPopup, setShowCharPopup] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [showPotionCrafting, setShowPotionCrafting] = useState(false)
+  const [showCooking, setShowCooking] = useState(false)
+  const [showTamagotchi, setShowTamagotchi] = useState(false)
   const [hasActiveCombat, setHasActiveCombat] = useState(false)
 
   // Escuta se existe algum combate ativo no momento
@@ -136,6 +140,24 @@ export default function HUD({ locationSlug, locationName, weatherCondition, minT
 
           <button
             type="button"
+            className={`hud-icon-btn hud-cooking-btn ${showCooking ? 'active' : ''}`}
+            onClick={() => setShowCooking(p => !p)}
+            title="Cozinha — Preparar Pratos e Receitas"
+          >
+            🍳
+          </button>
+
+          <button
+            type="button"
+            className={`hud-icon-btn hud-tamagotchi-btn ${showTamagotchi ? 'active' : ''}`}
+            onClick={() => setShowTamagotchi(p => !p)}
+            title="Pets — Sistema de Companheiros"
+          >
+            🐾
+          </button>
+
+          <button
+            type="button"
             className={`hud-icon-btn ${showDice ? 'active' : ''}`}
             onClick={() => setShowDice(p => !p)}
             title="Oráculo dos Dados"
@@ -180,6 +202,10 @@ export default function HUD({ locationSlug, locationName, weatherCondition, minT
       {showDice && <DiceRoller onClose={() => setShowDice(false)} />}
 
       {showPotionCrafting && <PotionCraftingModal onClose={() => setShowPotionCrafting(false)} />}
+
+      {showCooking && <CookingCraftingModal onClose={() => setShowCooking(false)} />}
+
+      {showTamagotchi && <TamagotchiModal onClose={() => setShowTamagotchi(false)} />}
 
       {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
 

@@ -13,6 +13,8 @@ const CharacterSheet = lazy(() => import('./pages/CharacterSheet.jsx'))
 const PublicCharacters = lazy(() => import('./pages/PublicCharacters.jsx'))
 const Combat = lazy(() => import('./pages/Combat.jsx'))
 const PotionCraftingModal = lazy(() => import('./components/PotionCraftingModal.jsx'))
+const CookingCraftingModal = lazy(() => import('./components/CookingCraftingModal.jsx'))
+const TamagotchiModal = lazy(() => import('./components/TamagotchiModal.jsx'))
 
 function DynamicDefaultRedirect() {
   const { defaultSlug } = useDefaultLocation()
@@ -49,6 +51,14 @@ export default function App() {
             <Routes>
               {/* Rota de pré-visualização e teste de bordas da Alquimia */}
               <Route path="/alchemy-preview" element={<PotionCraftingModal onClose={() => {}} />} />
+              {/* Rota de pré-visualização e teste da Cozinha */}
+              <Route path="/cooking-preview" element={<CookingCraftingModal onClose={() => {}} />} />
+              <Route path="/cozinha" element={<CookingCraftingModal onClose={() => {}} />} />
+              {/* Rotas de pré-visualização e acesso aos Pets */}
+              <Route path="/tamagotchi-preview" element={<TamagotchiModal onClose={() => {}} />} />
+              <Route path="/tamagotchi" element={<TamagotchiModal onClose={() => {}} />} />
+              <Route path="/pet" element={<TamagotchiModal onClose={() => {}} />} />
+              <Route path="/pets" element={<TamagotchiModal onClose={() => {}} />} />
 
               {/* Rotas protegidas por autenticação */}
               <Route path="/*" element={
