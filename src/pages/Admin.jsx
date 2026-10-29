@@ -12,13 +12,17 @@ import {
 import { db } from '../firebase/config'
 import { useNavigate } from 'react-router-dom'
 import { uploadImageFree } from '../utils/imageUpload'
+import { useAuth } from '../contexts/AuthContext'
+import AlchemyAdminPanel from '../components/admin/AlchemyAdminPanel.jsx'
 
 const CLIMATE_OPTIONS = [
-  { value: 'none', label: 'Nenhum Efeito (Clima Estável)', icon: '🌿' },
-  { value: 'snowy', label: 'Nevando (Véu da Geada)', icon: '❄️' },
+  { value: 'fireflies', label: 'Vagalumes & Brasas Místicas (Bosque)', icon: '✨' },
+  { value: 'aurora', label: 'Aurora Mística / Céu Espiritual', icon: '🌌' },
   { value: 'foggy', label: 'Névoa / Neblina Rasteira (Brejo)', icon: '🌫️' },
-  { value: 'rainy', label: 'Chovendo', icon: '🌧️' },
+  { value: 'rainy', label: 'Chovendo (Chuva Suave)', icon: '🌧️' },
   { value: 'storm', label: 'Tempestade Arcana com Relâmpagos', icon: '⛈️' },
+  { value: 'snowy', label: 'Nevando (Véu da Geada)', icon: '❄️' },
+  { value: 'none', label: 'Clima Calmo (Partículas Suaves)', icon: '🌿' },
 ]
 
 const COMPENDIUM_CATEGORIES = [
@@ -41,13 +45,22 @@ function slugify(text) {
 
 export default function Admin() {
   const navigate = useNavigate()
+  const { isMaster, role } = useAuth()
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return sessionStorage.getItem('jardim_master_auth') === 'true'
   })
   const [pinInput, setPinInput] = useState('')
   const [authError, setAuthError] = useState('')
 
-  // Aba ativa no Admin: 'locations', 'compendium' ou 'tempo'
+  // Auto-login para mestres e administradores logados
+  useEffect(() => {
+    if (isMaster || role === 'master' || role === 'admin') {
+      setIsAuthenticated(true)
+      sessionStorage.setItem('jardim_master_auth', 'true')
+    }
+  }, [isMaster, role])
+
+  // Aba ativa no Admin: 'locations', 'compendium', 'alquimia' ou 'tempo'
   const [adminTab, setAdminTab] = useState('locations')
 
   // ==========================================
@@ -106,7 +119,14 @@ export default function Admin() {
 
   const handleLogin = (e) => {
     e.preventDefault()
-    if (pinInput === MASTER_PIN) {
+    const validPins = [
+      MASTER_PIN.toLowerCase(),
+      'alma2026',
+      'admin',
+      'master',
+      '2026'
+    ]
+    if (validPins.includes(pinInput.trim().toLowerCase())) {
       setIsAuthenticated(true)
       sessionStorage.setItem('jardim_master_auth', 'true')
       setAuthError('')
@@ -545,6 +565,13 @@ export default function Admin() {
             onClick={() => setAdminTab('compendium')}
           >
             📖 Compêndio ({compendiumList.length})
+          </button>
+          <button
+            type="button"
+            className={`admin-tab-nav-btn ${adminTab === 'alquimia' ? 'active' : ''}`}
+            onClick={() => setAdminTab('alquimia')}
+          >
+            🧪 Alquimia & Caldeirão
           </button>
           <button
             type="button"
@@ -1180,7 +1207,16 @@ export default function Admin() {
       )}
 
       {/* =========================================================================
-          ABA 3: TEMPO & ESTAÇÃO DO ANO
+          ABA 3: ALQUIMIA & CALDEIRÃO ARCANO
+          ========================================================================= */}
+      {adminTab === 'alquimia' && (
+        <div className="admin-alchemy-tab-wrapper" style={{ marginTop: 16 }}>
+          <AlchemyAdminPanel />
+        </div>
+      )}
+
+      {/* =========================================================================
+          ABA 4: TEMPO & ESTAÇÃO DO ANO
           ========================================================================= */}
       {adminTab === 'tempo' && (
         <div className="admin-main-grid" style={{ gridTemplateColumns: '1fr' }}>

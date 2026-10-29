@@ -56,7 +56,7 @@ export default function WeatherEffects({ condition = 'none', enabled = true }) {
     'none'
 
   useEffect(() => {
-    if (!enabled || !fxEnabled || activeCondition === 'none') return
+    if (!enabled || !fxEnabled) return
 
     const canvas = canvasRef.current
     if (!canvas) return
@@ -134,6 +134,23 @@ export default function WeatherEffects({ condition = 'none', enabled = true }) {
           phase: Math.random() * Math.PI * 2,
           pulseSpeed: Math.random() * 0.04 + 0.015,
           baseColor: Math.random() > 0.4 ? '163, 230, 53' : '250, 204, 21' // dourado ou verde-esmeralda
+        })
+      }
+    }
+
+    // 🌿 CLIMA CALMO / PARTÍCULAS MÍSTICAS DO BOSQUE (Pólen & Esporos Arcanos)
+    if (activeCondition === 'none') {
+      const count = 30
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          radius: Math.random() * 2.2 + 1.0,
+          vx: (Math.random() - 0.5) * 0.35,
+          vy: -Math.random() * 0.35 - 0.1,
+          phase: Math.random() * Math.PI * 2,
+          pulseSpeed: Math.random() * 0.03 + 0.012,
+          baseColor: Math.random() > 0.5 ? '192, 132, 252' : (Math.random() > 0.5 ? '250, 204, 21' : '52, 211, 153')
         })
       }
     }
@@ -302,6 +319,36 @@ export default function WeatherEffects({ condition = 'none', enabled = true }) {
         }
       }
 
+      // 🌿 CLIMA CALMO / PARTÍCULAS DO BOSQUE
+      if (activeCondition === 'none') {
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i]
+          p.phase += p.pulseSpeed
+          const glow = (Math.sin(p.phase) + 1) / 2
+          const curOpacity = 0.15 + glow * 0.55
+
+          const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius * 3.5)
+          grad.addColorStop(0, `rgba(${p.baseColor}, ${curOpacity})`)
+          grad.addColorStop(0.5, `rgba(${p.baseColor}, ${curOpacity * 0.35})`)
+          grad.addColorStop(1, `rgba(${p.baseColor}, 0)`)
+
+          ctx.fillStyle = grad
+          ctx.beginPath()
+          ctx.arc(p.x, p.y, p.radius * 3.5, 0, Math.PI * 2)
+          ctx.fill()
+
+          p.x += p.vx + Math.sin(p.phase) * 0.25
+          p.y += p.vy
+
+          if (p.y < -15) {
+            p.y = height + 15
+            p.x = Math.random() * width
+          }
+          if (p.x < 0) p.x = width
+          if (p.x > width) p.x = 0
+        }
+      }
+
       animationFrameId = requestAnimationFrame(render)
     }
 
@@ -313,7 +360,7 @@ export default function WeatherEffects({ condition = 'none', enabled = true }) {
     }
   }, [activeCondition, enabled, fxEnabled])
 
-  if (!enabled || !fxEnabled || activeCondition === 'none') {
+  if (!enabled || !fxEnabled) {
     return null
   }
 
@@ -327,7 +374,7 @@ export default function WeatherEffects({ condition = 'none', enabled = true }) {
         width: '100vw',
         height: '100vh',
         pointerEvents: 'none',
-        zIndex: 2,
+        zIndex: 4,
         opacity: opacity / 100,
         transition: 'opacity 0.25s ease',
       }}

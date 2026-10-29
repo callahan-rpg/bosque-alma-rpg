@@ -14,7 +14,7 @@ const FALLBACK_LOCATION = {
   slug: 'crepusculo',
   description: 'O coração do bosque mágico de Alma Koskovic. O ar é suave e perfumado por flores raras.',
   backgroundImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1600&auto=format&fit=crop&q=80',
-  weatherCondition: 'none',
+  weatherCondition: 'fireflies',
   locationSound: '',
   navigationButtons: [
     { label: 'Chalés / Estufas', targetSlug: 'estufas', position: 'left' },
