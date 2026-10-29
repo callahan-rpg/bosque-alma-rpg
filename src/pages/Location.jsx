@@ -7,7 +7,6 @@ import LocationChat from '../components/chat/LocationChat.jsx'
 import WeatherEffects from '../components/WeatherEffects.jsx'
 import AmbientSoundPlayer from '../components/AmbientSoundPlayer.jsx'
 import FantasyNavButton from '../components/FantasyNavButton.jsx'
-import { useLocationTransition } from '../contexts/LocationTransitionContext.jsx'
 
 // Localidade padrão de fallback (Jardim do Crepúsculo com botões paralelos)
 const FALLBACK_LOCATION = {
@@ -28,7 +27,6 @@ export default function Location() {
   const { slug } = useParams()
   const navigate = useNavigate()
   const currentSlug = slug || 'crepusculo'
-  const { startTransition } = useLocationTransition()
 
   const [locationData, setLocationData] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -62,12 +60,8 @@ export default function Location() {
   const navLeft = (loc.navigationButtons || []).filter(b => b.position === 'left')
   const navRight = (loc.navigationButtons || []).filter(b => b.position !== 'left')
 
-  const handleNavigate = (targetSlug, label) => {
-    if (startTransition) {
-      startTransition(targetSlug, null, { locationName: label })
-    } else {
-      navigate(`/location/${targetSlug}`)
-    }
+  const handleNavigate = (targetSlug) => {
+    navigate(`/location/${targetSlug}`)
   }
 
   return (
