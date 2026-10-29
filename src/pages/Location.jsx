@@ -6,6 +6,8 @@ import HUD from '../components/HUD.jsx'
 import LocationChat from '../components/chat/LocationChat.jsx'
 import WeatherEffects from '../components/WeatherEffects.jsx'
 import AmbientSoundPlayer from '../components/AmbientSoundPlayer.jsx'
+import FantasyNavButton from '../components/FantasyNavButton.jsx'
+import { useLocationTransition } from '../contexts/LocationTransitionContext.jsx'
 
 // Localidade padrão de fallback (Jardim do Crepúsculo com botões paralelos)
 const FALLBACK_LOCATION = {
@@ -26,6 +28,7 @@ export default function Location() {
   const { slug } = useParams()
   const navigate = useNavigate()
   const currentSlug = slug || 'crepusculo'
+  const { startTransition } = useLocationTransition()
 
   const [locationData, setLocationData] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -59,6 +62,14 @@ export default function Location() {
   const navLeft = (loc.navigationButtons || []).filter(b => b.position === 'left')
   const navRight = (loc.navigationButtons || []).filter(b => b.position !== 'left')
 
+  const handleNavigate = (targetSlug, label) => {
+    if (startTransition) {
+      startTransition(targetSlug, null, { locationName: label })
+    } else {
+      navigate(`/location/${targetSlug}`)
+    }
+  }
+
   return (
     <div className="location-page-container">
       {/* Player de Trilha Sonora */}
@@ -85,14 +96,11 @@ export default function Location() {
           {/* Botões de saída (Esquerda) */}
           <div className="nav-buttons-left">
             {navLeft.map((btn, i) => (
-              <button
+              <FantasyNavButton
                 key={i}
-                type="button"
-                className="nav-btn"
-                onClick={() => navigate(`/location/${btn.targetSlug}`)}
-              >
-                {btn.label}
-              </button>
+                label={btn.label}
+                onClick={() => handleNavigate(btn.targetSlug, btn.label)}
+              />
             ))}
           </div>
 
@@ -107,14 +115,11 @@ export default function Location() {
           {/* Botões de saída (Direita) */}
           <div className="nav-buttons-right">
             {navRight.map((btn, i) => (
-              <button
+              <FantasyNavButton
                 key={i}
-                type="button"
-                className="nav-btn"
-                onClick={() => navigate(`/location/${btn.targetSlug}`)}
-              >
-                {btn.label}
-              </button>
+                label={btn.label}
+                onClick={() => handleNavigate(btn.targetSlug, btn.label)}
+              />
             ))}
           </div>
         </div>
@@ -122,3 +127,4 @@ export default function Location() {
     </div>
   )
 }
+

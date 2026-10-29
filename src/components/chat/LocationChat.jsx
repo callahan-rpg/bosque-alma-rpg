@@ -5,7 +5,7 @@ import ChatMessageList from './ChatMessageList.jsx'
 import ChatSidebar from './ChatSidebar.jsx'
 import ChatEmojiBar from './ChatEmojiBar.jsx'
 import ChatInputBar from './ChatInputBar.jsx'
-import ChatUserActionModal from './ChatUserActionModal.jsx'
+import CharacterPopupModal from '../character/CharacterPopupModal.jsx'
 import EditProfileModal from './EditProfileModal.jsx'
 import {
   sendZoneMessage,
@@ -713,7 +713,7 @@ export default function LocationChat({ slug, locationName }) {
       </div>
 
       {modalUser && (
-        <ChatUserActionModal
+        <CharacterPopupModal
           targetUser={modalUser}
           currentUser={user}
           currentChar={character}
