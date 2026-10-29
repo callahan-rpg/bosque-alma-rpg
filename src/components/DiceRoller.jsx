@@ -9,7 +9,7 @@ import {
   serverTimestamp,
 } from 'firebase/firestore'
 import { db } from '../firebase/config'
-import { useGuest } from '../contexts/GuestContext.jsx'
+import { useGuest } from '../contexts/AuthContext.jsx'
 
 const DICE_TYPES = [
   { type: 'D4',   faces: 4,   icon: '▲' },

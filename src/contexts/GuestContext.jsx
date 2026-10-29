@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import React, { createContext, useContext, useState } from 'react'
+import { useAuth } from './AuthContext.jsx'
 
 const GuestContext = createContext(null)
 
@@ -58,9 +59,23 @@ export function GuestProvider({ children }) {
 }
 
 export function useGuest() {
+  // Primeiro tenta obter do AuthProvider (sistema oficial de autenticação)
+  try {
+    const auth = useAuth()
+    if (auth) return auth
+  } catch {}
+
+  // Fallback caso esteja explicitamente usando GuestProvider
   const context = useContext(GuestContext)
-  if (!context) {
-    throw new Error('useGuest deve ser usado dentro de um GuestProvider')
+  if (context) return context
+
+  return {
+    user: { uid: 'guest_fallback' },
+    character: { name: 'Viajante', avatarUrl: '' },
+    role: 'player',
+    isMaster: false,
+    profile: null,
+    updateProfile: () => {}
   }
-  return context
 }
+

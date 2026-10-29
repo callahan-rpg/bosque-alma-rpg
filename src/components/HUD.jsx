@@ -3,7 +3,7 @@ import DiceRoller from './DiceRoller.jsx'
 import EditProfileModal from './chat/EditProfileModal.jsx'
 import SettingsModal from './SettingsModal.jsx'
 import WeatherWidget from './WeatherWidget.jsx'
-import { useGuest } from '../contexts/GuestContext.jsx'
+import { useGuest } from '../contexts/AuthContext.jsx'
 import { useDefaultLocation } from '../hooks/useDefaultLocation'
 import { useNavigate } from 'react-router-dom'
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import DiceRoller from './DiceRoller.jsx'
 import EditProfileModal from './chat/EditProfileModal.jsx'
-import { useGuest } from '../contexts/GuestContext.jsx'
+import { useGuest } from '../contexts/AuthContext.jsx'
 
 export default function TopBar({ locationName, onOpenAdmin }) {
   const { character, updateProfile } = useGuest()

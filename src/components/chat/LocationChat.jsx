@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { useGuest } from '../../contexts/GuestContext.jsx'
+import { useGuest } from '../../contexts/AuthContext.jsx'
 import ChatPresenceSync from './ChatPresenceSync.jsx'
 import ChatMessageList from './ChatMessageList.jsx'
 import ChatSidebar from './ChatSidebar.jsx'
