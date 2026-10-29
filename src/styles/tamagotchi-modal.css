@@ -1,0 +1,1204 @@
+/* ==========================================================================
+   SISTEMA DE COMPANHEIROS & TAMAGOTCHI — DESIGN DE ALTA FIDELIDADE
+   Estilo Dark Fantasy / RPG Medieval — Berçário Arcano do Bosque
+   Baseado fielmente na interface oficial de referência do Tamagotchi
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=MedievalSharp&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --tama-bg-main: #0c0f12;
+  --tama-bg-panel: #11171b;
+  --tama-bg-surface: #161e23;
+  --tama-bg-surface-elevated: #1b262d;
+  --tama-bg-hover: #223038;
+  --tama-bg-active: #192329;
+
+  /* Molduras e Cores Metálicas */
+  --tama-border-subtle: #3a2a1b;
+  --tama-border-faint: rgba(74, 55, 32, 0.45);
+  --tama-bronze-dark: #21160e;
+  --tama-bronze-rim: #3e2b1b;
+  --tama-bronze-mid: #5e4125;
+  --tama-gold-ancient: #8f682c;
+  --tama-gold-main: #c4923b;
+  --tama-gold-bright: #f0bd5a;
+  --tama-gold-glow: rgba(240, 189, 90, 0.35);
+
+  /* Barras de Necessidades */
+  --tama-hunger-green: #34d399;
+  --tama-thirst-blue: #38bdf8;
+  --tama-happy-gold: #fbbf24;
+  --tama-sleep-purple: #a855f7;
+
+  /* Textos */
+  --tama-text-main: #f5eedf;
+  --tama-text-sec: #b8c4c7;
+  --tama-text-muted: #6f7f85;
+}
+
+/* Overlay do Modal */
+.tamagotchi-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(4, 7, 9, 0.88);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  animation: tamaFadeIn 0.28s ease-out forwards;
+}
+
+@keyframes tamaFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Moldura Principal do Modal */
+.tamagotchi-frame-container {
+  width: min(1440px, 98vw);
+  height: min(920px, 96vh);
+  background: var(--tama-bg-main);
+  border: 2px solid var(--tama-bronze-mid);
+  border-radius: 8px;
+  box-shadow:
+    0 0 0 1px #0a0704,
+    0 0 0 3px var(--tama-bronze-dark),
+    0 25px 60px rgba(0, 0, 0, 0.98),
+    0 0 35px rgba(240, 189, 90, 0.12),
+    inset 0 0 0 1px rgba(240, 189, 90, 0.28),
+    inset 0 0 0 3px #15100b,
+    inset 0 0 80px rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  font-family: 'Inter', -apple-system, sans-serif;
+  color: var(--tama-text-main);
+}
+
+/* Cantoneiras Rústicas */
+.tamagotchi-frame-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M0 0 L32 0 L32 6 L6 6 L6 32 L0 32 Z' fill='%232a190b' stroke='%236e4d29' stroke-width='1'/%3E%3Cpath d='M2 2 L26 2 L26 4 L4 4 L4 26 L2 26 Z' fill='%23c4923b'/%3E%3Ccircle cx='10' cy='10' r='2.8' fill='%23f0bd5a' stroke='%232c1c0e' stroke-width='1'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M32 0 L0 0 L0 6 L26 6 L26 32 L32 32 Z' fill='%232a190b' stroke='%236e4d29' stroke-width='1'/%3E%3Cpath d='M30 2 L6 2 L6 4 L28 4 L28 26 L30 26 Z' fill='%23c4923b'/%3E%3Ccircle cx='22' cy='10' r='2.8' fill='%23f0bd5a' stroke='%232c1c0e' stroke-width='1'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M0 32 L32 32 L32 26 L6 26 L6 0 L0 0 Z' fill='%232a190b' stroke='%236e4d29' stroke-width='1'/%3E%3Cpath d='M2 30 L26 30 L26 28 L4 28 L4 6 L2 6 Z' fill='%23c4923b'/%3E%3Ccircle cx='10' cy='22' r='2.8' fill='%23f0bd5a' stroke='%232c1c0e' stroke-width='1'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M32 32 L0 32 L0 26 L26 26 L26 0 L32 0 Z' fill='%232a190b' stroke='%236e4d29' stroke-width='1'/%3E%3Cpath d='M30 30 L6 30 L6 28 L28 28 L28 6 L30 6 Z' fill='%23c4923b'/%3E%3Ccircle cx='22' cy='22' r='2.8' fill='%23f0bd5a' stroke='%232c1c0e' stroke-width='1'/%3E%3C/svg%3E");
+  background-position: top 0 left 0, top 0 right 0, bottom 0 left 0, bottom 0 right 0;
+  background-repeat: no-repeat;
+  background-size: 32px 32px;
+}
+
+/* Scrollbars */
+.tamagotchi-frame-container * {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(196, 146, 59, 0.45) rgba(18, 14, 10, 0.5);
+}
+.tamagotchi-frame-container *::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.tamagotchi-frame-container *::-webkit-scrollbar-track {
+  background: rgba(18, 14, 10, 0.45);
+}
+.tamagotchi-frame-container *::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #c4923b 0%, #754b21 100%);
+  border-radius: 4px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CABEÇALHO OFICIAL DO TAMAGOTCHI
+   ───────────────────────────────────────────────────────────── */
+.tamagotchi-header-bar {
+  position: relative;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  border-bottom: 2px solid var(--tama-bronze-mid);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.85);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.tamagotchi-header-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('/assets/tamagotchi/tamagotchi_banner.jpg');
+  background-size: cover;
+  background-position: center 35%;
+  filter: brightness(0.38) saturate(1.25);
+  z-index: 1;
+}
+
+.tamagotchi-header-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(8,11,14,0.96) 0%, rgba(14,19,23,0.78) 50%, rgba(8,11,14,0.94) 100%);
+  z-index: 2;
+}
+
+.tamagotchi-header-left {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.tamagotchi-header-icon-orb {
+  width: 46px;
+  height: 46px;
+  border-radius: 8px;
+  background: radial-gradient(circle at 40% 30%, #3e2815, #171008);
+  border: 2px solid var(--tama-gold-main);
+  box-shadow: 0 0 16px rgba(196, 146, 59, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+}
+
+.tamagotchi-header-titles {
+  display: flex;
+  flex-direction: column;
+}
+
+.tamagotchi-main-title {
+  font-family: 'Cinzel', serif;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #fff4db;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9), 0 0 12px rgba(240, 189, 90, 0.4);
+  line-height: 1.1;
+  margin: 0;
+}
+
+.tamagotchi-subtitle {
+  font-size: 12px;
+  color: var(--tama-text-sec);
+  letter-spacing: 0.02em;
+  margin-top: 3px;
+}
+
+.tamagotchi-header-right {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Insígnia de Vínculo */
+.tamagotchi-bond-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(14, 18, 22, 0.75);
+  border: 1px solid var(--tama-bronze-mid);
+  border-radius: 6px;
+  padding: 6px 14px;
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.5);
+}
+
+.tamagotchi-hex-badge {
+  width: 36px;
+  height: 38px;
+  background: linear-gradient(135deg, #2b1f13, #150f09);
+  border: 1.5px solid var(--tama-gold-main);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--tama-gold-bright);
+  box-shadow: 0 0 8px rgba(196, 146, 59, 0.35);
+}
+
+.tamagotchi-bond-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 140px;
+}
+
+.tamagotchi-bond-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--tama-gold-bright);
+}
+
+.tamagotchi-bond-bar-wrap {
+  width: 100%;
+  height: 7px;
+  background: #0d1215;
+  border-radius: 3px;
+  border: 1px solid rgba(196, 146, 59, 0.3);
+  overflow: hidden;
+}
+
+.tamagotchi-bond-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #c4923b, #f0bd5a);
+  box-shadow: 0 0 8px rgba(240, 189, 90, 0.6);
+  transition: width 0.3s ease;
+}
+
+.tamagotchi-bond-text {
+  font-size: 10px;
+  color: var(--tama-text-muted);
+  text-align: right;
+}
+
+.tamagotchi-benefits-btn {
+  background: linear-gradient(180deg, #241b12 0%, #150f09 100%);
+  border: 1px solid var(--tama-gold-ancient);
+  color: var(--tama-gold-bright);
+  padding: 8px 14px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Inter', sans-serif;
+}
+
+.tamagotchi-benefits-btn:hover {
+  background: linear-gradient(180deg, #38291a 0%, #22160d 100%);
+  border-color: var(--tama-gold-bright);
+  box-shadow: 0 0 12px rgba(240, 189, 90, 0.3);
+  transform: translateY(-1px);
+}
+
+.tamagotchi-close-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  background: rgba(22, 16, 12, 0.85);
+  border: 1px solid var(--tama-bronze-mid);
+  color: var(--tama-text-sec);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tamagotchi-close-btn:hover {
+  background: #7f1d1d;
+  border-color: #ef4444;
+  color: #fff;
+  transform: scale(1.05);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CORPO PRINCIPAL (3 COLUNAS CONFORME DESIGN OFICIAL)
+   ───────────────────────────────────────────────────────────── */
+.tamagotchi-body-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 290px 1fr 320px;
+  overflow: hidden;
+  position: relative;
+  z-index: 5;
+  background: #0e1215;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   COLUNA ESQUERDA: COMPANHEIROS & COLEÇÃO
+   ───────────────────────────────────────────────────────────── */
+.tamagotchi-left-col {
+  border-right: 1.5px solid var(--tama-border-subtle);
+  background: linear-gradient(180deg, #11161a 0%, #0c0f12 100%);
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 14px;
+  overflow-y: auto;
+}
+
+/* Abas */
+.tamagotchi-tabs-nav {
+  display: flex;
+  background: #090c0e;
+  border-radius: 6px;
+  border: 1px solid var(--tama-border-subtle);
+  padding: 3px;
+  gap: 4px;
+}
+
+.tamagotchi-tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--tama-text-muted);
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tamagotchi-tab-btn.active {
+  background: linear-gradient(180deg, #2a1f14 0%, #17110a 100%);
+  border: 1px solid var(--tama-gold-main);
+  color: var(--tama-gold-bright);
+  box-shadow: 0 0 10px rgba(196, 146, 59, 0.25);
+}
+
+/* Barra de Busca */
+.tamagotchi-search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.tamagotchi-search-icon {
+  position: absolute;
+  left: 10px;
+  font-size: 13px;
+  color: var(--tama-text-muted);
+}
+
+.tamagotchi-search-input {
+  width: 100%;
+  background: #080a0d;
+  border: 1px solid var(--tama-border-subtle);
+  border-radius: 6px;
+  padding: 8px 12px 8px 32px;
+  color: var(--tama-text-main);
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.tamagotchi-search-input:focus {
+  border-color: var(--tama-gold-main);
+}
+
+/* Cards de Companheiros */
+.tamagotchi-pet-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tamagotchi-pet-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 6px;
+  background: #141b20;
+  border: 1.5px solid var(--tama-border-subtle);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.tamagotchi-pet-card:hover {
+  background: #1a232a;
+  border-color: var(--tama-gold-ancient);
+}
+
+.tamagotchi-pet-card.active {
+  background: linear-gradient(90deg, #241a10 0%, #151a1e 100%);
+  border: 1.5px solid var(--tama-gold-bright);
+  box-shadow: 0 0 16px rgba(240, 189, 90, 0.22);
+}
+
+.tamagotchi-pet-thumb-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 6px;
+  background: #090c0e;
+  border: 1px solid var(--tama-gold-ancient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.tamagotchi-pet-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.tamagotchi-pet-card-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tamagotchi-pet-card-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tamagotchi-pet-card-name {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--tama-text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tamagotchi-gender-male {
+  color: #38bdf8;
+  font-size: 12px;
+  margin-left: 4px;
+}
+.tamagotchi-gender-female {
+  color: #f472b6;
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+.tamagotchi-pet-card-species {
+  font-size: 11px;
+  color: var(--tama-text-muted);
+}
+
+.tamagotchi-pet-card-lvl-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.tamagotchi-pet-card-lvl-text {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--tama-gold-bright);
+}
+
+.tamagotchi-pet-card-bar {
+  width: 60px;
+  height: 5px;
+  background: #090d0f;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.tamagotchi-pet-card-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #c4923b, #f0bd5a);
+}
+
+/* Espaço Vazio / Adoção */
+.tamagotchi-empty-slot-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 6px;
+  background: rgba(16, 21, 26, 0.45);
+  border: 1.5px dashed rgba(74, 55, 32, 0.6);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tamagotchi-empty-slot-card:hover {
+  background: rgba(26, 35, 42, 0.7);
+  border-color: var(--tama-gold-main);
+}
+
+.tamagotchi-empty-egg-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 6px;
+  background: #090c0e;
+  border: 1px dashed rgba(196, 146, 59, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.tamagotchi-empty-slot-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tamagotchi-empty-slot-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--tama-text-sec);
+}
+
+.tamagotchi-empty-slot-sub {
+  font-size: 11px;
+  color: var(--tama-text-muted);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   COLUNA CENTRAL: O APOSENTO DO PET (CENÁRIO, AÇÕES, EVOLUÇÃO)
+   ───────────────────────────────────────────────────────────── */
+.tamagotchi-center-col {
+  display: flex;
+  flex-direction: column;
+  background: #090d0f;
+  overflow-y: auto;
+  padding: 16px;
+  gap: 14px;
+}
+
+/* Cenário / Habitat */
+.tamagotchi-room-stage {
+  position: relative;
+  width: 100%;
+  height: 380px;
+  border-radius: 8px;
+  border: 2px solid var(--tama-bronze-mid);
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.9), 0 8px 24px rgba(0, 0, 0, 0.75);
+  background-image: url('/assets/tamagotchi/pet_room.jpg');
+  background-size: cover;
+  background-position: center bottom;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.tamagotchi-room-ambient-light {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 65%, rgba(255, 145, 0, 0.12) 0%, rgba(0, 0, 0, 0.45) 85%);
+  pointer-events: none;
+}
+
+/* Badges sobrepostas no quarto */
+.tamagotchi-room-badge-topright {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(14, 18, 22, 0.88);
+  border: 1px solid var(--tama-border-subtle);
+  border-radius: 6px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 130px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 10;
+}
+
+.tamagotchi-room-badge-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--tama-text-sec);
+}
+
+.tamagotchi-room-badge-header span:first-child {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tamagotchi-room-badge-bar {
+  width: 100%;
+  height: 6px;
+  background: #090c0e;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.tamagotchi-room-badge-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  transition: width 0.3s ease;
+}
+
+.tamagotchi-room-badge-level {
+  position: absolute;
+  top: 68px;
+  right: 14px;
+  background: rgba(14, 18, 22, 0.88);
+  border: 1px solid var(--tama-border-subtle);
+  border-radius: 6px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 130px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 10;
+}
+
+/* Pet Display no Centro */
+.tamagotchi-pet-entity-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 65px;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.tamagotchi-pet-sprite-wrap {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease-out;
+}
+
+.tamagotchi-pet-sprite-wrap:hover {
+  transform: scale(1.06);
+}
+
+.tamagotchi-pet-sprite-wrap:active {
+  transform: scale(0.95);
+}
+
+.tamagotchi-pet-sprite-wrap.bounce {
+  animation: petBounceHop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes petBounceHop {
+  0% { transform: translateY(0) scale(1); }
+  35% { transform: translateY(-24px) scale(1.1, 0.9); }
+  65% { transform: translateY(-4px) scale(0.95, 1.05); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+.tamagotchi-pet-sprite {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.85));
+}
+
+/* Sombra suave no tapete */
+.tamagotchi-pet-rug-shadow {
+  width: 110px;
+  height: 22px;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0) 75%);
+  border-radius: 50%;
+  margin-top: -12px;
+}
+
+/* Balão de Fala do Pet */
+.tamagotchi-speech-bubble {
+  position: absolute;
+  top: -34px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #1a150f;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+  animation: popInBubble 0.25s ease-out;
+}
+
+.tamagotchi-speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px 6px 0;
+  border-style: solid;
+  border-color: rgba(255, 255, 255, 0.95) transparent;
+}
+
+@keyframes popInBubble {
+  from { transform: scale(0.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Partículas Flutuantes */
+.tamagotchi-floating-particle {
+  position: absolute;
+  pointer-events: none;
+  font-size: 20px;
+  animation: floatUpFade 1.2s ease-out forwards;
+}
+
+@keyframes floatUpFade {
+  0% { transform: translate(0, 0) scale(0.6); opacity: 1; }
+  100% { transform: translate(var(--p-x, 0), -60px) scale(1.2); opacity: 0; }
+}
+
+/* Seção de Ações */
+.tamagotchi-actions-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tamagotchi-section-title {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--tama-text-main);
+  margin: 0;
+}
+
+.tamagotchi-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.tamagotchi-action-btn {
+  background: linear-gradient(180deg, #182229 0%, #10161b 100%);
+  border: 1.5px solid var(--tama-border-subtle);
+  border-radius: 6px;
+  padding: 10px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--tama-text-sec);
+}
+
+.tamagotchi-action-btn:hover {
+  background: linear-gradient(180deg, #26333c 0%, #192229 100%);
+  border-color: var(--tama-gold-bright);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(196, 146, 59, 0.25);
+}
+
+.tamagotchi-action-btn:active {
+  transform: translateY(1px);
+}
+
+.tamagotchi-action-icon {
+  font-size: 22px;
+}
+
+.tamagotchi-action-label {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Seção de Evolução */
+.tamagotchi-evolution-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #11171b;
+  border: 1px solid var(--tama-border-subtle);
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.tamagotchi-evolution-timeline {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 8px;
+}
+
+.tamagotchi-evo-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.tamagotchi-evo-step.active {
+  opacity: 1;
+}
+
+.tamagotchi-evo-thumb-box {
+  width: 58px;
+  height: 58px;
+  border-radius: 6px;
+  background: #090c0e;
+  border: 1.5px solid var(--tama-border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  position: relative;
+  overflow: hidden;
+}
+
+.tamagotchi-evo-step.active .tamagotchi-evo-thumb-box {
+  border-color: var(--tama-gold-bright);
+  box-shadow: 0 0 12px rgba(240, 189, 90, 0.35);
+  background: radial-gradient(circle, #251b10 0%, #0d1215 100%);
+}
+
+.tamagotchi-evo-step-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--tama-text-main);
+  text-align: center;
+}
+
+.tamagotchi-evo-step-lvl {
+  font-size: 10px;
+  color: var(--tama-text-muted);
+}
+
+.tamagotchi-evo-arrow {
+  color: var(--tama-text-muted);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   COLUNA DIREITA: STATUS, ATRIBUTOS, HISTÓRICO, DETALHES
+   ───────────────────────────────────────────────────────────── */
+.tamagotchi-right-col {
+  border-left: 1.5px solid var(--tama-border-subtle);
+  background: linear-gradient(180deg, #11161a 0%, #0c0f12 100%);
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 14px;
+  overflow-y: auto;
+}
+
+/* Painel de Necessidades */
+.tamagotchi-needs-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tamagotchi-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--tama-text-main);
+}
+
+.tamagotchi-need-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+}
+
+.tamagotchi-need-icon {
+  width: 24px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tamagotchi-need-label {
+  width: 60px;
+  color: var(--tama-text-sec);
+  font-weight: 500;
+}
+
+.tamagotchi-need-bar-track {
+  flex: 1;
+  height: 8px;
+  background: #090c0e;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+}
+
+.tamagotchi-need-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.35s ease;
+}
+
+.tamagotchi-need-bar-fill.hunger {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.tamagotchi-need-bar-fill.thirst {
+  background: linear-gradient(90deg, #0284c7, #38bdf8);
+}
+
+.tamagotchi-need-bar-fill.happy {
+  background: linear-gradient(90deg, #d97706, #fbbf24);
+}
+
+.tamagotchi-need-bar-fill.sleep {
+  background: linear-gradient(90deg, #7e22ce, #a855f7);
+}
+
+.tamagotchi-need-val {
+  width: 32px;
+  text-align: right;
+  font-weight: 700;
+  color: var(--tama-text-main);
+  font-size: 11px;
+}
+
+/* Painel de Atributos */
+.tamagotchi-attrs-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--tama-border-subtle);
+}
+
+.tamagotchi-attr-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3px 0;
+  font-size: 12px;
+}
+
+.tamagotchi-attr-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--tama-text-sec);
+}
+
+.tamagotchi-attr-val {
+  font-weight: 700;
+  color: var(--tama-gold-bright);
+}
+
+/* Painel de Histórico */
+.tamagotchi-history-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--tama-border-subtle);
+  flex: 1;
+}
+
+.tamagotchi-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  max-height: 140px;
+}
+
+.tamagotchi-history-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--tama-text-sec);
+  line-height: 1.3;
+}
+
+.tamagotchi-history-icon {
+  font-size: 14px;
+  opacity: 0.8;
+  margin-top: 1px;
+}
+
+.tamagotchi-history-text-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.tamagotchi-history-time {
+  font-size: 10px;
+  color: var(--tama-text-muted);
+}
+
+/* Botão de Rodapé: Ver Detalhes */
+.tamagotchi-details-btn {
+  background: linear-gradient(180deg, #2b1f13 0%, #161009 100%);
+  border: 1.5px solid var(--tama-gold-main);
+  border-radius: 6px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  color: var(--tama-gold-bright);
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+  margin-top: auto;
+}
+
+.tamagotchi-details-btn:hover {
+  background: linear-gradient(180deg, #3d2c1b 0%, #20170e 100%);
+  border-color: var(--tama-gold-bright);
+  box-shadow: 0 0 16px rgba(240, 189, 90, 0.35);
+  transform: translateY(-1px);
+}
+
+.tamagotchi-details-btn-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   SUB-MODAIS (DETALHES, BENEFÍCIOS, ADOÇÃO)
+   ───────────────────────────────────────────────────────────── */
+.tamagotchi-submodal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 7, 10, 0.85);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: tamaFadeIn 0.2s ease;
+}
+
+.tamagotchi-submodal-content {
+  width: min(520px, 94%);
+  background: #11171b;
+  border: 2px solid var(--tama-gold-main);
+  border-radius: 8px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.95), 0 0 25px rgba(196, 146, 59, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.tamagotchi-submodal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: #161e23;
+  border-bottom: 1px solid var(--tama-border-subtle);
+}
+
+.tamagotchi-submodal-title {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--tama-gold-bright);
+  margin: 0;
+}
+
+.tamagotchi-submodal-body {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: 65vh;
+  overflow-y: auto;
+}
+
+.tamagotchi-submodal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 18px;
+  background: #0d1215;
+  border-top: 1px solid var(--tama-border-subtle);
+}
+
+.tamagotchi-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tamagotchi-form-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--tama-text-sec);
+}
+
+.tamagotchi-form-input {
+  background: #080b0d;
+  border: 1px solid var(--tama-border-subtle);
+  border-radius: 5px;
+  padding: 9px 12px;
+  color: var(--tama-text-main);
+  font-size: 13px;
+  outline: none;
+}
+
+.tamagotchi-form-input:focus {
+  border-color: var(--tama-gold-main);
+}
+
+.tamagotchi-primary-btn {
+  background: linear-gradient(180deg, #c4923b 0%, #8f682c 100%);
+  border: 1px solid var(--tama-gold-bright);
+  color: #171109;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tamagotchi-primary-btn:hover {
+  box-shadow: 0 0 12px rgba(240, 189, 90, 0.45);
+  transform: translateY(-1px);
+}
+
+.tamagotchi-sec-btn {
+  background: transparent;
+  border: 1px solid var(--tama-border-subtle);
+  color: var(--tama-text-sec);
+  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tamagotchi-sec-btn:hover {
+  background: #1c262d;
+  color: #fff;
+}

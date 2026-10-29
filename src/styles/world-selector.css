@@ -1,0 +1,631 @@
+/* ==========================================================================
+   PORTAL DO MULTIVERSO — SELETOR DE MUNDOS 3D (VISION OS / FROSTED GLASS)
+   Fiel à estética Apple VisionOS: Glassmorphism, 3D Coverflow e profundidade
+   ========================================================================== */
+
+.world-selector-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  /* Preto espacial profundo — a galáxia animada em canvas fica por cima */
+  background-color: #02030a;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #ffffff;
+  user-select: none;
+}
+
+/* Vinheta nas bordas para dar profundidade ao espaço */
+.world-selector-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 25%, rgba(2, 3, 10, 0.72) 85%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   BARRA SUPERIOR (TOP BAR — VISION OS SAFARI PILL)
+   ========================================================================== */
+.world-topbar {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(28px) saturate(1.8);
+  -webkit-backdrop-filter: blur(28px) saturate(1.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 9999px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35),
+              inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  animation: fadeInDown 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.topbar-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.topbar-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  transform: scale(1.08);
+}
+
+.topbar-address-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 18px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.topbar-lock-icon {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+/* ==========================================================================
+   BARRA LATERAL ESQUERDA (SIDEBAR PILL)
+   ========================================================================== */
+.world-sidebar-dock {
+  position: absolute;
+  left: 28px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 12px 8px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(28px) saturate(1.8);
+  -webkit-backdrop-filter: blur(28px) saturate(1.8);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 9999px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3),
+              inset 0 1px 1px rgba(255, 255, 255, 0.25);
+  animation: fadeInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sidebar-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 18px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.sidebar-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+.sidebar-btn.active {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   CARROSSEL 3D / COVERFLOW DOS MUNDOS
+   ========================================================================== */
+.world-carousel-stage {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1500px;
+  overflow: visible;
+}
+
+.world-carousel-track {
+  position: relative;
+  width: 350px;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-style: preserve-3d;
+  /* Garante renderização nítida no contexto 3D */
+  isolation: isolate;
+}
+
+/* CARD DE VIDRO VISION OS — 100% OPACO COM BORDA BRILHANTE */
+.world-card {
+  position: absolute;
+  width: 340px;
+  height: 495px;
+  border-radius: 28px;
+  /* Fundo 100% sólido opaco com gradiente sutil de profundidade */
+  background: #13151f;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  box-shadow: 0 30px 65px rgba(0, 0, 0, 0.7),
+              inset 0 1px 1.5px rgba(255, 255, 255, 0.35);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform;
+  transform-origin: center center;
+}
+
+/* ── POSIÇÕES 3D NO ARCO DE 5 CARDS (ESTILO VISION OS DA REFERÊNCIA) ── */
+
+/* 1. Card Central Ativo (Destacado e à frente) */
+.world-card.active {
+  transform: translate3d(0, 0, 90px) rotateY(0deg) scale(1.05);
+  z-index: 10;
+  opacity: 1;
+  background: #151824;
+  border-color: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 38px 80px rgba(0, 0, 0, 0.82),
+              0 0 50px rgba(255, 255, 255, 0.15),
+              inset 0 1.5px 1.5px rgba(255, 255, 255, 0.45);
+  cursor: default;
+  filter: brightness(1);
+}
+
+/* 2. Slot +1 à Direita (Visível próximo, inclinado) */
+.world-card.slot-next-1,
+.world-card.next {
+  transform: translate3d(245px, 0, -35px) rotateY(-22deg) scale(0.88);
+  z-index: 7;
+  opacity: 1;
+  filter: brightness(0.82);
+}
+
+.world-card.slot-next-1:hover,
+.world-card.next:hover {
+  transform: translate3d(230px, 0, -15px) rotateY(-17deg) scale(0.91);
+  filter: brightness(0.96);
+  z-index: 8;
+}
+
+/* 3. Slot +2 à Direita (Visível mais longe, como o 5º card da referência) */
+.world-card.slot-next-2 {
+  transform: translate3d(460px, 0, -120px) rotateY(-34deg) scale(0.75);
+  z-index: 5;
+  opacity: 1;
+  filter: brightness(0.68);
+}
+
+.world-card.slot-next-2:hover {
+  transform: translate3d(440px, 0, -95px) rotateY(-28deg) scale(0.79);
+  filter: brightness(0.88);
+  z-index: 6;
+}
+
+/* 4. Slot -1 à Esquerda (Visível próximo, inclinado) */
+.world-card.slot-prev-1,
+.world-card.prev {
+  transform: translate3d(-245px, 0, -35px) rotateY(22deg) scale(0.88);
+  z-index: 7;
+  opacity: 1;
+  filter: brightness(0.82);
+}
+
+.world-card.slot-prev-1:hover,
+.world-card.prev:hover {
+  transform: translate3d(-230px, 0, -15px) rotateY(17deg) scale(0.91);
+  filter: brightness(0.96);
+  z-index: 8;
+}
+
+/* 5. Slot -2 à Esquerda (Visível mais longe, como o 1º card da referência) */
+.world-card.slot-prev-2 {
+  transform: translate3d(-460px, 0, -120px) rotateY(34deg) scale(0.75);
+  z-index: 5;
+  opacity: 1;
+  filter: brightness(0.68);
+}
+
+.world-card.slot-prev-2:hover {
+  transform: translate3d(-440px, 0, -95px) rotateY(28deg) scale(0.79);
+  filter: brightness(0.88);
+  z-index: 6;
+}
+
+/* Ocultos além dos 5 cards visíveis na tela */
+.world-card.hidden-left {
+  transform: translate3d(-680px, 0, -220px) rotateY(45deg) scale(0.58);
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.world-card.hidden-right {
+  transform: translate3d(680px, 0, -220px) rotateY(-45deg) scale(0.58);
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ÁREA DA IMAGEM DO CARD */
+.world-card-media {
+  position: relative;
+  width: 100%;
+  height: 270px;
+  overflow: hidden;
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+}
+
+.world-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.world-card.active:hover .world-card-img {
+  transform: scale(1.05);
+}
+
+.world-card-media-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.2) 0%,
+    transparent 40%,
+    rgba(15, 17, 23, 0.85) 85%,
+    rgba(15, 17, 23, 0.98) 100%
+  );
+}
+
+/* BOTÕES SUSPENSOS NO TOPO DO CARD */
+.world-card-top-controls {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 5;
+}
+
+.card-expand-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 9999px;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.card-expand-pill:hover {
+  background: rgba(255, 255, 255, 0.32);
+  transform: scale(1.05);
+}
+
+.card-more-btn {
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.card-more-btn:hover {
+  background: rgba(255, 255, 255, 0.32);
+  transform: scale(1.05);
+}
+
+/* ÁREA DE TEXTO E CONTEÚDO DO CARD */
+.world-card-body {
+  flex: 1;
+  padding: 4px 22px 18px 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  /* Fundo 100% sólido opaco */
+  background: #10121a;
+}
+
+.world-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+
+.world-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: #ffffff;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.world-counter {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 500;
+}
+
+.world-description {
+  margin: 0 0 12px 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.75);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.world-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 14px;
+}
+
+.world-location-pin {
+  color: #f59e0b;
+}
+
+.world-enter-btn {
+  width: 100%;
+  padding: 11px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #0b0c10;
+  border: none;
+  border-radius: 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.world-enter-btn:hover {
+  background: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(255, 255, 255, 0.2);
+}
+
+/* ==========================================================================
+   BARRA DE CONTROLE INFERIOR (DOCK PILL)
+   ========================================================================== */
+.world-dock-container {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.world-dock-pill {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 18px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(30px) saturate(1.8);
+  -webkit-backdrop-filter: blur(30px) saturate(1.8);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 9999px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4),
+              inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+.dock-nav-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dock-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+.dock-world-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 170px;
+}
+
+.dock-thumbnail {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dock-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.dock-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: -0.2px;
+}
+
+.dock-subtitle {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.dock-heart-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dock-heart-btn:hover,
+.dock-heart-btn.liked {
+  color: #ef4444;
+  transform: scale(1.12);
+}
+
+/* PAGINAÇÃO (DOTS) */
+.world-pagination-dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.page-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.page-dot.active {
+  width: 18px;
+  border-radius: 4px;
+  background: #ffffff;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+}
+
+/* ==========================================================================
+   ANIMAÇÕES
+   ========================================================================== */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translate(-20px, -50%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, -50%);
+  }
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 768px) {
+  .world-sidebar-dock {
+    display: none;
+  }
+  .world-card {
+    width: 310px;
+    height: 460px;
+  }
+  .world-card.prev {
+    transform: translate3d(-150px, 0, -50px) rotateY(20deg) scale(0.82);
+  }
+  .world-card.next {
+    transform: translate3d(150px, 0, -50px) rotateY(-20deg) scale(0.82);
+  }
+  .world-card-media {
+    height: 230px;
+  }
+}

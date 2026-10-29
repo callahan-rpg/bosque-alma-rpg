@@ -1,0 +1,1290 @@
+/* ==========================================================================
+   pokemon-contest.css — Estilos Oficiais do Grand Gala & Festivais Pokémon
+   Palco Teatral, Luzes Cênicas, Camarim Nobre e Minigame de Showstopper
+   ========================================================================== */
+
+:root {
+  --contest-bg-deep: #0a0815;
+  --contest-gold: #fbbf24;
+  --contest-gold-glow: rgba(251, 191, 36, 0.5);
+  --contest-purple: #9333ea;
+  --contest-rose: #f43f5e;
+  --contest-stage-velvet: #3b0764;
+  --contest-glass: rgba(18, 14, 38, 0.75);
+  --contest-border: rgba(251, 191, 36, 0.25);
+}
+
+.contest-viewport {
+  min-height: 100vh;
+  background: radial-gradient(circle at 50% 10%, #1e113a 0%, #0c0818 55%, #05030a 100%);
+  color: #f8fafc;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  padding: 1.5rem;
+  box-sizing: border-box;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Header de Luxo */
+.contest-header {
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: var(--contest-glass);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--contest-border);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(251, 191, 36, 0.1);
+}
+
+.contest-brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.contest-brand-icon {
+  font-size: 2.2rem;
+  filter: drop-shadow(0 0 12px var(--contest-gold));
+  animation: floatSoft 3s ease-in-out infinite;
+}
+
+.contest-brand-title {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #fff 20%, #fde047 60%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.contest-brand-subtitle {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.contest-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.glamour-wallet {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(251, 191, 36, 0.12);
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  font-weight: 700;
+  color: #fef08a;
+  font-size: 0.95rem;
+  box-shadow: 0 0 15px rgba(251, 191, 36, 0.15);
+}
+
+.contest-btn-back {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 0.5rem 1.2rem;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.contest-btn-back:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Modos: Camarim & Spa */
+.contest-dressing-room {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 2rem;
+}
+
+@media (max-width: 900px) {
+  .contest-dressing-room {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dressing-card {
+  background: var(--contest-glass);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--contest-border);
+  border-radius: 24px;
+  padding: 1.8rem;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+}
+
+.pokemon-stage-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.pokemon-spotlight-disc {
+  width: 190px;
+  height: 190px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.35) 0%, rgba(217, 119, 6, 0.15) 50%, transparent 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 0 40px rgba(251, 191, 36, 0.2);
+}
+
+.pokemon-spotlight-disc img {
+  width: 130px;
+  height: 130px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.7));
+  animation: floatSoft 3s ease-in-out infinite;
+}
+
+.pokemon-sheen-indicator {
+  margin-top: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(251, 191, 36, 0.15);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  color: #fde047;
+}
+
+/* Barras de Esplendor */
+.contest-stat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin: 1.5rem 0;
+}
+
+.contest-stat-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.contest-stat-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.contest-stat-bar-track {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.contest-stat-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Vitrine de Cuidados (Grooming) */
+.grooming-shelf {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.grooming-item-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+}
+
+.grooming-item-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--contest-gold);
+  transform: translateY(-2px);
+}
+
+.grooming-item-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.grooming-item-icon {
+  font-size: 1.8rem;
+}
+
+.grooming-item-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.grooming-item-desc {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin: 0 0 0.8rem 0;
+  line-height: 1.35;
+}
+
+.grooming-item-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.grooming-cost {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fde047;
+}
+
+.btn-apply-grooming {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  border: none;
+  color: #fff;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.btn-apply-grooming:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.btn-apply-grooming:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Fitas Conquistadas */
+.ribbon-rack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.ribbon-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(251, 191, 36, 0.12);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  padding: 0.4rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #fef08a;
+}
+
+/* Categorias de Festival */
+.category-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.8rem;
+  margin: 1.2rem 0;
+}
+
+.category-choice-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 1rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.category-choice-btn.active {
+  border-color: var(--contest-gold);
+  background: rgba(251, 191, 36, 0.12);
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.2);
+}
+
+.btn-enter-stage {
+  width: 100%;
+  margin-top: 1.5rem;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+  border: none;
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.15rem;
+  letter-spacing: 0.5px;
+  padding: 1.1rem;
+  border-radius: 16px;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(245, 158, 11, 0.35);
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.btn-enter-stage:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(245, 158, 11, 0.5);
+}
+
+/* ==========================================================================
+   O PALCO DOS ESPETÁCULOS (ARENA AO VIVO)
+   ========================================================================== */
+.contest-live-stage {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.stage-theater {
+  background: radial-gradient(circle at 50% 25%, #3b0764 0%, #1e0836 60%, #0d0417 100%);
+  border: 2px solid var(--contest-border);
+  border-radius: 28px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 0 80px rgba(147, 51, 234, 0.3);
+}
+
+/* Holofotes Cênicos */
+.stage-spotlights {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  pointer-events: none;
+  background: 
+    radial-gradient(ellipse at 20% 0%, rgba(251, 191, 36, 0.22) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 0%, rgba(244, 63, 94, 0.22) 0%, transparent 60%),
+    radial-gradient(ellipse at 50% 10%, rgba(168, 85, 247, 0.2) 0%, transparent 70%);
+  animation: lightsSway 8s ease-in-out infinite alternate;
+}
+
+/* Medidor de Fervor da Plateia */
+.crowd-hype-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 0.8rem 1.4rem;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+.crowd-hype-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #fde047;
+}
+
+.crowd-stars-gauge {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.crowd-star {
+  font-size: 1.4rem;
+  opacity: 0.25;
+  transition: all 0.3s ease;
+  filter: grayscale(1);
+}
+
+.crowd-star.lit {
+  opacity: 1;
+  filter: grayscale(0) drop-shadow(0 0 8px var(--contest-gold));
+  transform: scale(1.15);
+}
+
+/* Os 4 Competidores no Palco */
+.stage-contestants-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.2rem;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 850px) {
+  .stage-contestants-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.contestant-podium-card {
+  background: rgba(18, 14, 38, 0.65);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 1.2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.contestant-podium-card.is-active-turn {
+  border-color: var(--contest-gold);
+  box-shadow: 0 0 30px rgba(251, 191, 36, 0.4), inset 0 0 15px rgba(251, 191, 36, 0.2);
+  transform: translateY(-4px) scale(1.02);
+}
+
+.contestant-podium-card.is-player {
+  border-color: rgba(56, 189, 248, 0.6);
+}
+
+.contestant-hearts-counter {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #f43f5e;
+  margin-bottom: 0.5rem;
+  background: rgba(244, 63, 94, 0.12);
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid rgba(244, 63, 94, 0.3);
+}
+
+.contestant-avatar-box {
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.6rem;
+  position: relative;
+}
+
+.contestant-avatar-box img {
+  width: 75px;
+  height: 75px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.6));
+}
+
+.contestant-name-tag {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #fff;
+  margin: 0;
+}
+
+.contestant-trainer-tag {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin: 0.2rem 0 0.5rem 0;
+}
+
+/* Mesa dos Jurados */
+.judges-table {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 1rem;
+  position: relative;
+  z-index: 2;
+}
+
+.judge-seat {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  max-width: 320px;
+}
+
+.judge-avatar {
+  font-size: 2rem;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+}
+
+.judge-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.judge-name {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #fef08a;
+  margin: 0;
+}
+
+.judge-bubble {
+  font-size: 0.78rem;
+  color: #cbd5e1;
+  font-style: italic;
+  line-height: 1.3;
+  margin: 0.2rem 0 0 0;
+}
+
+/* Painel de Ações do Turno */
+.stage-action-panel {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .stage-action-panel {
+    grid-template-columns: 1fr;
+  }
+}
+
+.moves-selection-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.contest-move-card {
+  background: var(--contest-glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--contest-border);
+  border-radius: 18px;
+  padding: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: left;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+.contest-move-card:hover:not(:disabled) {
+  transform: translateY(-3px);
+  border-color: var(--contest-gold);
+  box-shadow: 0 10px 25px rgba(251, 191, 36, 0.25);
+}
+
+.contest-move-card:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.contest-move-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.contest-move-name {
+  font-size: 1rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.contest-move-appeal-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #f43f5e;
+}
+
+.contest-move-desc {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin: 0 0 0.8rem 0;
+  line-height: 1.35;
+}
+
+.contest-move-flavor {
+  font-size: 0.78rem;
+  font-style: italic;
+  color: #fde047;
+  border-left: 2px solid var(--contest-gold);
+  padding-left: 0.5rem;
+  margin: 0;
+}
+
+/* Log Teatral */
+.stage-narrative-log {
+  background: var(--contest-glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--contest-border);
+  border-radius: 20px;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  height: 240px;
+}
+
+.log-title {
+  margin: 0 0 0.8rem 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fef08a;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.4rem;
+}
+
+.log-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.log-scroll-area::-webkit-scrollbar {
+  width: 6px;
+}
+
+.log-scroll-area::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+}
+
+.log-entry {
+  font-size: 0.82rem;
+  color: #e2e8f0;
+  line-height: 1.35;
+  padding: 0.3rem 0.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+}
+
+/* ==========================================================================
+   ATO III: SHOWSTOPPER INTERATIVO (QTE MODAL)
+   ========================================================================== */
+.showstopper-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(13, 8, 30, 0.96) 0%, rgba(3, 2, 8, 0.98) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(10px);
+}
+
+.showstopper-box {
+  max-width: 650px;
+  width: 90%;
+  background: rgba(22, 17, 44, 0.8);
+  border: 2px solid var(--contest-gold);
+  border-radius: 32px;
+  padding: 2.5rem;
+  text-align: center;
+  box-shadow: 0 0 80px rgba(251, 191, 36, 0.35);
+  position: relative;
+  overflow: hidden;
+}
+
+.qte-ring-container {
+  width: 220px;
+  height: 220px;
+  margin: 1.5rem auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qte-target-center {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 3px dashed var(--contest-gold);
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.3) 0%, transparent 70%);
+  box-shadow: 0 0 25px var(--contest-gold-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.4rem;
+}
+
+.qte-shrinking-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 3px solid #38bdf8;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.8);
+  pointer-events: none;
+}
+
+.btn-trigger-sync {
+  background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+  border: none;
+  color: #1e113a;
+  font-size: 1.3rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  padding: 1.1rem 2.8rem;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(251, 191, 36, 0.5);
+  transition: all 0.15s ease;
+}
+
+.btn-trigger-sync:hover {
+  transform: scale(1.05);
+  box-shadow: 0 15px 40px rgba(251, 191, 36, 0.7);
+}
+
+.btn-trigger-sync:active {
+  transform: scale(0.97);
+}
+
+/* Pódio Final / Cerimônia */
+.ceremony-podium-grid {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 1.5rem;
+  margin: 2.5rem 0;
+}
+
+.podium-pillar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border-radius: 24px 24px 0 0;
+  padding: 1.5rem 1rem;
+  width: 170px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+.podium-pillar.rank-1 {
+  height: 260px;
+  background: linear-gradient(180deg, #d97706 0%, #78350f 100%);
+  border: 2px solid #fde047;
+  order: 2;
+}
+
+.podium-pillar.rank-2 {
+  height: 200px;
+  background: linear-gradient(180deg, #64748b 0%, #334155 100%);
+  border: 2px solid #cbd5e1;
+  order: 1;
+}
+
+.podium-pillar.rank-3 {
+  height: 160px;
+  background: linear-gradient(180deg, #b45309 0%, #451a03 100%);
+  border: 2px solid #f59e0b;
+  order: 3;
+}
+
+/* Animações */
+@keyframes floatSoft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes lightsSway {
+  0% { transform: rotate(-3deg); }
+  100% { transform: rotate(3deg); }
+}
+
+/* Simplificação Cirúrgica: Badges Estratégicos e Visibilidade de Combos */
+.contest-move-tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.6rem;
+}
+
+.contest-badge-cat {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.contest-badge-theme {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(234, 179, 8, 0.2);
+  color: #fde047;
+  border: 1px solid rgba(234, 179, 8, 0.5);
+  animation: pulseGold 2s infinite ease-in-out;
+}
+
+.contest-badge-combo {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #0284c7, #38bdf8);
+  color: #fff;
+  border: 1px solid #7dd3fc;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+  animation: pulseCombo 1.5s infinite alternate;
+}
+
+.contest-badge-repeat {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.contest-badge-jam {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(168, 85, 247, 0.2);
+  color: #d8b4fe;
+  border: 1px solid rgba(168, 85, 247, 0.4);
+}
+
+.contest-move-card.has-combo {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.4) !important;
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.2), rgba(18, 14, 38, 0.8)) !important;
+}
+
+.last-move-banner {
+  background: rgba(18, 14, 38, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 0.6rem 1rem;
+  margin-bottom: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #e2e8f0;
+}
+
+.combo-tip-alert {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.dressing-help-banner {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(234, 179, 8, 0.1));
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 16px;
+  padding: 0.9rem 1.2rem;
+  margin-bottom: 1.2rem;
+  color: #cbd5e1;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+@keyframes pulseCombo {
+  0% { transform: scale(1); filter: brightness(1); }
+  100% { transform: scale(1.04); filter: brightness(1.2); }
+}
+
+@keyframes pulseGold {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 1; }
+}
+
+/* Modal de Tutorial Guiado */
+.contest-tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 6, 20, 0.85);
+  backdrop-filter: blur(14px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.contest-tutorial-modal {
+  background: linear-gradient(145deg, rgba(26, 20, 50, 0.95), rgba(13, 10, 28, 0.98));
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(251, 191, 36, 0.2);
+  border-radius: 28px;
+  max-width: 650px;
+  width: 100%;
+  padding: 2rem;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.tutorial-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.2rem;
+}
+
+.tutorial-category-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.15);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  padding: 3px 10px;
+  border-radius: 999px;
+  display: inline-block;
+  margin-bottom: 0.4rem;
+}
+
+.tutorial-main-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin: 0 0 0.3rem 0;
+  color: #fef08a;
+}
+
+.tutorial-subtitle {
+  font-size: 0.88rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.tutorial-close-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.tutorial-close-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+  color: #fca5a5;
+  transform: scale(1.08);
+}
+
+.tutorial-stepper {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+  margin: 0.8rem 0 1.5rem 0;
+}
+
+.tutorial-stepper-dot {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.06);
+  color: #94a3b8;
+  font-size: 0.85rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tutorial-stepper-dot.active {
+  border-color: #fbbf24;
+  background: linear-gradient(135deg, #d97706, #b45309);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.5);
+  transform: scale(1.15);
+}
+
+.tutorial-stepper-dot.completed {
+  border-color: rgba(56, 189, 248, 0.5);
+  background: rgba(56, 189, 248, 0.2);
+  color: #7dd3fc;
+}
+
+.tutorial-body {
+  min-height: 230px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1.6;
+}
+
+.tutorial-highlight-box {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 1rem 1.2rem;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-top: 0.6rem;
+}
+
+.tutorial-highlight-icon {
+  font-size: 1.8rem;
+}
+
+.tutorial-highlight-box strong {
+  color: #fde047;
+  font-size: 0.95rem;
+}
+
+.tutorial-highlight-box p {
+  margin: 0.3rem 0 0 0;
+  font-size: 0.88rem;
+  color: #cbd5e1;
+}
+
+.tutorial-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 0.6rem;
+  margin: 0.8rem 0;
+}
+
+.stat-pill {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid;
+  border-radius: 12px;
+  padding: 0.6rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.stat-pill small {
+  font-size: 0.68rem;
+  font-weight: normal;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.tutorial-tips-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin-top: 0.8rem;
+}
+
+.tutorial-tip-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.85rem;
+  color: #e2e8f0;
+}
+
+.badge-preview {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.badge-preview.theme {
+  background: rgba(234, 179, 8, 0.2);
+  color: #fde047;
+  border: 1px solid rgba(234, 179, 8, 0.5);
+}
+
+.badge-preview.combo {
+  background: linear-gradient(135deg, #0284c7, #38bdf8);
+  color: #fff;
+  border: 1px solid #7dd3fc;
+}
+
+.badge-preview.repeat {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.badge-preview.jam {
+  background: rgba(168, 85, 247, 0.2);
+  color: #d8b4fe;
+  border: 1px solid rgba(168, 85, 247, 0.4);
+}
+
+.tutorial-rewards-preview {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 0.8rem;
+}
+
+.reward-box {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.3rem;
+}
+
+.reward-box strong {
+  color: #fde047;
+  font-size: 0.9rem;
+}
+
+.reward-box small {
+  color: #94a3b8;
+  font-size: 0.75rem;
+}
+
+.tutorial-modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.8rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tutorial-nav-btn {
+  padding: 0.6rem 1.4rem;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.tutorial-nav-btn.prev {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #e2e8f0;
+}
+
+.tutorial-nav-btn.prev:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.tutorial-nav-btn.next {
+  background: linear-gradient(135deg, #d97706, #b45309);
+  color: #fff;
+  border: 1px solid #fbbf24;
+  box-shadow: 0 4px 15px rgba(217, 119, 6, 0.4);
+}
+
+.tutorial-nav-btn.next:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(251, 191, 36, 0.5);
+}
+
+.tutorial-counter {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.btn-open-tutorial {
+  background: rgba(251, 191, 36, 0.15);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  color: #fde047;
+  padding: 0.4rem 0.9rem;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+}
+
+.btn-open-tutorial:hover {
+  background: rgba(251, 191, 36, 0.3);
+  border-color: #fbbf24;
+  transform: translateY(-1px);
+}
+
+

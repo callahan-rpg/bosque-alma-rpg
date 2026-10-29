@@ -1,0 +1,1327 @@
+/* ==========================================================================
+   SISTEMA DE ALQUIMIA & POÇÕES — DESIGN DE ALTA FIDELIDADE
+   Estilo Dark Fantasy / RPG Medieval — Materiais Físicos e Alquimia Artesanal
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=MedievalSharp&family=Inter:wght@400;500;600;700&display=swap');
+
+/* Tokens de Tema da Alquimia — Molduras de Metal Medieval & Pergaminho */
+:root {
+  --alc-bg-main: #090e10;
+  --alc-bg-panel: #0d1417;
+  --alc-bg-surface: #121a1d;
+  --alc-bg-hover: #172226;
+  --alc-bg-active: #151f23;
+
+  /* Molduras Metálicas de Fantasia Medieval (Bronze Escuro, Cobre Envelhecido & Ouro Antigo) */
+  --alc-border-subtle: #453221;
+  --alc-border-faint: rgba(75, 52, 33, 0.45);
+  --alc-bronze-dark: #261a10;
+  --alc-bronze-rim: #44301e;
+  --alc-bronze-mid: #5a3f26;
+  --alc-bronze-light: #7c5735;
+  --alc-gold-ancient: #9a7337;
+  --alc-gold-main: #c49545;
+  --alc-gold-bright: #eec470;
+  --alc-gold-highlight: #ffdf94;
+  --alc-gold-glow: rgba(196, 149, 69, 0.22);
+  --alc-bronze: #72502d;
+
+  --alc-text-main: #f3e8d2;
+  --alc-text-sec: #b0babc;
+  --alc-text-muted: #6f7f85;
+
+  /* Pergaminho Medieval / Tomo Antigo */
+  --alc-parchment-base: #d8be8d;
+  --alc-parchment-light: #e8d5ad;
+  --alc-parchment-deep: #bca06c;
+  --alc-parchment-text: #26190e;
+  --alc-parchment-text-sec: #4a3522;
+  --alc-parchment-border: #8b643a;
+  --alc-parchment-border-inner: #aa8457;
+  --alc-parchment-card-bg: rgba(255, 248, 235, 0.42);
+  --alc-parchment-card-border: #9b7548;
+}
+
+/* Overlay do Modal */
+.alchemy-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(4, 7, 9, 0.88);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: alchemyFadeIn 0.3s ease-out forwards;
+}
+
+@keyframes alchemyFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes runeFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-8px) scale(1.08); }
+}
+
+/* Scrollbars Douradas / Bronze Medievais para todo o Modal de Alquimia */
+.alchemy-frame-container,
+.alchemy-frame-container * {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(196, 149, 69, 0.45) rgba(18, 12, 6, 0.5);
+}
+
+.alchemy-frame-container *::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.alchemy-frame-container *::-webkit-scrollbar-track {
+  background: rgba(18, 12, 6, 0.45);
+  border-radius: 4px;
+}
+
+.alchemy-frame-container *::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #c49545 0%, #8b643a 100%);
+  border-radius: 4px;
+  border: 1px solid rgba(40, 25, 12, 0.6);
+}
+
+.alchemy-frame-container *::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #eec470 0%, #a4763e 100%);
+  box-shadow: 0 0 6px rgba(238, 196, 112, 0.5);
+}
+
+/* Moldura Principal do Modal com Acabamento Metálico Medieval & Cantos Ornamentados */
+.alchemy-frame-container {
+  width: min(1360px, 98vw);
+  height: min(880px, 94vh);
+  background: var(--alc-bg-main);
+  border: 2px solid var(--alc-bronze-mid);
+  border-radius: 6px;
+  box-shadow:
+    0 0 0 1px #0e0905,
+    0 0 0 3px var(--alc-bronze-dark),
+    0 25px 60px rgba(0, 0, 0, 0.98),
+    0 0 30px rgba(184, 133, 55, 0.12),
+    inset 0 0 0 1px rgba(212, 162, 76, 0.35),
+    inset 0 0 0 3px #18110a,
+    inset 0 0 80px rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  font-family: 'Inter', -apple-system, sans-serif;
+  color: var(--alc-text-main);
+}
+
+/* Cantoneiras de Metal Forjado nos 4 Cantos do Modal Principal */
+.alchemy-frame-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M0 0 L32 0 L32 6 L6 6 L6 32 L0 32 Z' fill='%23362414' stroke='%236e4d29' stroke-width='1'/%3E%3Cpath d='M2 2 L26 2 L26 4 L4 4 L4 26 L2 26 Z' fill='%23b88537'/%3E%3Ccircle cx='10' cy='10' r='2.8' fill='%23d4a24c' stroke='%232c1c0e' stroke-width='1'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M32 0 L0 0 L0 6 L26 6 L26 32 L32 32 Z' fill='%23362414' stroke='%236e4d29' stroke-width='1'/%3E%3Cpath d='M30 2 L6 2 L6 4 L28 4 L28 26 L30 26 Z' fill='%23b88537'/%3E%3Ccircle cx='22' cy='10' r='2.8' fill='%23d4a24c' stroke='%232c1c0e' stroke-width='1'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M0 32 L32 32 L32 26 L6 26 L6 0 L0 0 Z' fill='%23362414' stroke='%236e4d29' stroke-width='1'/%3E%3Cpath d='M2 30 L26 30 L26 28 L4 28 L4 6 L2 6 Z' fill='%23b88537'/%3E%3Ccircle cx='10' cy='22' r='2.8' fill='%23d4a24c' stroke='%232c1c0e' stroke-width='1'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M32 32 L0 32 L0 26 L26 26 L26 0 L32 0 Z' fill='%23362414' stroke='%236e4d29' stroke-width='1'/%3E%3Cpath d='M30 30 L6 30 L6 28 L28 28 L28 6 L30 6 Z' fill='%23b88537'/%3E%3Ccircle cx='22' cy='22' r='2.8' fill='%23d4a24c' stroke='%232c1c0e' stroke-width='1'/%3E%3C/svg%3E");
+  background-position: top 0 left 0, top 0 right 0, bottom 0 left 0, bottom 0 right 0;
+  background-repeat: no-repeat;
+  background-size: 32px 32px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CABEÇALHO ALQUÍMICO (COM BANNER DE LABORATÓRIO)
+   ───────────────────────────────────────────────────────────── */
+.alchemy-header-bar {
+  position: relative;
+  height: 98px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  border-bottom: 2px solid var(--alc-bronze-mid);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8), inset 0 -1px 0 rgba(212, 162, 76, 0.25);
+  flex-shrink: 0;
+  overflow: hidden;
+  background: var(--alc-bg-main);
+}
+
+.alchemy-header-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('/assets/alchemy/header_banner.png');
+  background-size: cover;
+  background-position: center 25%;
+  opacity: 0.92;
+  filter: none;
+  transform: none;
+}
+
+.alchemy-header-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(8, 13, 15, 0.88) 0%, rgba(8, 13, 15, 0.35) 45%, rgba(8, 13, 15, 0.6) 100%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(8, 13, 15, 0.75) 100%);
+}
+
+.alchemy-header-left {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.alchemy-logo-orb {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #1e1812 0%, var(--alc-bg-panel) 100%);
+  border: 2px solid #b88537;
+  box-shadow: 0 0 15px rgba(184, 133, 55, 0.3), inset 0 0 10px rgba(184, 133, 55, 0.2), inset 0 1px 2px rgba(255, 235, 180, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.alchemy-logo-icon {
+  font-size: 1.8rem;
+  filter: drop-shadow(0 0 6px rgba(232, 173, 80, 0.5));
+}
+
+.alchemy-header-text h1 {
+  font-family: 'Cinzel', serif;
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: var(--alc-text-main);
+  margin: 0;
+  letter-spacing: 0.04em;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9), 0 0 20px rgba(232, 173, 80, 0.18);
+}
+
+.alchemy-header-text p {
+  font-size: 0.8rem;
+  color: var(--alc-text-sec);
+  margin: 3px 0 0;
+  letter-spacing: 0.01em;
+  font-weight: 400;
+}
+
+.alchemy-close-btn {
+  position: relative;
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #182327 0%, #0e1518 100%);
+  border: 1px solid var(--alc-bronze-mid);
+  color: var(--alc-text-sec);
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 1px 0 rgba(184, 133, 55, 0.25), 0 2px 5px rgba(0, 0, 0, 0.7);
+  transition: all 0.2s;
+}
+
+.alchemy-close-btn:hover {
+  background: rgba(220, 38, 38, 0.25);
+  border-color: #ef4444;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+  transform: scale(1.05);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CORPO PRINCIPAL (3 COLUNAS)
+   ───────────────────────────────────────────────────────────── */
+.alchemy-body-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 30% 35% 35%;
+  overflow: hidden;
+  background: var(--alc-bg-main);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   COLUNA 1 (ESQUERDA): CATÁLOGO DE RECEITAS
+   ───────────────────────────────────────────────────────────── */
+.alchemy-col-recipes {
+  background: var(--alc-bg-panel);
+  border-right: 2px solid var(--alc-bronze-dark);
+  box-shadow: 1px 0 0 var(--alc-bronze-mid), inset -1px 0 0 #18110a;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 14px 14px 10px;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* Linha de Busca & Dropdown */
+.alchemy-search-row {
+  display: flex;
+  gap: 8px;
+}
+
+.alchemy-search-input-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(180deg, #0e1518 0%, #131c20 100%);
+  border: 1px solid var(--alc-bronze-mid);
+  border-radius: 4px;
+  padding: 0 10px;
+  gap: 8px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.75), 0 1px 0 rgba(140, 100, 50, 0.15);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.alchemy-search-input-wrap:focus-within {
+  border-color: var(--alc-gold-main);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.75), 0 0 8px var(--alc-gold-glow);
+}
+
+.alchemy-search-icon {
+  font-size: 0.85rem;
+  color: var(--alc-text-muted);
+}
+
+.alchemy-search-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 0.82rem;
+  color: var(--alc-text-main);
+  padding: 8px 0;
+}
+
+.alchemy-search-input::placeholder {
+  color: var(--alc-text-muted);
+}
+
+.alchemy-select-dropdown {
+  background: linear-gradient(180deg, #0e1518 0%, #131c20 100%);
+  border: 1px solid var(--alc-bronze-mid);
+  border-radius: 4px;
+  color: var(--alc-text-sec);
+  font-size: 0.78rem;
+  padding: 0 10px;
+  outline: none;
+  cursor: pointer;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.75), 0 1px 0 rgba(140, 100, 50, 0.15);
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.alchemy-select-dropdown:hover {
+  border-color: var(--alc-gold-ancient);
+  color: var(--alc-text-main);
+}
+
+/* Pílulas de Categoria (Abas de Filtro) */
+.alchemy-category-pills {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.alchemy-category-pills::-webkit-scrollbar {
+  display: none;
+}
+
+.alchemy-cat-pill {
+  background: linear-gradient(180deg, #1b262a 0%, #11191c 100%);
+  border: 1px solid #483422;
+  border-radius: 4px;
+  color: var(--alc-text-sec);
+  font-size: 0.72rem;
+  padding: 5px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: inset 0 1px 0 rgba(140, 100, 50, 0.18), 0 2px 4px rgba(0, 0, 0, 0.6);
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.alchemy-cat-pill:hover {
+  color: #f5eedb;
+  border-color: #7b5832;
+  box-shadow: inset 0 1px 0 rgba(180, 130, 60, 0.25), 0 2px 6px rgba(0, 0, 0, 0.7);
+}
+
+.alchemy-cat-pill.active {
+  background: linear-gradient(180deg, rgba(140, 95, 30, 0.35) 0%, rgba(30, 20, 10, 0.5) 100%);
+  border: 1.5px solid var(--alc-gold-main);
+  color: #ffe6aa;
+  box-shadow: inset 0 1px 0 rgba(255, 220, 130, 0.45), 0 0 10px var(--alc-gold-glow);
+}
+
+/* Lista de Receitas com Scroll */
+.alchemy-recipes-scroll {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding-right: 4px;
+}
+
+.alchemy-recipes-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.alchemy-recipes-scroll::-webkit-scrollbar-thumb {
+  background: rgba(184, 133, 55, 0.28);
+  border-radius: 3px;
+}
+
+.alchemy-recipe-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 12px;
+  background: linear-gradient(180deg, #131c20 0%, #0d1417 100%);
+  border: 1px solid #3c2a1a;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  text-align: left;
+  box-shadow: inset 0 1px 0 rgba(120, 85, 45, 0.15), 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.alchemy-recipe-card:hover {
+  background: linear-gradient(180deg, #182529 0%, #111a1d 100%);
+  border-color: #6c4d29;
+  box-shadow: inset 0 1px 0 rgba(180, 130, 60, 0.25), 0 3px 6px rgba(0, 0, 0, 0.65);
+  transform: translateX(2px);
+}
+
+/* Container Selecionado — Destaque dourado luminoso refinado com cantoneiras */
+.alchemy-recipe-card.active {
+  background: linear-gradient(90deg, rgba(180, 130, 45, 0.25) 0%, rgba(20, 30, 34, 0.95) 75%);
+  border: 1.5px solid var(--alc-gold-bright);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 230, 150, 0.35),
+    0 0 14px rgba(216, 168, 82, 0.3),
+    0 3px 8px rgba(0, 0, 0, 0.8);
+}
+
+.alchemy-recipe-card.active::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 3px;
+  pointer-events: none;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M0 0 L10 0 L10 2 L2 2 L2 10 L0 10 Z' fill='%23ffdf94'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M10 0 L0 0 L0 2 L8 2 L8 10 L10 10 Z' fill='%23ffdf94'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M0 10 L10 10 L10 8 L2 8 L2 0 L0 0 Z' fill='%23ffdf94'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M10 10 L0 10 L0 8 L8 8 L8 0 L10 0 Z' fill='%23ffdf94'/%3E%3C/svg%3E");
+  background-position: top 0 left 0, top 0 right 0, bottom 0 left 0, bottom 0 right 0;
+  background-repeat: no-repeat;
+  background-size: 8px 8px;
+}
+
+/* Ícone da Poção na Lista */
+.alchemy-card-bottle-frame {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  background: #080d0f;
+  border: 1px solid var(--alc-bronze-mid);
+  border-radius: 4px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.alchemy-card-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.alchemy-card-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--alc-text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.alchemy-recipe-card.active .alchemy-card-title {
+  color: #FFF5DF;
+  font-weight: 700;
+}
+
+.alchemy-card-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.68rem;
+  color: var(--alc-text-sec);
+}
+
+.alchemy-card-chevron {
+  font-size: 0.85rem;
+  color: var(--alc-text-muted);
+  flex-shrink: 0;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.alchemy-recipe-card.active .alchemy-card-chevron {
+  color: var(--alc-gold-main);
+  transform: translateX(2px);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   COLUNA 2 (CENTRAL): ESTAÇÃO DE ALQUIMIA & CALDEIRÃO
+   ───────────────────────────────────────────────────────────── */
+.alchemy-col-station {
+  background: var(--alc-bg-panel);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 0;
+  gap: 0;
+  border-right: 2px solid var(--alc-bronze-dark);
+  box-shadow: 1px 0 0 var(--alc-bronze-mid), inset -1px 0 0 #18110a;
+  position: relative;
+  min-width: 0;
+}
+
+/* Todos os filhos diretos após o stage recebem padding lateral */
+.alchemy-col-station > *:not(.alchemy-cauldron-stage) {
+  padding-left: 20px;
+  padding-right: 20px;
+  margin-top: 14px;
+}
+
+.alchemy-col-station > *:last-child {
+  margin-bottom: 16px;
+}
+
+.alchemy-col-station::-webkit-scrollbar {
+  width: 5px;
+}
+
+.alchemy-col-station::-webkit-scrollbar-thumb {
+  background: rgba(184, 133, 55, 0.28);
+  border-radius: 3px;
+}
+
+.alchemy-station-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.alchemy-station-header-icon {
+  font-size: 1.4rem;
+  filter: drop-shadow(0 0 6px var(--alc-gold-main));
+}
+
+.alchemy-station-header-text h2 {
+  font-family: 'Cinzel', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--alc-text-main);
+  margin: 0;
+  letter-spacing: 0.03em;
+}
+
+.alchemy-station-header-text p {
+  font-size: 0.74rem;
+  color: var(--alc-text-sec);
+  margin: 2px 0 0;
+}
+
+/* Palco do Caldeirão — Imagem do caldeirão mágico como background borda-a-borda */
+.alchemy-cauldron-stage {
+  position: relative;
+  width: 100%;
+  min-height: 240px;
+  height: 240px;
+  flex-shrink: 0;
+  border-radius: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.alchemy-cauldron-stage::before {
+  display: none;
+}
+
+.alchemy-cauldron-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/assets/alchemy/cauldron_magic.jpg');
+  background-size: cover;
+  background-position: center 30%;
+  background-repeat: no-repeat;
+  opacity: 1;
+  z-index: 1;
+  pointer-events: none;
+  /* Fusão suave apenas na borda inferior para transição para o conteúdo abaixo */
+  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+}
+
+/* Vapores e Névoa mágica no topo do caldeirão no canto superior direito */
+.alchemy-magical-steam {
+  position: absolute;
+  top: 40px;
+  right: 125px;
+  left: auto;
+  transform: none;
+  width: 110px;
+  height: 90px;
+  border-radius: 50%;
+  filter: blur(16px);
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: 2;
+  animation: steamDriftRight 3s ease-in-out infinite alternate;
+}
+
+@keyframes steamDriftRight {
+  0% { transform: translateY(0) scale(1); opacity: 0.55; }
+  50% { transform: translateY(-10px) scale(1.15); opacity: 0.85; }
+  100% { transform: translateY(-20px) scale(1.3); opacity: 0.4; }
+}
+
+/* Colunas de slots laterais */
+.alchemy-slots-col {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.alchemy-cauldron-center-zone {
+  flex: 1;
+  min-width: 60px;
+  pointer-events: none;
+}
+
+/* Slots dos Ingredientes ao redor do Caldeirão */
+.alchemy-ingredient-slot {
+  position: relative;
+  width: 78px;
+  padding: 6px 4px;
+  background: rgba(13, 20, 23, 0.92);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--alc-bronze-mid);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  box-shadow: inset 0 1px 0 rgba(140, 100, 50, 0.25), 0 4px 12px rgba(0, 0, 0, 0.75);
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.alchemy-ingredient-slot:hover {
+  transform: scale(1.04);
+  border-color: var(--alc-gold-main);
+  box-shadow: 0 0 12px var(--alc-gold-glow);
+}
+
+.alchemy-slot-icon-box {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.4));
+}
+
+.alchemy-slot-name {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--alc-text-main);
+  text-align: center;
+  line-height: 1.15;
+  max-width: 72px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.alchemy-slot-count {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+
+.alchemy-slot-count.ok {
+  color: #4ADE80;
+  background: rgba(0, 0, 0, 0.55);
+  text-shadow: 0 0 6px rgba(74, 222, 128, 0.5);
+}
+
+.alchemy-slot-count.missing {
+  color: #F87171;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MÉTODO DE PREPARO
+   ───────────────────────────────────────────────────────────── */
+.alchemy-prep-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.alchemy-prep-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--alc-text-main);
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+
+.alchemy-prep-steps-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.alchemy-prep-step-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background: linear-gradient(180deg, #152024 0%, #0e1518 100%);
+  border: 1px solid #3e2d1d;
+  border-top: 1px solid #5a4129;
+  border-bottom: 1px solid #20150b;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 0 rgba(140, 100, 50, 0.2), inset 0 -1px 0 rgba(0, 0, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s;
+}
+
+.alchemy-prep-step-card:hover {
+  background: linear-gradient(180deg, #1b282d 0%, #121b1e 100%);
+  border-color: #63472b;
+  border-top-color: #825e39;
+}
+
+.alchemy-step-badge {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #e8ba60 0%, #8c5d1e 100%);
+  border: 1.5px solid #d4a24c;
+  color: var(--alc-parchment-text);
+  font-weight: 800;
+  font-size: 0.72rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 240, 190, 0.6);
+  flex-shrink: 0;
+}
+
+.alchemy-step-icon {
+  font-size: 1.15rem;
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
+.alchemy-step-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.alchemy-step-name {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--alc-text-main);
+  line-height: 1.2;
+}
+
+.alchemy-step-desc {
+  font-size: 0.68rem;
+  color: var(--alc-text-sec);
+  margin-top: 1px;
+}
+
+/* Barra de Tempo e Dificuldade */
+.alchemy-meta-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: linear-gradient(180deg, #141e21 0%, #0d1316 100%);
+  border: 1px solid #43301f;
+  border-top: 1px solid #5e442c;
+  border-bottom: 1px solid #24190f;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 0 rgba(140, 100, 50, 0.18), 0 2px 5px rgba(0, 0, 0, 0.6);
+}
+
+.alchemy-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.alchemy-meta-icon {
+  font-size: 1.1rem;
+  color: var(--alc-gold-main);
+}
+
+.alchemy-meta-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.alchemy-meta-label {
+  font-size: 0.64rem;
+  color: var(--alc-text-sec);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.alchemy-meta-val {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--alc-text-main);
+}
+
+.alchemy-difficulty-diamonds {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.8rem;
+  color: var(--alc-gold-main);
+}
+
+/* Botão de Preparar Poção */
+.alchemy-craft-action-btn {
+  width: 100%;
+  padding: 12px 20px;
+  background: linear-gradient(180deg, #b88235 0%, #8f5d1d 50%, #613b0c 100%);
+  border: 2px solid #b88537;
+  border-radius: 6px;
+  color: #FFF8E7;
+  font-family: 'Cinzel', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 235, 175, 0.6),
+    inset 0 -2px 0 rgba(40, 20, 5, 0.8),
+    0 4px 14px rgba(0, 0, 0, 0.8),
+    0 0 16px rgba(184, 130, 53, 0.35);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  transition: all 0.2s;
+  margin-top: auto;
+}
+
+.alchemy-craft-action-btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, #cc8f3a 0%, #a66d26 50%, #7e4b16 100%);
+  border-color: var(--alc-gold-bright);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 245, 200, 0.7),
+    inset 0 -2px 0 rgba(40, 20, 5, 0.8),
+    0 6px 20px rgba(0, 0, 0, 0.85),
+    0 0 22px rgba(201, 147, 68, 0.5);
+  transform: translateY(-1px);
+}
+
+.alchemy-craft-action-btn:disabled {
+  background: #151F22;
+  border-color: var(--alc-border-subtle);
+  color: var(--alc-text-muted);
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+  text-shadow: none;
+}
+
+/* Botão quando ingredientes são insuficientes */
+.alchemy-craft-action-btn.disabled-no-ingredients {
+  background: linear-gradient(180deg, #321515 0%, #200b0b 50%, #150606 100%);
+  border: 2px solid #5a2727;
+  border-color: #5a2727;
+  color: #c96b6b;
+  cursor: not-allowed;
+  box-shadow: inset 0 1px 0 rgba(160, 60, 60, 0.25), inset 0 -2px 0 rgba(0, 0, 0, 0.9), 0 3px 8px rgba(0, 0, 0, 0.7);
+  text-shadow: none;
+}
+.alchemy-craft-action-btn.disabled-no-ingredients:hover {
+  transform: none;
+  box-shadow: inset 0 1px 0 rgba(160, 60, 60, 0.25), inset 0 -2px 0 rgba(0, 0, 0, 0.9), 0 3px 8px rgba(0, 0, 0, 0.7);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   COLUNA 3 (DIREITA): TOMO / PERGAMINHO DE DETALHES
+   ───────────────────────────────────────────────────────────── */
+.alchemy-col-parchment {
+  position: relative;
+  background-color: var(--alc-parchment-base);
+  background-image:
+    /* Textura de pergaminho de alta resolução */
+    radial-gradient(ellipse at 50% 50%, var(--alc-parchment-light) 0%, var(--alc-parchment-base) 75%, var(--alc-parchment-deep) 100%),
+    url('/assets/alchemy/parchment_page.jpg');
+  background-size: cover, cover;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+  border-left: 2px solid var(--alc-bronze-dark);
+  box-shadow:
+    inset 0 0 35px rgba(90, 55, 22, 0.3),
+    inset 0 0 90px rgba(70, 42, 16, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 22px 20px 28px;
+  min-width: 0;
+  color: var(--alc-parchment-text);
+  font-family: 'Inter', serif;
+}
+
+.alchemy-col-parchment::before {
+  display: none;
+}
+
+.alchemy-col-parchment::-webkit-scrollbar {
+  width: 5px;
+}
+
+.alchemy-col-parchment::-webkit-scrollbar-thumb {
+  background: rgba(114, 80, 45, 0.45);
+  border-radius: 3px;
+}
+
+.alchemy-parchment-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.alchemy-parchment-title {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--alc-parchment-text);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.alchemy-parchment-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(185, 28, 28, 0.1);
+  border: 1px solid rgba(185, 28, 28, 0.35);
+  color: #881A1A;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+/* Imagem Grande da Poção e Lore */
+.alchemy-parchment-hero {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.alchemy-parchment-flask-img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 12px rgba(60, 36, 12, 0.35));
+  flex-shrink: 0;
+  border: 2px solid #7d5932;
+  border-radius: 5px;
+  box-shadow: inset 0 0 0 1px rgba(255, 245, 220, 0.4), 0 4px 10px rgba(60, 36, 12, 0.35);
+}
+
+.alchemy-parchment-lore {
+  font-size: 0.74rem;
+  line-height: 1.45;
+  color: var(--alc-parchment-text-sec);
+  margin: 0;
+  font-style: italic;
+}
+
+/* Divisores Decorativos */
+.alchemy-parchment-divider {
+  position: relative;
+  z-index: 2;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(114, 80, 45, 0.45) 30%, rgba(114, 80, 45, 0.45) 70%, transparent 100%);
+  margin: 10px 0;
+}
+
+/* Seções de Detalhes no Pergaminho */
+.alchemy-parchment-section-title {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--alc-parchment-text);
+  margin: 0 0 8px;
+  text-transform: capitalize;
+}
+
+/* Efeitos */
+.alchemy-effects-grid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.alchemy-effect-card {
+  background: rgba(255, 250, 240, 0.45);
+  border: 1.5px solid #946f43;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55), 0 2px 4px rgba(70, 45, 20, 0.12);
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.alchemy-effect-icon {
+  font-size: 1.2rem;
+  color: #dc2626;
+  flex-shrink: 0;
+}
+
+.alchemy-effect-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.alchemy-effect-val {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--alc-parchment-text);
+}
+
+.alchemy-effect-desc {
+  font-size: 0.65rem;
+  color: var(--alc-parchment-text-sec);
+  line-height: 1.2;
+}
+
+/* Ingredientes Necessários (Grid para exibir nomes completos) */
+.alchemy-req-ing-row {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.alchemy-req-ing-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  background: rgba(255, 250, 240, 0.4);
+  border: 1.5px solid #946f43;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45), 0 2px 4px rgba(70, 45, 20, 0.1);
+  padding: 8px 6px;
+}
+
+.alchemy-req-ing-name {
+  font-size: 0.68rem;
+  color: var(--alc-parchment-text);
+  font-weight: 600;
+  line-height: 1.25;
+  word-break: break-word;
+  white-space: normal;
+  text-align: center;
+}
+
+.alchemy-req-ing-icon-box {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid #856138;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 3px rgba(80, 50, 20, 0.18);
+}
+
+.alchemy-req-ing-count {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--alc-parchment-text);
+}
+
+/* Cuidados e Advertências */
+.alchemy-warnings-box {
+  position: relative;
+  z-index: 2;
+  background: rgba(216, 175, 105, 0.2);
+  border: 1px solid #a37c4d;
+  border-left: 4px solid #734a20;
+  padding: 8px 10px;
+  border-radius: 0 4px 4px 0;
+  margin-bottom: 12px;
+  box-shadow: inset 0 0 10px rgba(115, 74, 32, 0.08), 0 1px 4px rgba(80, 50, 20, 0.12);
+}
+
+.alchemy-warnings-box ul {
+  margin: 0;
+  padding-left: 16px;
+}
+
+.alchemy-warnings-box li {
+  font-size: 0.69rem;
+  color: var(--alc-parchment-text);
+  line-height: 1.4;
+  margin-bottom: 2px;
+}
+
+/* Conhecimento Necessário */
+.alchemy-knowledge-box {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 12px;
+}
+
+.alchemy-knowledge-text {
+  font-size: 0.72rem;
+  color: var(--alc-parchment-text);
+  margin: 0;
+}
+
+/* Caixa de Resultado */
+.alchemy-result-box {
+  position: relative;
+  z-index: 2;
+  background: rgba(255, 250, 240, 0.55);
+  border: 1.5px solid #8e683e;
+  border-radius: 5px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6), 0 2px 6px rgba(80, 50, 20, 0.15);
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  margin-bottom: 8px;
+}
+
+.alchemy-result-mini-flask {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  border: 1px solid #8e683e;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 2px;
+}
+
+.alchemy-result-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.alchemy-result-label {
+  font-size: 0.64rem;
+  font-weight: 700;
+  color: var(--alc-bronze);
+  text-transform: uppercase;
+}
+
+.alchemy-result-text {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--alc-parchment-text);
+}
+
+/* Animação de Sucesso / Fabricação no Caldeirão */
+.alchemy-brewing-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 13, 15, 0.88);
+  backdrop-filter: blur(6px);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+  animation: alchemyFadeIn 0.3s ease;
+}
+
+.alchemy-brewing-sparkle {
+  font-size: 3rem;
+  animation: runeFloat 2s ease-in-out infinite;
+  margin-bottom: 12px;
+}
+
+.alchemy-brewing-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--alc-gold-bright);
+  margin: 0 0 6px;
+  text-shadow: 0 0 10px rgba(232, 173, 80, 0.5);
+}
+
+.alchemy-brewing-desc {
+  font-size: 0.8rem;
+  color: var(--alc-text-sec);
+  margin: 0 0 16px;
+  max-width: 320px;
+}
+
+.alchemy-collect-btn {
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #15803d 0%, #16a34a 50%, #22c55e 100%);
+  border: 1px solid #86efac;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.4);
+  transition: all 0.2s;
+}
+
+.alchemy-collect-btn:hover {
+  transform: scale(1.04);
+  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.6);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   RESPONSIVIDADE & TELAS DE NOTEBOOK
+   ───────────────────────────────────────────────────────────── */
+@media (max-height: 820px) {
+  .alchemy-header-bar {
+    height: 72px;
+    padding: 0 18px;
+  }
+  .alchemy-logo-orb {
+    width: 44px;
+    height: 44px;
+  }
+  .alchemy-logo-icon {
+    font-size: 1.5rem;
+  }
+  .alchemy-header-text h1 {
+    font-size: 1.35rem;
+  }
+  .alchemy-cauldron-stage {
+    min-height: 210px;
+    height: 210px;
+    padding: 10px 12px;
+  }
+  .alchemy-ingredient-slot {
+    width: 72px;
+    padding: 5px 3px;
+  }
+  .alchemy-slot-icon-box {
+    width: 28px;
+    height: 28px;
+    font-size: 1.15rem;
+  }
+  .alchemy-col-station {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+  .alchemy-col-parchment {
+    padding: 16px 16px;
+  }
+  .alchemy-parchment-flask-img {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+@media (max-width: 960px) {
+  .alchemy-body-grid {
+    grid-template-columns: 320px 1fr;
+  }
+  .alchemy-col-parchment {
+    display: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .alchemy-frame-container {
+    height: 98vh;
+    width: 98vw;
+  }
+  .alchemy-body-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: 220px 1fr;
+  }
+  .alchemy-col-recipes {
+    border-right: none;
+    border-bottom: 1px solid var(--alc-border-subtle);
+  }
+}
