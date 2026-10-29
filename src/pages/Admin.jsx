@@ -17,6 +17,7 @@ import AlchemyAdminPanel from '../components/admin/AlchemyAdminPanel.jsx'
 
 const CLIMATE_OPTIONS = [
   { value: 'fireflies', label: 'Vagalumes & Brasas Místicas (Bosque)', icon: '✨' },
+  { value: 'lava', label: 'Lava / Fogo & Brasas Vulcânicas', icon: '🔥' },
   { value: 'aurora', label: 'Aurora Mística / Céu Espiritual', icon: '🌌' },
   { value: 'foggy', label: 'Névoa / Neblina Rasteira (Brejo)', icon: '🌫️' },
   { value: 'rainy', label: 'Chovendo (Chuva Suave)', icon: '🌧️' },

@@ -46,6 +46,10 @@ export const WEATHER_CONDITIONS = {
   storm:       { icon: '⛈️', label: 'Tempestade Arcana',   temp: 10 },
   foggy:       { icon: '🌫️', label: 'Névoa Espectral',     temp: 10 },
   snowy:       { icon: '❄️', label: 'Neve Encantada',      temp: -2 },
+  lava:        { icon: '🔥', label: 'Lava & Brasas de Fogo', temp: 52 },
+  fire:        { icon: '🔥', label: 'Fogo & Calor Vulcânico', temp: 48 },
+  fireflies:   { icon: '✨', label: 'Vagalumes Místicos',   temp: 20 },
+  aurora:      { icon: '🌌', label: 'Aurora Espiritual',    temp: 8 },
   clear_night: { icon: '🌙', label: 'Noite Estrelada',     temp: 14 },
   magic:       { icon: '✨', label: 'Aura Mágica',         temp: 20 },
 }

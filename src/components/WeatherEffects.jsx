@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
  * WeatherEffects: Renderiza efeitos visuais em Canvas diretamente sobre o cenário do Domínio.
  *
  * Suporta:
+ * - 'lava' | 'fire' | 'fogo' | 'magma': Ondas de calor de magma, brasas ardentes e faíscas incandescentes
  * - 'aurora' | 'aurora_storm': Ondas de Aurora Boreal cósmica e mística (verde, ciano, violeta)
  * - 'fireflies' | 'embers': Vaga-lumes mágicos / faíscas brilhantes flutuando suavemente
  * - 'snowy': Véu da geada / neve caindo
@@ -47,6 +48,7 @@ export default function WeatherEffects({ condition = 'none', enabled = true }) {
 
   const normalizedCondition = (condition || 'none').toLowerCase().trim()
   const activeCondition =
+    normalizedCondition === 'lava' || normalizedCondition === 'fire' || normalizedCondition === 'fogo' || normalizedCondition === 'magma' ? 'lava' :
     normalizedCondition === 'aurora' || normalizedCondition === 'aurora_storm' ? 'aurora' :
     normalizedCondition === 'fireflies' || normalizedCondition === 'embers' ? 'fireflies' :
     normalizedCondition === 'snowy' ? 'snowy' :
@@ -117,6 +119,30 @@ export default function WeatherEffects({ condition = 'none', enabled = true }) {
           vx: (Math.random() - 0.5) * 0.35,
           vy: (Math.random() - 0.5) * 0.15,
           opacity: Math.random() * 0.08 + 0.03,
+        })
+      }
+    }
+
+    // 🔥 LAVA / FOGO & BRASAS VULCÂNICAS
+    if (activeCondition === 'lava') {
+      const emberCount = 90
+      for (let i = 0; i < emberCount; i++) {
+        const isSpark = Math.random() > 0.65
+        const isAsh = !isSpark && Math.random() > 0.6
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          radius: isSpark ? Math.random() * 1.6 + 0.8 : (isAsh ? Math.random() * 2.5 + 1.2 : Math.random() * 3.4 + 1.6),
+          speedY: isSpark ? Math.random() * 3.2 + 2.0 : (isAsh ? Math.random() * 1.4 + 0.6 : Math.random() * 2.2 + 1.1),
+          drift: (Math.random() - 0.5) * 1.4,
+          swing: Math.random() * Math.PI * 2,
+          swingSpeed: Math.random() * 0.05 + 0.02,
+          phase: Math.random() * Math.PI * 2,
+          flickerSpeed: Math.random() * 0.08 + 0.03,
+          type: isSpark ? 'spark' : (isAsh ? 'ash' : 'ember'),
+          colorCore: isSpark ? '255, 255, 220' : '254, 240, 138',
+          colorMid: isAsh ? '120, 53, 15' : '249, 115, 22',
+          colorOuter: isAsh ? '40, 20, 20' : '220, 38, 38'
         })
       }
     }
@@ -316,6 +342,50 @@ export default function WeatherEffects({ condition = 'none', enabled = true }) {
           }
           if (p.x < 0) p.x = width
           if (p.x > width) p.x = 0
+        }
+      }
+
+      // 🔥 LAVA / FOGO & BRASAS INCANDESCENTES
+      if (activeCondition === 'lava') {
+        // 1. Resplendor e Ondas de Calor de Magma na base
+        const heatPulse = (Math.sin(elapsed * 2.4) + 1) / 2
+        const glowGrad = ctx.createLinearGradient(0, height, 0, height - 220)
+        glowGrad.addColorStop(0, `rgba(234, 88, 12, ${0.22 + heatPulse * 0.12})`)
+        glowGrad.addColorStop(0.35, `rgba(220, 38, 38, ${0.12 + heatPulse * 0.08})`)
+        glowGrad.addColorStop(1, 'rgba(220, 38, 38, 0)')
+        ctx.fillStyle = glowGrad
+        ctx.fillRect(0, height - 220, width, 220)
+
+        // 2. Brasas incandescentes, faíscas e cinzas subindo
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i]
+          p.phase += p.flickerSpeed
+          p.swing += p.swingSpeed
+          const flicker = (Math.sin(p.phase) + 1) / 2
+          const curOpacity = 0.35 + flicker * 0.65
+
+          // Sobe contra a gravidade
+          p.y -= p.speedY
+          p.x += p.drift + Math.sin(p.swing) * 0.75
+
+          const haloRadius = p.radius * (p.type === 'spark' ? 2.5 : 4)
+          const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, haloRadius)
+          grad.addColorStop(0, `rgba(${p.colorCore}, ${curOpacity})`)
+          grad.addColorStop(0.35, `rgba(${p.colorMid}, ${curOpacity * 0.7})`)
+          grad.addColorStop(0.75, `rgba(${p.colorOuter}, ${curOpacity * 0.25})`)
+          grad.addColorStop(1, 'rgba(0, 0, 0, 0)')
+
+          ctx.fillStyle = grad
+          ctx.beginPath()
+          ctx.arc(p.x, p.y, haloRadius, 0, Math.PI * 2)
+          ctx.fill()
+
+          if (p.y < -20) {
+            p.y = height + Math.random() * 30
+            p.x = Math.random() * width
+          }
+          if (p.x < -20) p.x = width + 20
+          if (p.x > width + 20) p.x = -20
         }
       }
 
