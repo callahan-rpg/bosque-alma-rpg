@@ -16,6 +16,8 @@ import { useAuth } from '../contexts/AuthContext'
 import AlchemyAdminPanel from '../components/admin/AlchemyAdminPanel.jsx'
 
 const CLIMATE_OPTIONS = [
+  { value: 'none', label: 'Sem Efeito Visual (Desativado)', icon: '🚫' },
+  { value: 'calm', label: 'Clima Calmo (Partículas Suaves)', icon: '🌿' },
   { value: 'fireflies', label: 'Vagalumes & Brasas Místicas (Bosque)', icon: '✨' },
   { value: 'lava', label: 'Lava / Fogo & Brasas Vulcânicas', icon: '🔥' },
   { value: 'aurora', label: 'Aurora Mística / Céu Espiritual', icon: '🌌' },
@@ -23,7 +25,6 @@ const CLIMATE_OPTIONS = [
   { value: 'rainy', label: 'Chovendo (Chuva Suave)', icon: '🌧️' },
   { value: 'storm', label: 'Tempestade Arcana com Relâmpagos', icon: '⛈️' },
   { value: 'snowy', label: 'Nevando (Véu da Geada)', icon: '❄️' },
-  { value: 'none', label: 'Clima Calmo (Partículas Suaves)', icon: '🌿' },
 ]
 
 const COMPENDIUM_CATEGORIES = [

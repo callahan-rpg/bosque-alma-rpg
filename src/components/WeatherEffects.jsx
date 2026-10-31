@@ -48,6 +48,8 @@ export default function WeatherEffects({ condition = 'none', enabled = true }) {
 
   const normalizedCondition = (condition || 'none').toLowerCase().trim()
   const activeCondition =
+    normalizedCondition === 'none' || normalizedCondition === 'disabled' || normalizedCondition === 'off' || normalizedCondition === 'sem_efeito' || normalizedCondition === 'sem_efeitos' || normalizedCondition === 'nenhum' ? 'none' :
+    normalizedCondition === 'calm' || normalizedCondition === 'calmo' || normalizedCondition === 'spores' || normalizedCondition === 'polen' ? 'calm' :
     normalizedCondition === 'lava' || normalizedCondition === 'fire' || normalizedCondition === 'fogo' || normalizedCondition === 'magma' ? 'lava' :
     normalizedCondition === 'aurora' || normalizedCondition === 'aurora_storm' ? 'aurora' :
     normalizedCondition === 'fireflies' || normalizedCondition === 'embers' ? 'fireflies' :
@@ -58,7 +60,7 @@ export default function WeatherEffects({ condition = 'none', enabled = true }) {
     'none'
 
   useEffect(() => {
-    if (!enabled || !fxEnabled) return
+    if (!enabled || !fxEnabled || activeCondition === 'none') return
 
     const canvas = canvasRef.current
     if (!canvas) return
@@ -165,7 +167,7 @@ export default function WeatherEffects({ condition = 'none', enabled = true }) {
     }
 
     // 🌿 CLIMA CALMO / PARTÍCULAS MÍSTICAS DO BOSQUE (Pólen & Esporos Arcanos)
-    if (activeCondition === 'none') {
+    if (activeCondition === 'calm') {
       const count = 30
       for (let i = 0; i < count; i++) {
         particles.push({
@@ -390,7 +392,7 @@ export default function WeatherEffects({ condition = 'none', enabled = true }) {
       }
 
       // 🌿 CLIMA CALMO / PARTÍCULAS DO BOSQUE
-      if (activeCondition === 'none') {
+      if (activeCondition === 'calm') {
         for (let i = 0; i < particles.length; i++) {
           const p = particles[i]
           p.phase += p.pulseSpeed
@@ -430,7 +432,7 @@ export default function WeatherEffects({ condition = 'none', enabled = true }) {
     }
   }, [activeCondition, enabled, fxEnabled])
 
-  if (!enabled || !fxEnabled) {
+  if (!enabled || !fxEnabled || activeCondition === 'none') {
     return null
   }
 

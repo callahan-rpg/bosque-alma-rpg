@@ -39,7 +39,9 @@ export const MONTHS = [
  * As localidades do Bosque de Alma armazenam 'weatherCondition' como string.
  */
 export const WEATHER_CONDITIONS = {
-  none:        { icon: '🌿', label: 'Céu Límpido',        temp: 18 },
+  none:        { icon: '☀️', label: 'Céu Límpido (Sem Efeito)', temp: 20 },
+  disabled:    { icon: '☀️', label: 'Sem Efeito Visual',  temp: 20 },
+  calm:        { icon: '🌿', label: 'Clima Calmo',         temp: 18 },
   sunny:       { icon: '☀️', label: 'Ensolarado',          temp: 24 },
   cloudy:      { icon: '⛅', label: 'Parcialmente Nublado', temp: 16 },
   rainy:       { icon: '🌧️', label: 'Chuva no Bosque',     temp: 12 },
