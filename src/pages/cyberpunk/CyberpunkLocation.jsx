@@ -86,7 +86,7 @@ export default function CyberpunkLocation() {
       <div
         className="location-bg-overlay"
         style={{
-          background: 'linear-gradient(180deg, rgba(6, 8, 14, 0.6) 0%, rgba(6, 8, 14, 0.85) 100%)'
+          background: 'linear-gradient(180deg, rgba(6, 8, 14, 0.06) 0%, rgba(6, 8, 14, 0.06) 100%)'
         }}
       />
 
