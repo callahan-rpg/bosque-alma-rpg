@@ -20,10 +20,13 @@ export function calculateMaxHp(vitalidade = 10) {
   return 50 + vit * 10
 }
 
-export function calculateMaxRam(vitalidade = 10) {
+export function calculateMaxVigor(vitalidade = 10) {
   const vit = Math.max(0, parseInt(vitalidade, 10) || 0)
   return 10 + Math.floor(vit / 2)
 }
+
+// Retrocompatibilidade
+export const calculateMaxRam = calculateMaxVigor
 
 export const CYBERPUNK_ROLES = [
   { id: 'dock_solo', name: 'Mercenário das Docas', icon: '🎯', desc: 'Especialista em segurança armada de comboios e combate tático nas docas de carga estelares.' },
@@ -41,7 +44,7 @@ export const CYBERPUNK_ATTRIBUTES_LIST = [
   { key: 'destreza', label: 'Destreza', icon: '⚡', desc: 'Reflexos em microgravidade, esquiva rápida e precisão cirúrgica com projéteis e lâminas.' },
   { key: 'sabedoria', label: 'Sabedoria', icon: '👁️', desc: 'Percepção situacional, intuição nas docas espaciais, instinto sob fogo cruzado e discernimento de perigo.' },
   { key: 'inteligencia', label: 'Inteligência', icon: '🧠', desc: 'Quebra de criptografia da cidadela, navegação no ciberespaço orbital e análise tecnológica.' },
-  { key: 'vitalidade', label: 'Vitalidade', icon: '❤️', desc: 'Constituição celular e resistência à radiação estelar. Define o HP Máximo e a capacidade de RAM (Vigor).' },
+  { key: 'vitalidade', label: 'Vitalidade', icon: '❤️', desc: 'Constituição celular e resistência à radiação estelar. Define o HP Máximo e a capacidade de Vigor.' },
 ]
 
 export const CYBERPUNK_WEATHER_OPTIONS = [
@@ -245,22 +248,23 @@ export async function deleteCyberpunkLocation(slug) {
 export function createDefaultCyberpunkCharacter(uid, displayName = 'Viajante') {
   const defaultVit = 10
   const defaultHp = calculateMaxHp(defaultVit)
-  const defaultRam = calculateMaxRam(defaultVit)
+  const defaultVigor = calculateMaxVigor(defaultVit)
 
   return {
     uid,
-    handle: displayName || 'V-Runner',
-    realName: '',
-    roleClass: 'solo',
+    name: displayName || 'Viajante',
+    handle: displayName || 'Viajante',
+    race: 'Humano',
+    homeworld: 'Sentinela 1',
     avatarUrl: '',
     streetCred: 1,
     eurodollars: 2000,
-    humanityMax: 100,
-    humanityCurrent: 85,
     hpMax: defaultHp,
     hpCurrent: defaultHp,
-    ramMax: defaultRam,
-    ramCurrent: defaultRam,
+    vigorMax: defaultVigor,
+    vigorCurrent: defaultVigor,
+    ramMax: defaultVigor,
+    ramCurrent: defaultVigor,
     attributes: {
       forca: 10,
       destreza: 10,
@@ -274,7 +278,6 @@ export function createDefaultCyberpunkCharacter(uid, displayName = 'Viajante') {
         name: 'Olhos Ópticos Kiroshi MK.1',
         slot: 'Olhos / Visão',
         manufacturer: 'Kiroshi',
-        humanityCost: 4,
         description: 'Exibição HUD integrada, scanner de alvos e zoom óptico 4x com telemetria.',
         icon: '👁️',
       },
@@ -283,7 +286,6 @@ export function createDefaultCyberpunkCharacter(uid, displayName = 'Viajante') {
         name: 'Armadura Subdérmica Leve',
         slot: 'Pele / Tegumentar',
         manufacturer: 'Zetatech',
-        humanityCost: 6,
         description: 'Fibras de kevlar balístico tecidas logo abaixo da derme. Reduz dano de projéteis leves.',
         icon: '🛡️',
       }
@@ -521,7 +523,7 @@ export const DEFAULT_CYBERPUNK_FACTIONS = [
     type: 'Cibergangue Extremista',
     headquarters: 'Watson • Antiga Fábrica All Foods',
     dangerLevel: 'Muito Alta',
-    description: 'Gangue obcecada por modificações corporais descontroladas e cibermilitares. Quase todos os membros beiram a ciberpsicose clínica e usam implantes de lentes múltiplas vermelhas.',
+    description: 'Gangue obcecada por modificações corporais descontroladas e cibermilitares pesadas. Quase todos os membros usam implantes de lentes múltiplas vermelhas.',
     icon: '👹',
   },
   {

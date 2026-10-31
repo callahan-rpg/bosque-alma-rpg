@@ -607,7 +607,8 @@
 }
 
 .cb-fill-hp { background: linear-gradient(90deg, #ff0055, #ff3366); box-shadow: 0 0 10px var(--cb-magenta-glow); }
-.cb-fill-ram { background: linear-gradient(90deg, #00f0ff, #38bdf8); box-shadow: 0 0 10px var(--cb-cyan-glow); }
+.cb-fill-ram,
+.cb-fill-vigor { background: linear-gradient(90deg, #00f0ff, #38bdf8); box-shadow: 0 0 10px var(--cb-cyan-glow); }
 .cb-fill-humanity { background: linear-gradient(90deg, #fcee0a, #fbbf24); box-shadow: 0 0 10px var(--cb-yellow-glow); }
 
 /* Ciberware Silhouette / Body Slots */

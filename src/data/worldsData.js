@@ -37,7 +37,7 @@ export const WORLDS_DATA = [
     route: '/cyberpunk',
     isExternal: false,
     themeColor: '#00f0ff',
-    tags: ['Cidadela Espacial', 'Sentinela 1', 'Auroras Radioativas', 'Chuva Perpétua', 'Cromo & RAM', 'Chat RPG']
+    tags: ['Cidadela Espacial', 'Sentinela 1', 'Auroras Radioativas', 'Chuva Perpétua', 'Cromo & Vigor', 'Chat RPG']
   },
   {
     id: 'gottlich',

@@ -226,7 +226,6 @@ export default function CyberpunkAdmin() {
   const [newItemManufacturer, setNewItemManufacturer] = useState('Arasaka Labs')
   const [newItemRarity, setNewItemRarity] = useState('Raro')
   const [newItemPrice, setNewItemPrice] = useState(10000)
-  const [newItemHumanity, setNewItemHumanity] = useState(8)
   const [newItemEffect, setNewItemEffect] = useState('')
   const [newItemIcon, setNewItemIcon] = useState('🦾')
 
@@ -241,7 +240,6 @@ export default function CyberpunkAdmin() {
         manufacturer: newItemManufacturer.trim() || 'Desconhecido',
         rarity: newItemRarity,
         price: Number(newItemPrice) || 0,
-        humanityCost: Number(newItemHumanity) || 0,
         effect: newItemEffect.trim(),
         icon: newItemIcon.trim() || '⚙️',
       })
@@ -875,15 +873,6 @@ export default function CyberpunkAdmin() {
                       onChange={(e) => setNewItemPrice(e.target.value)}
                     />
                   </div>
-                  <div className="cb-form-group">
-                    <label className="cb-label">Custo Humanidade:</label>
-                    <input
-                      type="number"
-                      className="cb-input"
-                      value={newItemHumanity}
-                      onChange={(e) => setNewItemHumanity(e.target.value)}
-                    />
-                  </div>
                 </div>
 
                 <div className="cb-form-group">
@@ -928,11 +917,6 @@ export default function CyberpunkAdmin() {
                         <div style={{ color: 'var(--cb-yellow)', fontWeight: 'bold', fontSize: '14px', fontFamily: 'var(--cb-font-mono)' }}>
                           €$ {it.price?.toLocaleString()}
                         </div>
-                        {it.humanityCost > 0 && (
-                          <div style={{ color: 'var(--cb-magenta)', fontSize: '11px', fontFamily: 'var(--cb-font-mono)' }}>
-                            -{it.humanityCost} Humanidade
-                          </div>
-                        )}
                       </div>
                     </div>
 
@@ -1112,25 +1096,27 @@ export default function CyberpunkAdmin() {
                       <div style={{ flex: 1 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <h3 style={{ margin: 0, fontSize: '18px', color: '#ffffff' }}>
-                            {char.handle || 'Sem Handle'}
+                            {char.name || char.handle || 'Sem Nome'}
                           </h3>
-                          <span className="cb-threat-badge cb-threat-2">
-                            {char.roleClass?.toUpperCase() || 'SOLO'}
-                          </span>
+                          {char.race && (
+                            <span className="cb-threat-badge cb-threat-2">
+                              {char.race.toUpperCase()}
+                            </span>
+                          )}
                         </div>
                         <div style={{ fontSize: '12px', color: 'var(--cb-cyan)', fontFamily: 'var(--cb-font-mono)' }}>
-                          Nome Civil: {char.realName || 'Não divulgado'} • Afiliação: {char.faction || 'Independente'}
+                          {char.homeworld ? `Planeta: ${char.homeworld} • ` : ''}Afiliação: {char.faction || 'Independente'}
                         </div>
                       </div>
                     </div>
 
-                    {/* Barras de Estatísticas */}
+                    {/* Barras de Estatísticas (HP e Vigor) */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '14px' }}>
                       <div className="cb-stat-track" style={{ height: '8px' }}>
                         <div className="cb-stat-fill cb-fill-hp" style={{ width: `${Math.min(100, (char.hpCurrent / char.hpMax) * 100)}%` }} />
                       </div>
                       <div className="cb-stat-track" style={{ height: '8px' }}>
-                        <div className="cb-stat-fill cb-fill-humanity" style={{ width: `${Math.min(100, (char.humanityCurrent / char.humanityMax) * 100)}%` }} />
+                        <div className="cb-stat-fill cb-fill-ram" style={{ width: `${Math.min(100, (((char.vigorCurrent ?? char.ramCurrent ?? 10)) / (char.vigorMax ?? char.ramMax ?? 15)) * 100)}%` }} />
                       </div>
                     </div>
 
@@ -1236,7 +1222,7 @@ export default function CyberpunkAdmin() {
                 <option value="2">Nível 2 - Código Amarelo: Patrulhamento Regular</option>
                 <option value="3">Nível 3 - Código Laranja: Operações Táticas Ativas</option>
                 <option value="4">Nível 4 - Código Vermelho: Toque de Recolher em Distritos</option>
-                <option value="5">Nível 5 - Ciberpsicose / Alerta Máximo MAX-TAC</option>
+                <option value="5">Nível 5 - Alerta Máximo MAX-TAC / Risco Extremo</option>
               </select>
             </div>
 

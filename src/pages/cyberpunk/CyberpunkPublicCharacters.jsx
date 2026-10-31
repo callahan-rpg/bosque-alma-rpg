@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { subscribeAllCyberpunkCharacters, CYBERPUNK_ROLES } from '../../firebase/cyberpunkService'
+import { subscribeAllCyberpunkCharacters } from '../../firebase/cyberpunkService'
 import '../../styles/cyberpunk.css'
 
 export default function CyberpunkPublicCharacters() {
@@ -8,7 +8,6 @@ export default function CyberpunkPublicCharacters() {
   const [characters, setCharacters] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedRole, setSelectedRole] = useState('all')
 
   useEffect(() => {
     const unsub = subscribeAllCyberpunkCharacters((list) => {
@@ -19,12 +18,12 @@ export default function CyberpunkPublicCharacters() {
   }, [])
 
   const filtered = characters.filter((c) => {
-    const handle = (c.handle || '').toLowerCase()
+    const name = (c.name || c.handle || '').toLowerCase()
     const faction = (c.faction || '').toLowerCase()
+    const race = (c.race || '').toLowerCase()
+    const homeworld = (c.homeworld || '').toLowerCase()
     const query = searchTerm.toLowerCase().trim()
-    const matchesSearch = !query || handle.includes(query) || faction.includes(query)
-    const matchesRole = selectedRole === 'all' || c.roleClass === selectedRole
-    return matchesSearch && matchesRole
+    return !query || name.includes(query) || faction.includes(query) || race.includes(query) || homeworld.includes(query)
   })
 
   return (
@@ -70,28 +69,13 @@ export default function CyberpunkPublicCharacters() {
       <main className="cb-container">
         {/* FILTROS E BUSCA */}
         <div className="cb-card" style={{ marginBottom: '24px', padding: '16px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 220px', gap: '14px', alignItems: 'center' }}>
-            <input
-              type="text"
-              className="cb-input"
-              placeholder="Buscar por handle, codinome ou facção..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-
-            <select
-              className="cb-select"
-              value={selectedRole}
-              onChange={(e) => setSelectedRole(e.target.value)}
-            >
-              <option value="all">Todas as Classes / Papéis</option>
-              {CYBERPUNK_ROLES.map((r) => (
-                <option key={r.id} value={r.id}>
-                  {r.icon} {r.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <input
+            type="text"
+            className="cb-input"
+            placeholder="Buscar por nome, raça, planeta natal ou afiliação..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
 
         {/* LISTAGEM DE PERSONAGENS */}
@@ -106,7 +90,7 @@ export default function CyberpunkPublicCharacters() {
         ) : (
           <div className="cb-grid-3">
             {filtered.map((char) => {
-              const roleObj = CYBERPUNK_ROLES.find(r => r.id === char.roleClass) || CYBERPUNK_ROLES[0]
+              const charName = char.name || char.handle || 'Sem Nome'
               return (
                 <div key={char.uid} className="cb-card" style={{ padding: '20px' }}>
                   <div style={{ display: 'flex', gap: '14px', alignItems: 'center', marginBottom: '14px' }}>
@@ -134,11 +118,20 @@ export default function CyberpunkPublicCharacters() {
                     )}
 
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <span className="cb-threat-badge cb-threat-2" style={{ marginBottom: '4px' }}>
-                        {roleObj.icon} {roleObj.name}
-                      </span>
+                      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '4px' }}>
+                        {char.race && (
+                          <span className="cb-threat-badge" style={{ fontSize: '10px', background: 'rgba(0, 240, 255, 0.1)', color: 'var(--cb-cyan)', borderColor: 'var(--cb-cyan)' }}>
+                            🧬 {char.race}
+                          </span>
+                        )}
+                        {char.homeworld && (
+                          <span className="cb-threat-badge" style={{ fontSize: '10px', background: 'rgba(254, 231, 92, 0.1)', color: 'var(--cb-yellow)', borderColor: 'var(--cb-yellow)' }}>
+                            🪐 {char.homeworld}
+                          </span>
+                        )}
+                      </div>
                       <h3 style={{ margin: 0, fontSize: '18px', color: '#ffffff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {char.handle || 'Sem Handle'}
+                        {charName}
                       </h3>
                       <div style={{ fontSize: '11px', color: 'var(--cb-text-dim)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {char.faction || 'Mercenário Autônomo'}

@@ -3,8 +3,7 @@ import { doc, getDoc } from 'firebase/firestore'
 import { db } from '../../firebase/config'
 import {
   calculateMaxHp,
-  calculateMaxRam,
-  CYBERPUNK_ROLES,
+  calculateMaxVigor,
   CYBERPUNK_ATTRIBUTES_LIST
 } from '../../firebase/cyberpunkService'
 
@@ -131,13 +130,10 @@ export default function CyberpunkCharacterPopupModal({
   const isSelf = uid === currentUser?.uid
 
   // Consolidação dos dados da ficha
-  const handleName = cyberData?.handle || targetUser?.characterName || targetUser?.nick || 'Viajante'
+  const handleName = cyberData?.name || cyberData?.handle || targetUser?.characterName || targetUser?.nick || 'Viajante'
   const avatarUrl = cyberData?.avatarUrl || targetUser?.avatarUrl || ''
-  const roleClass = cyberData?.roleClass || 'dock_solo'
-  const roleInfo = CYBERPUNK_ROLES.find(r => r.id === roleClass) || {
-    name: 'Mercenário das Docas',
-    icon: '🎯'
-  }
+  const race = cyberData?.race || ''
+  const homeworld = cyberData?.homeworld || ''
   const faction = cyberData?.faction || 'Porto Seguro da Sentinela'
   const streetCred = cyberData?.streetCred || 1
   const eurodollars = cyberData?.eurodollars ?? 2000
@@ -154,18 +150,14 @@ export default function CyberpunkCharacterPopupModal({
 
   // Cálculos vitais:
   // HP Máximo: 50 + vitalidade * 10
-  // RAM Máxima (funciona como o vigor do Jardim): 10 + Math.floor(vitalidade / 2)
+  // Vigor Máximo: 10 + Math.floor(vitalidade / 2)
   const hpMax = calculateMaxHp(attributes.vitalidade)
-  const ramMax = calculateMaxRam(attributes.vitalidade)
+  const vigorMax = calculateMaxVigor(attributes.vitalidade)
   const hpCurrent = Math.min(hpMax, cyberData?.hpCurrent ?? hpMax)
-  const ramCurrent = Math.min(ramMax, cyberData?.ramCurrent ?? ramMax)
-
-  const humanityMax = cyberData?.humanityMax || 100
-  const humanityCurrent = Math.min(humanityMax, cyberData?.humanityCurrent ?? 85)
+  const vigorCurrent = Math.min(vigorMax, cyberData?.vigorCurrent ?? cyberData?.ramCurrent ?? vigorMax)
 
   const hpPercent = Math.min(100, Math.max(0, Math.round((hpCurrent / Math.max(1, hpMax)) * 100)))
-  const ramPercent = Math.min(100, Math.max(0, Math.round((ramCurrent / Math.max(1, ramMax)) * 100)))
-  const humanityPercent = Math.min(100, Math.max(0, Math.round((humanityCurrent / Math.max(1, humanityMax)) * 100)))
+  const vigorPercent = Math.min(100, Math.max(0, Math.round((vigorCurrent / Math.max(1, vigorMax)) * 100)))
 
   // Abertura do dossiê / ficha completa
   const handleOpenSheet = () => {
@@ -238,21 +230,18 @@ export default function CyberpunkCharacterPopupModal({
           >
             👤
           </div>
-          <span className="cb-popup-role-icon" title={roleInfo.name}>
-            {roleInfo.icon}
-          </span>
         </div>
 
         <div className="cb-popup-identity">
           <div className="cb-popup-role-line">
-            <span className="cb-popup-role-badge">{roleInfo.name}</span>
             <span className="cb-popup-cred-badge">Cred Nv. {streetCred}</span>
+            {race && <span className="cb-threat-badge" style={{ fontSize: '10px', color: 'var(--cb-cyan)', borderColor: 'var(--cb-cyan)' }}>🧬 {race}</span>}
           </div>
 
           <h3 className="cb-popup-name">{handleName}</h3>
 
           <div className="cb-popup-meta-row">
-            <span className="cb-popup-meta-pill">🪐 Sentinela 1</span>
+            <span className="cb-popup-meta-pill">🪐 {homeworld || 'Sentinela 1'}</span>
             <span className="cb-popup-meta-pill">🛡️ {faction}</span>
           </div>
 
@@ -262,7 +251,7 @@ export default function CyberpunkCharacterPopupModal({
         </div>
       </div>
 
-      {/* Barras de Status Vitais: HP, RAM (Vigor), Humanidade */}
+      {/* Barras de Status Vitais: HP e Vigor */}
       <div className="cb-popup-stats-section">
         {/* Barra de Vida (HP) */}
         <div className="cb-popup-bar-item">
@@ -280,34 +269,18 @@ export default function CyberpunkCharacterPopupModal({
           </div>
         </div>
 
-        {/* Barra de RAM (Funciona como o Vigor) */}
+        {/* Barra de Vigor */}
         <div className="cb-popup-bar-item">
           <div className="cb-popup-bar-labels">
             <span className="cb-popup-bar-title ram">
-              <span className="bar-icon">💾</span> MEMÓRIA RAM (VIGOR)
+              <span className="bar-icon">⚡</span> VIGOR
             </span>
-            <span className="cb-popup-bar-value">{ramCurrent} / {ramMax} RAM</span>
+            <span className="cb-popup-bar-value">{vigorCurrent} / {vigorMax}</span>
           </div>
           <div className="cb-popup-bar-track ram">
             <div
               className="cb-popup-bar-fill ram"
-              style={{ width: `${ramPercent}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Barra de Humanidade */}
-        <div className="cb-popup-bar-item">
-          <div className="cb-popup-bar-labels">
-            <span className="cb-popup-bar-title humanity">
-              <span className="bar-icon">🧠</span> HUMANIDADE / PSICOSE
-            </span>
-            <span className="cb-popup-bar-value">{humanityCurrent} / {humanityMax}</span>
-          </div>
-          <div className="cb-popup-bar-track humanity">
-            <div
-              className="cb-popup-bar-fill humanity"
-              style={{ width: `${humanityPercent}%` }}
+              style={{ width: `${vigorPercent}%` }}
             />
           </div>
         </div>
@@ -350,7 +323,7 @@ export default function CyberpunkCharacterPopupModal({
           </div>
 
           {/* Vitalidade */}
-          <div className="cb-popup-attr-card highlight" title="Vitalidade: Resistência a radiação e define HP/RAM">
+          <div className="cb-popup-attr-card highlight" title="Vitalidade: Resistência a radiação e define HP e Vigor">
             <span className="cb-attr-icon">❤️</span>
             <span className="cb-attr-label">VIT</span>
             <span className="cb-attr-num">{attributes.vitalidade}</span>

@@ -6,10 +6,9 @@ import {
   subscribeCyberpunkCharacter,
   getOrCreateCyberpunkCharacter,
   updateCyberpunkCharacter,
-  CYBERPUNK_ROLES,
   CYBERPUNK_ATTRIBUTES_LIST,
   calculateMaxHp,
-  calculateMaxRam
+  calculateMaxVigor
 } from '../../firebase/cyberpunkService'
 import '../../styles/cyberpunk.css'
 
@@ -98,20 +97,26 @@ export default function CyberpunkCharacterSheet() {
     await updateCyberpunkCharacter(activeUid, { hpCurrent: next, hpMax: max })
   }
 
-  // Ajuste rápido de RAM (funciona como o vigor)
-  const handleDeltaRam = async (delta) => {
+  // Ajuste rápido de Vigor
+  const handleDeltaVigor = async (delta) => {
     if (!charData) return
     const vit = charData.attributes?.vitalidade ?? 10
-    const max = calculateMaxRam(vit)
-    const next = Math.max(0, Math.min(max, (charData.ramCurrent ?? max) + delta))
-    await updateCyberpunkCharacter(activeUid, { ramCurrent: next, ramMax: max })
+    const max = calculateMaxVigor(vit)
+    const current = charData.vigorCurrent ?? charData.ramCurrent ?? max
+    const next = Math.max(0, Math.min(max, current + delta))
+    await updateCyberpunkCharacter(activeUid, {
+      vigorCurrent: next,
+      vigorMax: max,
+      ramCurrent: next,
+      ramMax: max
+    })
   }
 
   // Formulário de Edição da Ficha
   const [editForm, setEditForm] = useState({
-    handle: '',
-    realName: '',
-    roleClass: 'dock_solo',
+    name: '',
+    race: '',
+    homeworld: '',
     avatarUrl: '',
     lifePath: 'Vagante Espacial',
     faction: '',
@@ -127,9 +132,9 @@ export default function CyberpunkCharacterSheet() {
   const openEditModal = () => {
     if (!charData) return
     setEditForm({
-      handle: charData.handle || '',
-      realName: charData.realName || '',
-      roleClass: charData.roleClass || 'dock_solo',
+      name: charData.name || charData.handle || '',
+      race: charData.race || '',
+      homeworld: charData.homeworld || '',
       avatarUrl: charData.avatarUrl || '',
       lifePath: charData.lifePath || 'Vagante Espacial',
       faction: charData.faction || '',
@@ -162,19 +167,24 @@ export default function CyberpunkCharacterSheet() {
     try {
       const vit = Number(editForm.vitalidade) || 10
       const hpMax = calculateMaxHp(vit)
-      const ramMax = calculateMaxRam(vit)
+      const vigorMax = calculateMaxVigor(vit)
+      const currentVigor = charData.vigorCurrent ?? charData.ramCurrent ?? vigorMax
       const updates = {
-        handle: editForm.handle.trim(),
-        realName: editForm.realName.trim(),
-        roleClass: editForm.roleClass,
+        name: editForm.name.trim(),
+        handle: editForm.name.trim(),
+        realName: '',
+        race: editForm.race.trim(),
+        homeworld: editForm.homeworld.trim(),
         avatarUrl: editForm.avatarUrl.trim(),
         lifePath: editForm.lifePath,
         faction: editForm.faction.trim(),
         bio: editForm.bio.trim(),
         hpMax,
         hpCurrent: Math.min(hpMax, charData.hpCurrent ?? hpMax),
-        ramMax,
-        ramCurrent: Math.min(ramMax, charData.ramCurrent ?? ramMax),
+        vigorMax,
+        vigorCurrent: Math.min(vigorMax, currentVigor),
+        ramMax: vigorMax,
+        ramCurrent: Math.min(vigorMax, currentVigor),
         attributes: {
           forca: Number(editForm.forca) || 10,
           destreza: Number(editForm.destreza) || 10,
@@ -195,7 +205,6 @@ export default function CyberpunkCharacterSheet() {
     name: '',
     slot: 'Braços / Mãos',
     manufacturer: 'Kiroshi',
-    humanityCost: 4,
     description: '',
     icon: '🦾'
   })
@@ -209,30 +218,25 @@ export default function CyberpunkCharacterSheet() {
       name: newCw.name.trim(),
       slot: newCw.slot,
       manufacturer: newCw.manufacturer.trim(),
-      humanityCost: Number(newCw.humanityCost) || 0,
       description: newCw.description.trim(),
       icon: newCw.icon.trim() || '⚙️'
     }
 
-    const nextHumanity = Math.max(0, (charData?.humanityCurrent ?? 100) - item.humanityCost)
     await updateCyberpunkCharacter(activeUid, {
-      cyberware: [...currentList, item],
-      humanityCurrent: nextHumanity
+      cyberware: [...currentList, item]
     })
 
     setShowAddCyberwareModal(false)
-    setNewCw({ name: '', slot: 'Braços / Mãos', manufacturer: 'Kiroshi', humanityCost: 4, description: '', icon: '🦾' })
+    setNewCw({ name: '', slot: 'Braços / Mãos', manufacturer: 'Kiroshi', description: '', icon: '🦾' })
   }
 
-  const handleRemoveCyberware = async (cwId, humanityCost) => {
+  const handleRemoveCyberware = async (cwId) => {
     if (!confirm('Deseja desinstalar este implante cibernético?')) return
     const currentList = Array.isArray(charData?.cyberware) ? [...charData.cyberware] : []
     const nextList = currentList.filter(c => c.id !== cwId)
-    const nextHumanity = Math.min(charData.humanityMax || 100, (charData.humanityCurrent || 0) + (humanityCost || 0))
 
     await updateCyberpunkCharacter(activeUid, {
-      cyberware: nextList,
-      humanityCurrent: nextHumanity
+      cyberware: nextList
     })
   }
 
@@ -266,18 +270,14 @@ export default function CyberpunkCharacterSheet() {
     )
   }
 
-  const handleName = charData?.handle || 'V-Runner'
-  const realName = charData?.realName || 'Não declarado'
-  const roleInfo = CYBERPUNK_ROLES.find(r => r.id === charData?.roleClass) || CYBERPUNK_ROLES[0]
+  const charName = charData?.name || charData?.handle || 'Viajante'
   const vit = charData?.attributes?.vitalidade ?? 10
   const hpMax = calculateMaxHp(vit)
-  const ramMax = calculateMaxRam(vit)
+  const vigorMax = calculateMaxVigor(vit)
   const hpCurrent = Math.min(hpMax, charData?.hpCurrent ?? hpMax)
-  const ramCurrent = Math.min(ramMax, charData?.ramCurrent ?? ramMax)
+  const vigorCurrent = Math.min(vigorMax, charData?.vigorCurrent ?? charData?.ramCurrent ?? vigorMax)
   const hpPercent = Math.min(100, Math.max(0, Math.round((hpCurrent / Math.max(1, hpMax)) * 100)))
-  const ramPercent = Math.min(100, Math.max(0, Math.round((ramCurrent / Math.max(1, ramMax)) * 100)))
-  const humanityPercent = Math.min(100, Math.max(0, Math.round(((charData?.humanityCurrent ?? 80) / (charData?.humanityMax || 100)) * 100)))
-  const isCyberpsychosisRisk = (charData?.humanityCurrent || 0) < 30
+  const vigorPercent = Math.min(100, Math.max(0, Math.round((vigorCurrent / Math.max(1, vigorMax)) * 100)))
 
   return (
     <div className="cb-cyber-root">
@@ -299,7 +299,7 @@ export default function CyberpunkCharacterSheet() {
               DOSSIÊ BIOMÉTRICO • CIDADELA ESPACIAL SENTINELA 1
             </span>
             <h1 className="cb-header-title">
-              FICHA DE AGENTE <span className="cb-neon-text">{handleName.toUpperCase()}</span>
+              FICHA DE AGENTE <span className="cb-neon-text">{charName.toUpperCase()}</span>
             </h1>
           </div>
         </div>
@@ -366,7 +366,7 @@ export default function CyberpunkCharacterSheet() {
                 {charData?.avatarUrl ? (
                   <img
                     src={charData.avatarUrl}
-                    alt={handleName}
+                    alt={charName}
                     style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px', border: '2px solid var(--cb-cyan)', boxShadow: '0 0 20px var(--cb-cyan-glow)' }}
                   />
                 ) : (
@@ -374,31 +374,22 @@ export default function CyberpunkCharacterSheet() {
                     👤
                   </div>
                 )}
-                <span
-                  style={{
-                    position: 'absolute',
-                    bottom: '-8px',
-                    right: '-8px',
-                    fontSize: '20px',
-                    background: 'var(--cb-surface-1)',
-                    padding: '4px',
-                    borderRadius: '50%',
-                    border: '1px solid var(--cb-cyan)'
-                  }}
-                  title={roleInfo.name}
-                >
-                  {roleInfo.icon}
-                </span>
               </div>
 
               <h2 style={{ margin: '0 0 4px', fontSize: '22px', color: '#ffffff', letterSpacing: '1px' }}>
-                {handleName}
+                {charName}
               </h2>
-              <div style={{ fontSize: '12px', color: 'var(--cb-cyan)', fontFamily: 'var(--cb-font-mono)' }}>
-                {roleInfo.name}
-              </div>
-              <div style={{ fontSize: '11px', color: 'var(--cb-text-dim)', marginTop: '2px' }}>
-                Registro Civil: {realName}
+              <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap', marginTop: '6px' }}>
+                {charData?.race && (
+                  <span className="cb-threat-badge" style={{ fontSize: '11px', background: 'rgba(0, 240, 255, 0.1)', color: 'var(--cb-cyan)', borderColor: 'var(--cb-cyan)' }}>
+                    🧬 {charData.race}
+                  </span>
+                )}
+                {charData?.homeworld && (
+                  <span className="cb-threat-badge" style={{ fontSize: '11px', background: 'rgba(254, 231, 92, 0.1)', color: 'var(--cb-yellow)', borderColor: 'var(--cb-yellow)' }}>
+                    🪐 {charData.homeworld}
+                  </span>
+                )}
               </div>
             </div>
 
@@ -423,31 +414,20 @@ export default function CyberpunkCharacterSheet() {
 
             <div className="cb-stat-bar-container">
               <div className="cb-stat-header">
-                <span style={{ color: 'var(--cb-cyan)' }}>💾 MEMÓRIA RAM (VIGOR)</span>
-                <span>{ramCurrent} / {ramMax} RAM</span>
+                <span style={{ color: 'var(--cb-cyan)' }}>⚡ VIGOR</span>
+                <span>{vigorCurrent} / {vigorMax}</span>
               </div>
               <div className="cb-stat-track">
-                <div className="cb-stat-fill cb-fill-ram" style={{ width: `${ramPercent}%` }} />
+                <div className="cb-stat-fill cb-fill-ram" style={{ width: `${vigorPercent}%` }} />
               </div>
               {isMySheet && (
                 <div style={{ display: 'flex', gap: '4px', marginTop: '4px' }}>
-                  <button type="button" className="cb-btn" style={{ padding: '2px 8px', fontSize: '10px' }} onClick={() => handleDeltaRam(-2)}>-2 RAM</button>
-                  <button type="button" className="cb-btn" style={{ padding: '2px 8px', fontSize: '10px' }} onClick={() => handleDeltaRam(-4)}>-4 RAM</button>
-                  <button type="button" className="cb-btn cb-btn-ghost" style={{ padding: '2px 8px', fontSize: '10px' }} onClick={() => handleDeltaRam(8)}>Recarregar RAM</button>
+                  <button type="button" className="cb-btn" style={{ padding: '2px 8px', fontSize: '10px' }} onClick={() => handleDeltaVigor(-2)}>-2 Vigor</button>
+                  <button type="button" className="cb-btn" style={{ padding: '2px 8px', fontSize: '10px' }} onClick={() => handleDeltaVigor(-4)}>-4 Vigor</button>
+                  <button type="button" className="cb-btn cb-btn-ghost" style={{ padding: '2px 8px', fontSize: '10px' }} onClick={() => handleDeltaVigor(8)}>+8 Vigor</button>
+                  <button type="button" className="cb-btn cb-btn-ghost" style={{ padding: '2px 8px', fontSize: '10px' }} onClick={() => handleDeltaVigor(vigorMax)}>Recarregar</button>
                 </div>
               )}
-            </div>
-
-            <div className="cb-stat-bar-container">
-              <div className="cb-stat-header">
-                <span style={{ color: isCyberpsychosisRisk ? 'var(--cb-magenta)' : 'var(--cb-yellow)' }}>
-                  🧠 HUMANIDADE vs CROMO {isCyberpsychosisRisk && '⚠️ RISCO DE CIBERPSICOSE!'}
-                </span>
-                <span>{charData?.humanityCurrent ?? 80} / {charData?.humanityMax ?? 100}</span>
-              </div>
-              <div className="cb-stat-track">
-                <div className="cb-stat-fill cb-fill-humanity" style={{ width: `${humanityPercent}%` }} />
-              </div>
             </div>
 
             {/* CRÉDITOS & STREET CRED */}
@@ -584,7 +564,7 @@ export default function CyberpunkCharacterSheet() {
                         <div>
                           <div className="cb-slot-name">{cw.name}</div>
                           <div className="cb-slot-category">
-                            {cw.slot} • {cw.manufacturer || 'Submundo'} • -{cw.humanityCost || 0} Hum
+                            {cw.slot} • {cw.manufacturer || 'Submundo'}
                           </div>
                           <p style={{ margin: '4px 0 0', fontSize: '11px', color: 'var(--cb-text-dim)', lineHeight: 1.3 }}>
                             {cw.description}
@@ -598,7 +578,7 @@ export default function CyberpunkCharacterSheet() {
                           className="cb-btn cb-btn-magenta"
                           style={{ padding: '4px 8px', fontSize: '11px', marginLeft: '8px' }}
                           title="Desinstalar ciberware"
-                          onClick={() => handleRemoveCyberware(cw.id, cw.humanityCost)}
+                          onClick={() => handleRemoveCyberware(cw.id)}
                         >
                           ✕
                         </button>
@@ -658,6 +638,20 @@ export default function CyberpunkCharacterSheet() {
             {activeSheetTab === 'dossier' && (
               <div>
                 <div className="cb-form-group">
+                  <label className="cb-label">Raça:</label>
+                  <div style={{ fontSize: '14px', color: 'var(--cb-cyan)' }}>
+                    {charData?.race || 'Não declarada'}
+                  </div>
+                </div>
+
+                <div className="cb-form-group">
+                  <label className="cb-label">Planeta Natal:</label>
+                  <div style={{ fontSize: '14px', color: 'var(--cb-yellow)' }}>
+                    {charData?.homeworld || 'Não declarado'}
+                  </div>
+                </div>
+
+                <div className="cb-form-group">
                   <label className="cb-label">Afiliação / Conexão nas Ruas:</label>
                   <div style={{ fontSize: '14px', color: 'var(--cb-cyan)' }}>
                     {charData?.faction || 'Mercenário Autônomo'}
@@ -686,44 +680,40 @@ export default function CyberpunkCharacterSheet() {
             </div>
 
             <form onSubmit={handleSaveProfile}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div className="cb-form-group">
-                  <label className="cb-label">Nome nas Ruas (Handle): *</label>
-                  <input
-                    type="text"
-                    className="cb-input"
-                    value={editForm.handle}
-                    onChange={(e) => setEditForm(prev => ({ ...prev, handle: e.target.value }))}
-                    required
-                  />
-                </div>
-
-                <div className="cb-form-group">
-                  <label className="cb-label">Nome Civil Completo:</label>
-                  <input
-                    type="text"
-                    className="cb-input"
-                    value={editForm.realName}
-                    onChange={(e) => setEditForm(prev => ({ ...prev, realName: e.target.value }))}
-                  />
-                </div>
+              <div className="cb-form-group">
+                <label className="cb-label">Nome: *</label>
+                <input
+                  type="text"
+                  className="cb-input"
+                  placeholder="Nome do personagem..."
+                  value={editForm.name}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+                  required
+                />
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div className="cb-form-group">
-                  <label className="cb-label">Papel / Classe:</label>
-                  <select
-                    className="cb-select"
-                    value={editForm.roleClass}
-                    onChange={(e) => setEditForm(prev => ({ ...prev, roleClass: e.target.value }))}
-                  >
-                    {CYBERPUNK_ROLES.map(r => (
-                      <option key={r.id} value={r.id}>{r.icon} {r.name}</option>
-                    ))}
-                  </select>
+                  <label className="cb-label">Raça:</label>
+                  <input
+                    type="text"
+                    className="cb-input"
+                    placeholder="ex: Humano, Ciborgue, Androide..."
+                    value={editForm.race}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, race: e.target.value }))}
+                  />
                 </div>
 
-
+                <div className="cb-form-group">
+                  <label className="cb-label">Planeta Natal:</label>
+                  <input
+                    type="text"
+                    className="cb-input"
+                    placeholder="ex: Terra, Marte Orbital, Kepler-186f..."
+                    value={editForm.homeworld}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, homeworld: e.target.value }))}
+                  />
+                </div>
               </div>
 
               <div className="cb-form-group">
@@ -820,27 +810,14 @@ export default function CyberpunkCharacterSheet() {
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                <div className="cb-form-group">
-                  <label className="cb-label">Slot Corporal:</label>
-                  <input
-                    type="text"
-                    className="cb-input"
-                    value={newCw.slot}
-                    onChange={(e) => setNewCw(prev => ({ ...prev, slot: e.target.value }))}
-                  />
-                </div>
-                <div className="cb-form-group">
-                  <label className="cb-label">Custo de Humanidade:</label>
-                  <input
-                    type="number"
-                    min="0"
-                    max="50"
-                    className="cb-input"
-                    value={newCw.humanityCost}
-                    onChange={(e) => setNewCw(prev => ({ ...prev, humanityCost: Number(e.target.value) }))}
-                  />
-                </div>
+              <div className="cb-form-group">
+                <label className="cb-label">Slot Corporal:</label>
+                <input
+                  type="text"
+                  className="cb-input"
+                  value={newCw.slot}
+                  onChange={(e) => setNewCw(prev => ({ ...prev, slot: e.target.value }))}
+                />
               </div>
 
               <div className="cb-form-group">
