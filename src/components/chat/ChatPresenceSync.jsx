@@ -1,15 +1,26 @@
 import { useEffect } from 'react'
-import { setPresence, clearPresence } from '../../utils/chatService'
+import { setPresence, clearPresence, TAB_ID } from '../../utils/chatService'
 
 /**
- * Componente que sincroniza a presença online do visitante no Firebase Realtime Database
+ * Sincroniza a presença online do visitante no Firebase Realtime Database.
+ * Cada aba do navegador registra sua própria entrada (uid_tabId),
+ * permitindo que o mesmo usuário apareça online em múltiplas abas simultaneamente.
  */
 export default function ChatPresenceSync({ user, character, location, role, active = true }) {
+  // Limpa presença desta aba quando o componente desmontar (sair da sala)
+  useEffect(() => {
+    return () => {
+      if (user?.uid) {
+        clearPresence(user.uid, TAB_ID)
+      }
+    }
+  }, [user?.uid])
+
   useEffect(() => {
     if (!user?.uid) return
 
     if (!active) {
-      clearPresence(user.uid)
+      clearPresence(user.uid, TAB_ID)
       return
     }
 
@@ -19,11 +30,9 @@ export default function ChatPresenceSync({ user, character, location, role, acti
     const cleanup = setPresence(
       user.uid,
       character,
-      {
-        slug: locSlug,
-        name: locName
-      },
-      role || 'player'
+      { slug: locSlug, name: locName },
+      role || 'player',
+      TAB_ID
     )
 
     return () => {

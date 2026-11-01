@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
-import { subscribeCyberpunkCharacter } from '../../firebase/cyberpunkService'
+import {
+  subscribeCyberpunkCharacter,
+  getOrCreateCyberpunkCharacter
+} from '../../firebase/cyberpunkService'
 import CyberpunkCharacterPopupModal from './CyberpunkCharacterPopupModal.jsx'
 import CyberpunkDiceRoller from './CyberpunkDiceRoller.jsx'
 import SettingsModal from '../SettingsModal.jsx'
@@ -18,6 +21,7 @@ export default function CyberpunkHUD({ locationName }) {
   // Sincroniza a ficha Cyberpunk do jogador para exibir avatar e handle no HUD
   useEffect(() => {
     if (!user?.uid) return
+    getOrCreateCyberpunkCharacter(user.uid, 'Operador Cyberpunk').catch(() => {})
     const unsub = subscribeCyberpunkCharacter(user.uid, (data) => {
       setCyberProfile(data)
     })
@@ -47,8 +51,8 @@ export default function CyberpunkHUD({ locationName }) {
     }
   }
 
-  const handleName = cyberProfile?.handle || profile?.characterName || profile?.nick || user?.displayName || 'Viajante'
-  const avatarUrl = cyberProfile?.avatarUrl || profile?.avatarUrl || ''
+  const handleName = cyberProfile?.handle || cyberProfile?.name || 'Operador'
+  const avatarUrl = cyberProfile?.avatarUrl || ''
 
   return (
     <>

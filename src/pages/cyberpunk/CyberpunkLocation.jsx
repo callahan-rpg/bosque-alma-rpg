@@ -114,6 +114,7 @@ export default function CyberpunkLocation() {
               key={currentSlug}
               slug={`cyberpunk_${currentSlug}`}
               locationName={loc.name}
+              universe="cyberpunk"
             />
           </div>
 

@@ -29,6 +29,20 @@ export function getEstimatedServerTime() {
 }
 
 /**
+ * Gera um ID único em memória para cada aba do navegador.
+ * Como fica na memória do JavaScript da aba, nunca é compartilhado mesmo se
+ * a aba for duplicada ou aberta via target="_blank" / window.open.
+ */
+const TAB_INSTANCE_ID = `tab_${Math.random().toString(36).slice(2, 9)}_${Date.now().toString(36).slice(-4)}`
+
+export function getTabId() {
+  return TAB_INSTANCE_ID
+}
+
+/** Tab ID exclusivo desta aba */
+export const TAB_ID = TAB_INSTANCE_ID
+
+/**
  * Gera a chave simétrica de sala privada entre dois usuários (DM)
  */
 export function getPrivateRoomId(uid1, uid2) {
@@ -268,19 +282,24 @@ export async function toggleReaction(zoneSlugOrRoomId, messageId, emoji, uid, ch
 }
 
 /**
- * Gerencia presença online no RTDB
+ * Gerencia presença online no RTDB.
+ * Usa chave uid_tabId para suportar múltiplas abas abertas simultaneamente.
  */
-export function setPresence(uid, characterObj, locationObj, role = 'player') {
+export function setPresence(uid, characterObj, locationObj, role = 'player', tabId = 'default') {
   if (!rtdb || !uid) return () => {}
 
-  const userPresenceRef = ref(rtdb, `chat/presence/${uid}`)
+  // Chave única por aba: uid_tabId
+  const presenceKey = `${uid}_${tabId}`
+  const userPresenceRef = ref(rtdb, `chat/presence/${presenceKey}`)
   const connectedRef = ref(rtdb, '.info/connected')
 
   const handleConnect = (snap) => {
     if (snap.val() === true) {
+      // Quando a aba fechar/desconectar, remove SOMENTE a entrada desta aba
       onDisconnect(userPresenceRef).remove()
       set(userPresenceRef, {
         uid,
+        tabId,
         characterName: characterObj?.name || 'Visitante',
         avatarUrl: characterObj?.avatarUrl || null,
         locationSlug: locationObj?.slug || 'crepusculo',
@@ -295,21 +314,24 @@ export function setPresence(uid, characterObj, locationObj, role = 'player') {
 
   return () => {
     off(connectedRef, 'value', handleConnect)
-    remove(userPresenceRef).catch(() => {})
   }
 }
 
 /**
- * Remove presença
+ * Remove a entrada de presença de uma aba específica.
  */
-export function clearPresence(uid) {
+export function clearPresence(uid, tabId = 'default') {
   if (!rtdb || !uid) return
-  const userPresenceRef = ref(rtdb, `chat/presence/${uid}`)
+  const presenceKey = `${uid}_${tabId}`
+  const userPresenceRef = ref(rtdb, `chat/presence/${presenceKey}`)
   remove(userPresenceRef).catch(() => {})
 }
 
 /**
- * Escuta presença de todos os usuários online
+ * Escuta presença de todos os usuários online.
+ * Deduplica por (uid + locationSlug) para que um usuário com abas em
+ * localidades/universos diferentes apareça online em cada uma delas,
+ * sem sumir da primeira aba ao abrir a segunda ou terceira.
  */
 export function subscribeOnlinePresence(callback) {
   if (!rtdb) return () => {}
@@ -321,8 +343,19 @@ export function subscribeOnlinePresence(callback) {
       return
     }
     const raw = snapshot.val()
-    const list = Object.values(raw).filter(Boolean)
-    callback(list)
+    const allEntries = Object.values(raw).filter(Boolean)
+
+    // Deduplica por (uid + locationSlug)
+    const byKey = new Map()
+    for (const entry of allEntries) {
+      if (!entry.uid) continue
+      const key = `${entry.uid}_${entry.locationSlug || ''}`
+      const existing = byKey.get(key)
+      if (!existing || (entry.lastSeen || 0) > (existing.lastSeen || 0)) {
+        byKey.set(key, entry)
+      }
+    }
+    callback(Array.from(byKey.values()))
   }
 
   onValue(presenceRef, handleValue)
@@ -330,11 +363,12 @@ export function subscribeOnlinePresence(callback) {
 }
 
 /**
- * Atualiza status (away, disconnect, etc)
+ * Atualiza status (away, disconnect, etc) na entrada desta aba.
  */
-export function updatePresenceStatus(uid, status) {
+export function updatePresenceStatus(uid, status, tabId = 'default') {
   if (!rtdb || !uid) return
-  const statusRef = ref(rtdb, `chat/presence/${uid}/status`)
+  const presenceKey = `${uid}_${tabId}`
+  const statusRef = ref(rtdb, `chat/presence/${presenceKey}/status`)
   if (status) {
     set(statusRef, status).catch(() => {})
   } else {
@@ -343,11 +377,12 @@ export function updatePresenceStatus(uid, status) {
 }
 
 /**
- * Atualiza humor (mood)
+ * Atualiza humor (mood) na entrada desta aba.
  */
-export function updateMood(uid, moodId) {
+export function updateMood(uid, moodId, tabId = 'default') {
   if (!rtdb || !uid) return
-  const moodRef = ref(rtdb, `chat/presence/${uid}/mood`)
+  const presenceKey = `${uid}_${tabId}`
+  const moodRef = ref(rtdb, `chat/presence/${presenceKey}/mood`)
   if (moodId) {
     set(moodRef, moodId).catch(() => {})
   } else {

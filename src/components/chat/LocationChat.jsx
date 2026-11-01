@@ -1,11 +1,17 @@
 import { useState, useEffect, useRef } from 'react'
 import { useGuest } from '../../contexts/AuthContext.jsx'
+import {
+  subscribeCyberpunkCharacter,
+  getOrCreateCyberpunkCharacter,
+  updateCyberpunkCharacter
+} from '../../firebase/cyberpunkService.js'
 import ChatPresenceSync from './ChatPresenceSync.jsx'
 import ChatMessageList from './ChatMessageList.jsx'
 import ChatSidebar from './ChatSidebar.jsx'
 import ChatEmojiBar from './ChatEmojiBar.jsx'
 import ChatInputBar from './ChatInputBar.jsx'
 import CharacterPopupModal from '../character/CharacterPopupModal.jsx'
+import CyberpunkCharacterPopupModal from '../cyberpunk/CyberpunkCharacterPopupModal.jsx'
 import EditProfileModal from './EditProfileModal.jsx'
 import {
   sendZoneMessage,
@@ -22,7 +28,8 @@ import {
   subscribePinnedMessage,
   updatePresenceStatus,
   getEstimatedServerTime,
-  getPrivateRoomId
+  getPrivateRoomId,
+  TAB_ID
 } from '../../utils/chatService'
 import {
   playMessageSound,
@@ -37,9 +44,40 @@ import {
 } from '../../utils/friendsService'
 import { syncAvatarsFromPresence, setCachedAvatar } from '../../utils/avatarCache'
 
-export default function LocationChat({ slug, locationName }) {
-  const { user, character, role, updateProfile } = useGuest()
+export default function LocationChat({ slug, locationName, universe = 'jardim' }) {
+  const { user, character: jardimCharacter, role, updateProfile } = useGuest()
   const isAdmin = role === 'admin'
+
+  // ── Perfil por universo ──────────────────────────────────────────────────
+  // Para universos diferentes do Jardim, carregamos o personagem específico
+  // da collection daquele universo e o usamos como identidade no chat.
+  const [universeCharacter, setUniverseCharacter] = useState(null)
+
+  useEffect(() => {
+    if (universe !== 'cyberpunk' || !user?.uid) {
+      setUniverseCharacter(null)
+      return
+    }
+
+    // Garante que a ficha existe e a carrega
+    getOrCreateCyberpunkCharacter(user.uid).catch(() => {})
+
+    const unsub = subscribeCyberpunkCharacter(user.uid, (data) => {
+      if (data) {
+        setUniverseCharacter({
+          name: data.name || data.handle || 'Operador',
+          avatarUrl: data.avatarUrl || '',
+        })
+      }
+    })
+    return () => unsub()
+  }, [universe, user?.uid])
+
+  // character efetivo: usa o perfil do universo se disponível, senão usa o do Jardim
+  // Se for Cyberpunk, nunca utiliza o perfil do Jardim como fallback
+  const character = universe === 'cyberpunk'
+    ? (universeCharacter || { name: 'Operador', avatarUrl: '' })
+    : jardimCharacter
 
   // Mensagens da zona
   const [zoneMessages, setZoneMessages] = useState([])
@@ -156,7 +194,26 @@ export default function LocationChat({ slug, locationName }) {
   const handleToggleAway = async () => {
     const next = !isAway
     setIsAway(next)
-    await updatePresenceStatus(user?.uid, next ? 'away' : 'online')
+    await updatePresenceStatus(user?.uid, next ? 'away' : 'online', TAB_ID)
+  }
+
+  const handleSaveProfile = async (updates) => {
+    if (universe === 'cyberpunk') {
+      if (user?.uid) {
+        await updateCyberpunkCharacter(user.uid, {
+          name: updates.name,
+          handle: updates.name,
+          avatarUrl: updates.avatarUrl || ''
+        })
+      }
+    } else {
+      await updateProfile({
+        name: updates.name,
+        chatName: updates.name,
+        characterName: updates.name,
+        avatarUrl: updates.avatarUrl || ''
+      })
+    }
   }
 
   const handleToggleDisconnect = () => {
@@ -712,7 +769,13 @@ export default function LocationChat({ slug, locationName }) {
         )}
       </div>
 
-      {modalUser && (
+      {modalUser && universe === 'cyberpunk' ? (
+        <CyberpunkCharacterPopupModal
+          targetUser={modalUser}
+          currentUser={user}
+          onClose={() => setModalUser(null)}
+        />
+      ) : modalUser ? (
         <CharacterPopupModal
           targetUser={modalUser}
           currentUser={user}
@@ -729,12 +792,12 @@ export default function LocationChat({ slug, locationName }) {
             }
           }}
         />
-      )}
+      ) : null}
 
       {showEditProfile && (
         <EditProfileModal
           profile={character}
-          onSave={updateProfile}
+          onSave={handleSaveProfile}
           onClose={() => setShowEditProfile(false)}
         />
       )}
