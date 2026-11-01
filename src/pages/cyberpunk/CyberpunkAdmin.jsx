@@ -98,6 +98,17 @@ export default function CyberpunkAdmin() {
   const [uploadingBg, setUploadingBg] = useState(false)
   const [saveStatus, setSaveStatus] = useState('')
 
+  // Telemetria Atmosférica A.D.A.M.
+  const [formHasAtmosphere, setFormHasAtmosphere] = useState(false)
+  const [formAtmoO2, setFormAtmoO2] = useState(21.01)
+  const [formAtmoCO2, setFormAtmoCO2] = useState(0.05)
+  const [formAtmoN2, setFormAtmoN2] = useState(78.90)
+  const [formAtmoTemp, setFormAtmoTemp] = useState(22.2)
+  const [formAtmoPress, setFormAtmoPress] = useState(1.034)
+  const [formAtmoRad, setFormAtmoRad] = useState(0.20)
+  const [formAtmoHumid, setFormAtmoHumid] = useState(45.0)
+  const [formAtmoStability, setFormAtmoStability] = useState(72)
+
   const handleStartNewLocation = () => {
     setSelectedLoc(null)
     setFormSlug('')
@@ -110,6 +121,15 @@ export default function CyberpunkAdmin() {
     setFormSound('')
     setFormIsDefault(false)
     setFormNavButtons([])
+    setFormHasAtmosphere(false)
+    setFormAtmoO2(21.01)
+    setFormAtmoCO2(0.05)
+    setFormAtmoN2(78.90)
+    setFormAtmoTemp(22.2)
+    setFormAtmoPress(1.034)
+    setFormAtmoRad(0.20)
+    setFormAtmoHumid(45.0)
+    setFormAtmoStability(72)
     setSaveStatus('')
   }
 
@@ -124,6 +144,19 @@ export default function CyberpunkAdmin() {
     setFormBg(loc.backgroundImage || '')
     setFormSound(loc.locationSound || '')
     setFormIsDefault(!!loc.isDefault)
+
+    // Carrega dados atmosféricos se existirem
+    const atmo = loc.atmosphere
+    setFormHasAtmosphere(!!atmo && atmo.enabled !== false)
+    setFormAtmoO2(atmo?.o2 ?? 21.01)
+    setFormAtmoCO2(atmo?.co2 ?? 0.05)
+    setFormAtmoN2(atmo?.n2 ?? 78.90)
+    setFormAtmoTemp(atmo?.temp ?? 22.2)
+    setFormAtmoPress(atmo?.press ?? 1.034)
+    setFormAtmoRad(atmo?.rad ?? 0.20)
+    setFormAtmoHumid(atmo?.humid ?? 45.0)
+    setFormAtmoStability(atmo?.stability ?? 72)
+
     setFormNavButtons((loc.navigationButtons || []).map(b => ({
       label: b.label || '',
       targetSlug: b.targetSlug || '',
@@ -183,6 +216,17 @@ export default function CyberpunkAdmin() {
         description: formDescription.trim(),
         threatLevel: Number(formThreat) || 2,
         weatherCondition: formWeather,
+        atmosphere: formHasAtmosphere ? {
+          enabled: true,
+          o2: Number(formAtmoO2) || 0,
+          co2: Number(formAtmoCO2) || 0,
+          n2: Number(formAtmoN2) || 0,
+          temp: Number(formAtmoTemp) || 0,
+          press: Number(formAtmoPress) || 0,
+          rad: Number(formAtmoRad) || 0,
+          humid: Number(formAtmoHumid) || 0,
+          stability: Number(formAtmoStability) || 0,
+        } : { enabled: false },
         backgroundImage: formBg.trim() || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1920&auto=format&fit=crop&q=85',
         locationSound: formSound.trim(),
         isDefault: formIsDefault,
@@ -527,6 +571,166 @@ export default function CyberpunkAdmin() {
                       </option>
                     ))}
                   </select>
+                </div>
+
+                {/* Opção A.D.A.M.: Adicionar dados atmosféricos a essa localidade? */}
+                <div className="cb-form-group" style={{ background: 'rgba(0, 240, 255, 0.04)', border: '1px solid rgba(0, 240, 255, 0.25)', borderRadius: '4px', padding: '14px' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', margin: 0 }}>
+                    <input
+                      type="checkbox"
+                      checked={formHasAtmosphere}
+                      onChange={(e) => setFormHasAtmosphere(e.target.checked)}
+                      style={{ width: '18px', height: '18px', accentColor: '#00f0ff', cursor: 'pointer' }}
+                    />
+                    <span style={{ color: '#00f0ff', fontWeight: 700, fontSize: '0.88rem', letterSpacing: '0.05em' }}>
+                      📡 Adicionar dados atmosféricos a essa localidade? (A.D.A.M.)
+                    </span>
+                  </label>
+                  <p style={{ margin: '6px 0 0 28px', fontSize: '0.76rem', color: 'var(--cb-text-dim)' }}>
+                    Permite que viajantes utilizem o comando <code>/adam</code> no chat para capturar telemetria planetária neste local e compilar relatórios.
+                  </p>
+
+                  {formHasAtmosphere && (
+                    <div style={{ marginTop: '14px', paddingTop: '14px', borderTop: '1px dashed rgba(0, 240, 255, 0.2)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        <button
+                          type="button"
+                          className="cb-btn cb-btn-ghost"
+                          style={{ fontSize: '0.72rem', padding: '4px 10px' }}
+                          onClick={() => {
+                            setFormAtmoO2(21.01)
+                            setFormAtmoCO2(0.05)
+                            setFormAtmoN2(78.90)
+                            setFormAtmoTemp(22.2)
+                            setFormAtmoPress(1.034)
+                            setFormAtmoRad(0.20)
+                            setFormAtmoHumid(45.0)
+                            setFormAtmoStability(72)
+                          }}
+                        >
+                          🌍 Padrão Terra (Normal)
+                        </button>
+                        <button
+                          type="button"
+                          className="cb-btn cb-btn-ghost"
+                          style={{ fontSize: '0.72rem', padding: '4px 10px' }}
+                          onClick={() => {
+                            setFormAtmoO2(0.13)
+                            setFormAtmoCO2(95.32)
+                            setFormAtmoN2(2.70)
+                            setFormAtmoTemp(-63.0)
+                            setFormAtmoPress(0.006)
+                            setFormAtmoRad(2.40)
+                            setFormAtmoHumid(0.03)
+                            setFormAtmoStability(25)
+                          }}
+                        >
+                          🔴 Planeta Hostil / Vácuo (Letal)
+                        </button>
+                        <button
+                          type="button"
+                          className="cb-btn cb-btn-ghost"
+                          style={{ fontSize: '0.72rem', padding: '4px 10px' }}
+                          onClick={() => {
+                            setFormAtmoO2(18.20)
+                            setFormAtmoCO2(0.85)
+                            setFormAtmoN2(79.10)
+                            setFormAtmoTemp(38.5)
+                            setFormAtmoPress(1.420)
+                            setFormAtmoRad(0.65)
+                            setFormAtmoHumid(88.0)
+                            setFormAtmoStability(54)
+                          }}
+                        >
+                          ⚡ Tempestade Tóxica / Purificadores
+                        </button>
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px' }}>
+                        <div>
+                          <label className="cb-label" style={{ fontSize: '0.72rem' }}>Oxigênio (O₂) %:</label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            className="cb-input"
+                            value={formAtmoO2}
+                            onChange={(e) => setFormAtmoO2(e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <label className="cb-label" style={{ fontSize: '0.72rem' }}>Dióxido Carb. (CO₂) %:</label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            className="cb-input"
+                            value={formAtmoCO2}
+                            onChange={(e) => setFormAtmoCO2(e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <label className="cb-label" style={{ fontSize: '0.72rem' }}>Nitrogênio (N₂) %:</label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            className="cb-input"
+                            value={formAtmoN2}
+                            onChange={(e) => setFormAtmoN2(e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <label className="cb-label" style={{ fontSize: '0.72rem' }}>Temperatura (°C):</label>
+                          <input
+                            type="number"
+                            step="0.1"
+                            className="cb-input"
+                            value={formAtmoTemp}
+                            onChange={(e) => setFormAtmoTemp(e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <label className="cb-label" style={{ fontSize: '0.72rem' }}>Pressão (atm):</label>
+                          <input
+                            type="number"
+                            step="0.001"
+                            className="cb-input"
+                            value={formAtmoPress}
+                            onChange={(e) => setFormAtmoPress(e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <label className="cb-label" style={{ fontSize: '0.72rem' }}>Radiação (mSv/h):</label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            className="cb-input"
+                            value={formAtmoRad}
+                            onChange={(e) => setFormAtmoRad(e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <label className="cb-label" style={{ fontSize: '0.72rem' }}>Humidade (%):</label>
+                          <input
+                            type="number"
+                            step="0.1"
+                            className="cb-input"
+                            value={formAtmoHumid}
+                            onChange={(e) => setFormAtmoHumid(e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <label className="cb-label" style={{ fontSize: '0.72rem' }}>Estabilidade (%):</label>
+                          <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            className="cb-input"
+                            value={formAtmoStability}
+                            onChange={(e) => setFormAtmoStability(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="cb-form-group">

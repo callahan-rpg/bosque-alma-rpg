@@ -113,6 +113,16 @@ export default function CyberpunkHUD({ locationName }) {
             🎲
           </button>
 
+          {/* Dispositivo A.D.A.M. - Analisador Atmosférico */}
+          <button
+            type="button"
+            className="hud-icon-btn cb-hud-btn"
+            onClick={() => window.dispatchEvent(new CustomEvent('cyberpunk_toggle_adam'))}
+            title="Dispositivo A.D.A.M. // Analisador Atmosférico (ou digite /adam no chat)"
+          >
+            📡
+          </button>
+
           {/* Pill com a Ficha de Personagem Cyberpunk do usuário — abre popup flutuante */}
           <button
             type="button"

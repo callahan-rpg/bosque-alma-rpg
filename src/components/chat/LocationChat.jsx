@@ -387,6 +387,15 @@ export default function LocationChat({ slug, locationName, universe = 'jardim' }
   const handleSendMessage = async (text) => {
     if (!user?.uid) return
 
+    // Comando especial /adam: abre o analisador atmosférico A.D.A.M. apenas no universo Cyberpunk
+    const trimmed = (text || '').trim().toLowerCase()
+    if (trimmed === '/adam') {
+      if (universe === 'cyberpunk') {
+        window.dispatchEvent(new CustomEvent('cyberpunk_toggle_adam'))
+      }
+      return
+    }
+
     const userObj = {
       uid: user.uid,
       characterName: character?.name || 'Viajante',

@@ -240,6 +240,15 @@ export default function CyberpunkCharacterSheet() {
     })
   }
 
+  const handleDeleteAtmosphericReport = async (reportId) => {
+    if (!confirm('Deseja excluir este relatório atmosférico dos registros?')) return
+    const currentList = Array.isArray(charData?.atmosphericReports) ? [...charData.atmosphericReports] : []
+    const nextList = currentList.filter(r => r.id !== reportId)
+    await updateCyberpunkCharacter(activeUid, {
+      atmosphericReports: nextList
+    })
+  }
+
   if (loading) {
     return (
       <div className="cb-cyber-root" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
@@ -535,6 +544,15 @@ export default function CyberpunkCharacterSheet() {
               >
                 📜 Dossiê
               </button>
+
+              <button
+                type="button"
+                className={`cb-tab-item ${activeSheetTab === 'atmosphere' ? 'active' : ''}`}
+                style={{ padding: '6px 12px', fontSize: '12px' }}
+                onClick={() => setActiveSheetTab('atmosphere')}
+              >
+                📡 A.D.A.M. ({(charData?.atmosphericReports || []).length})
+              </button>
             </div>
 
             {/* ABA DE CIBERWARE */}
@@ -664,6 +682,176 @@ export default function CyberpunkCharacterSheet() {
                     {charData?.bio || 'Nenhum relatório foi cadastrado neste dossiê.'}
                   </p>
                 </div>
+              </div>
+            )}
+
+            {/* ABA DE RELATÓRIOS ATMOSFÉRICOS A.D.A.M. */}
+            {activeSheetTab === 'atmosphere' && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '6px' }}>
+                  <span style={{ fontSize: '12px', color: 'var(--cb-cyan)', fontFamily: 'var(--cb-font-mono)', fontWeight: 700 }}>
+                    📡 LAUDOS PLANETÁRIOS ARQUIVADOS ({ (charData?.atmosphericReports || []).length }):
+                  </span>
+                  <span style={{ fontSize: '11px', color: 'var(--cb-text-dim)' }}>
+                    💡 Digite <code>/adam</code> no chat para escanear
+                  </span>
+                </div>
+
+                {(!charData?.atmosphericReports || charData.atmosphericReports.length === 0) ? (
+                  <div style={{ padding: '32px 16px', textAlign: 'center', background: 'rgba(0, 240, 255, 0.03)', border: '1px dashed var(--cb-border-dim)', borderRadius: '4px' }}>
+                    <div style={{ fontSize: '2.2rem', marginBottom: '8px' }}>📡</div>
+                    <div style={{ color: 'var(--cb-cyan)', fontWeight: 700, fontSize: '13px', marginBottom: '6px' }}>
+                      NENHUM RELATÓRIO ATMOSFÉRICO ARQUIVADO
+                    </div>
+                    <p style={{ fontSize: '12px', color: 'var(--cb-text-dim)', margin: 0, lineHeight: 1.5 }}>
+                      Seu dispositivo A.D.A.M. ainda não compilou laudos planetários.<br />
+                      Acesse uma localidade planetária e digite <strong>/adam</strong> no chat para coletar dados atmosféricos e gerar relatórios.
+                    </p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {charData.atmosphericReports.map((rep) => {
+                      const dateStr = rep.timestamp ? new Date(rep.timestamp).toLocaleString('pt-BR') : 'Data Desconhecida'
+                      return (
+                        <div
+                          key={rep.id}
+                          style={{
+                            background: '#040810',
+                            border: '1px solid rgba(0, 240, 255, 0.3)',
+                            borderRadius: '4px',
+                            padding: '14px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '10px'
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', flexWrap: 'wrap' }}>
+                            <div>
+                              <div style={{ color: '#00f0ff', fontWeight: 800, fontSize: '14px', letterSpacing: '0.05em' }}>
+                                🪐 {rep.locationName || 'Local Desconhecido'}
+                              </div>
+                              <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>
+                                ⏱️ Registrado em {dateStr}
+                              </div>
+                            </div>
+
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <span
+                                style={{
+                                  fontSize: '11px',
+                                  fontWeight: 800,
+                                  padding: '3px 8px',
+                                  borderRadius: '3px',
+                                  border: `1px solid ${rep.badgeColor || '#00f0ff'}`,
+                                  color: rep.badgeColor || '#00f0ff',
+                                  background: 'rgba(0, 0, 0, 0.6)'
+                                }}
+                              >
+                                ● {rep.classification}
+                              </span>
+
+                              {isMySheet && (
+                                <button
+                                  type="button"
+                                  className="cb-btn cb-btn-magenta"
+                                  style={{ padding: '3px 8px', fontSize: '10px' }}
+                                  onClick={() => handleDeleteAtmosphericReport(rep.id)}
+                                  title="Excluir relatório da ficha"
+                                >
+                                  🗑️
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          <div style={{ fontSize: '12px', color: '#cbd5e1', background: 'rgba(15, 23, 42, 0.6)', padding: '8px 10px', borderLeft: '2px solid #00f0ff', lineHeight: 1.5 }}>
+                            {rep.generalVerdict}
+                          </div>
+
+                          {/* Medições registradas */}
+                          {rep.raw && (
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '6px', background: 'rgba(0, 0, 0, 0.4)', padding: '8px', borderRadius: '3px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                              <div style={{ fontSize: '11px' }}>
+                                <span style={{ color: '#5c9bbd' }}>O₂:</span> <strong style={{ color: '#00f0ff' }}>{rep.raw.o2}%</strong>
+                              </div>
+                              <div style={{ fontSize: '11px' }}>
+                                <span style={{ color: '#5c9bbd' }}>CO₂:</span> <strong style={{ color: '#fb923c' }}>{rep.raw.co2}%</strong>
+                              </div>
+                              <div style={{ fontSize: '11px' }}>
+                                <span style={{ color: '#5c9bbd' }}>N₂:</span> <strong style={{ color: '#cbd5e1' }}>{rep.raw.n2}%</strong>
+                              </div>
+                              <div style={{ fontSize: '11px' }}>
+                                <span style={{ color: '#5c9bbd' }}>TEMP:</span> <strong style={{ color: '#fb923c' }}>{rep.raw.temp}°C</strong>
+                              </div>
+                              <div style={{ fontSize: '11px' }}>
+                                <span style={{ color: '#5c9bbd' }}>PRESS:</span> <strong style={{ color: '#00f0ff' }}>{rep.raw.press} atm</strong>
+                              </div>
+                              <div style={{ fontSize: '11px' }}>
+                                <span style={{ color: '#5c9bbd' }}>RAD:</span> <strong style={{ color: '#10b981' }}>{rep.raw.rad} mSv/h</strong>
+                              </div>
+                              <div style={{ fontSize: '11px' }}>
+                                <span style={{ color: '#5c9bbd' }}>HUMID:</span> <strong style={{ color: '#00f0ff' }}>{rep.raw.humid}%</strong>
+                              </div>
+                              <div style={{ fontSize: '11px' }}>
+                                <span style={{ color: '#5c9bbd' }}>ESTAB.:</span> <strong style={{ color: '#00ff88' }}>{rep.raw.stability}%</strong>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Comparativo com a Terra */}
+                          {Array.isArray(rep.comparisons) && rep.comparisons.length > 0 && (
+                            <div style={{ overflowX: 'auto' }}>
+                              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                                <thead>
+                                  <tr style={{ background: '#091726', color: '#38bdf8' }}>
+                                    <th style={{ padding: '4px 6px', textAlign: 'left' }}>Parâmetro</th>
+                                    <th style={{ padding: '4px 6px', textAlign: 'left' }}>Aferido</th>
+                                    <th style={{ padding: '4px 6px', textAlign: 'left' }}>Padrão Terra</th>
+                                    <th style={{ padding: '4px 6px', textAlign: 'left' }}>Status</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {rep.comparisons.map((c, i) => (
+                                    <tr key={i} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                                      <td style={{ padding: '4px 6px', color: '#e2e8f0' }}>{c.param}</td>
+                                      <td style={{ padding: '4px 6px', color: '#00f0ff', fontFamily: 'monospace' }}>{c.value}</td>
+                                      <td style={{ padding: '4px 6px', color: '#64748b' }}>{c.earth}</td>
+                                      <td style={{ padding: '4px 6px', color: '#f1f5f9', fontWeight: 600 }}>{c.status}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          )}
+
+                          {/* Riscos */}
+                          {Array.isArray(rep.risks) && rep.risks.length > 0 && (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                              <span style={{ fontSize: '11px', color: '#f87171', fontWeight: 800 }}>⚠️ Riscos Biológicos:</span>
+                              <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '11px', color: '#94a3b8' }}>
+                                {rep.risks.map((r, i) => (
+                                  <li key={i}>{r}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {/* Cuidados */}
+                          {Array.isArray(rep.precautions) && rep.precautions.length > 0 && (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                              <span style={{ fontSize: '11px', color: '#38bdf8', fontWeight: 800 }}>🛡️ Protocolos Obrigatórios:</span>
+                              <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '11px', color: '#94a3b8' }}>
+                                {rep.precautions.map((p, i) => (
+                                  <li key={i}>{p}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
               </div>
             )}
           </div>

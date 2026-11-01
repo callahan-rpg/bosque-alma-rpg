@@ -5,6 +5,7 @@ import CyberNavButton from '../../components/cyberpunk/CyberNavButton.jsx'
 import LocationChat from '../../components/chat/LocationChat.jsx'
 import AmbientSoundPlayer from '../../components/AmbientSoundPlayer.jsx'
 import WeatherEffects from '../../components/WeatherEffects.jsx'
+import CyberpunkAtmosphereScanner from '../../components/cyberpunk/CyberpunkAtmosphereScanner.jsx'
 import {
   getCyberpunkLocation,
   subscribeCyberpunkLocations,
@@ -21,6 +22,14 @@ export default function CyberpunkLocation() {
   const [locationData, setLocationData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [config, setConfig] = useState(null)
+  const [showAdamScanner, setShowAdamScanner] = useState(false)
+
+  // Escuta comando /adam vindo do chat
+  useEffect(() => {
+    const handleToggle = () => setShowAdamScanner(prev => !prev)
+    window.addEventListener('cyberpunk_toggle_adam', handleToggle)
+    return () => window.removeEventListener('cyberpunk_toggle_adam', handleToggle)
+  }, [])
 
   // Escuta config global para saber a sala padrão
   useEffect(() => {
@@ -131,6 +140,13 @@ export default function CyberpunkLocation() {
           </div>
         </div>
       </div>
+      {/* Dispositivo A.D.A.M. - Analisador Atmosférico (aberto via /adam no chat) */}
+      {showAdamScanner && (
+        <CyberpunkAtmosphereScanner
+          location={loc}
+          onClose={() => setShowAdamScanner(false)}
+        />
+      )}
     </div>
   )
 }
