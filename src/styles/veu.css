@@ -1995,3 +1995,367 @@
   z-index: 1;
 }
 
+/* ============================================================
+   CÓDICE DE PERSONAGENS — ESTILO GÓTICO DEFINITIVO
+   ============================================================ */
+
+.vsheet-codex-hero {
+  background: linear-gradient(180deg, rgba(14, 18, 28, 0.95) 0%, rgba(9, 12, 18, 0.98) 100%);
+  border: 1px solid rgba(197, 160, 89, 0.3);
+  border-radius: 6px;
+  padding: 24px;
+  margin-bottom: 24px;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.85);
+}
+
+.vsheet-codex-hero::before,
+.vsheet-codex-hero::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+}
+.vsheet-codex-hero::before {
+  top: 3px;
+  left: 3px;
+  border-top: 2px solid #c5a059;
+  border-left: 2px solid #c5a059;
+}
+.vsheet-codex-hero::after {
+  bottom: 3px;
+  right: 3px;
+  border-bottom: 2px solid #c5a059;
+  border-right: 2px solid #c5a059;
+}
+
+.vsheet-codex-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.vsheet-codex-hero-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #ede8dc;
+  letter-spacing: 0.08em;
+  margin: 0 0 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vsheet-codex-hero-sub {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  color: #9e9a91;
+  margin: 0;
+  max-width: 680px;
+  line-height: 1.5;
+}
+
+.vsheet-codex-search-wrap {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.vsheet-codex-search-input {
+  width: 100%;
+  background: rgba(6, 8, 13, 0.9);
+  border: 1px solid rgba(197, 160, 89, 0.28);
+  border-radius: 4px;
+  padding: 11px 16px 11px 42px;
+  color: #f2ece0;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+.vsheet-codex-search-input:focus {
+  border-color: #c5a059;
+  box-shadow: 0 0 14px rgba(197, 160, 89, 0.35);
+  background: rgba(10, 14, 22, 0.98);
+}
+.vsheet-codex-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #c5a059;
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+/* Filtros de Linhagem / Raças */
+.vsheet-codex-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.vsheet-codex-chip {
+  background: rgba(8, 11, 18, 0.85);
+  border: 1px solid rgba(197, 160, 89, 0.22);
+  color: #a89f91;
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  padding: 5px 12px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.vsheet-codex-chip:hover {
+  background: rgba(22, 28, 40, 0.95);
+  border-color: #c5a059;
+  color: #ede8dc;
+  transform: translateY(-1px);
+}
+.vsheet-codex-chip.active {
+  background: rgba(197, 160, 89, 0.18);
+  border-color: #c5a059;
+  color: #f5f0e6;
+  box-shadow: 0 0 10px rgba(197, 160, 89, 0.25);
+}
+.vsheet-codex-chip-count {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+/* Grade de Personagens */
+.vsheet-codex-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 20px;
+}
+
+/* Card Individual de Personagem */
+.vsheet-codex-card {
+  background: linear-gradient(180deg, rgba(14, 18, 28, 0.94) 0%, rgba(9, 12, 18, 0.98) 100%);
+  border: 1px solid rgba(197, 160, 89, 0.28);
+  border-radius: 6px;
+  padding: 18px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  transition: all 0.25s ease;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+}
+.vsheet-codex-card:hover {
+  border-color: #c5a059;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.9), 0 0 18px rgba(197, 160, 89, 0.2);
+  transform: translateY(-2px);
+}
+
+.vsheet-codex-card::before,
+.vsheet-codex-card::after {
+  content: '';
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  pointer-events: none;
+}
+.vsheet-codex-card::before {
+  top: 2px;
+  left: 2px;
+  border-top: 1px solid #c5a059;
+  border-left: 1px solid #c5a059;
+}
+.vsheet-codex-card::after {
+  bottom: 2px;
+  right: 2px;
+  border-bottom: 1px solid #c5a059;
+  border-right: 1px solid #c5a059;
+}
+
+/* Cabeçalho do Card */
+.vsheet-codex-card-head {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.vsheet-codex-card-avatar {
+  width: 72px;
+  height: 84px;
+  border: 1px solid rgba(197, 160, 89, 0.35);
+  border-radius: 4px;
+  overflow: hidden;
+  background: #080a10;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+}
+.vsheet-codex-card-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+}
+
+.vsheet-codex-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.vsheet-codex-card-name {
+  font-family: 'Cinzel', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ede8dc;
+  letter-spacing: 0.04em;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.vsheet-codex-card-name span {
+  color: #c5a059;
+  font-size: 0.85em;
+  margin-left: 6px;
+}
+
+.vsheet-codex-card-sub {
+  font-family: 'Cinzel', serif;
+  font-size: 0.74rem;
+  color: #9e9a91;
+  letter-spacing: 0.04em;
+  margin-top: 4px;
+}
+
+.vsheet-codex-card-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.vsheet-codex-badge {
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 3px;
+  background: rgba(197, 160, 89, 0.08);
+  border: 1px solid rgba(197, 160, 89, 0.25);
+  color: #c5a059;
+}
+
+/* Quote breve no card */
+.vsheet-codex-quote {
+  font-family: 'Cinzel', serif;
+  font-style: italic;
+  font-size: 0.74rem;
+  color: #8c887f;
+  line-height: 1.4;
+  margin: 0;
+  border-left: 2px solid rgba(197, 160, 89, 0.3);
+  padding-left: 8px;
+}
+
+/* Mini-Grid dos 6 Atributos */
+.vsheet-codex-attrs-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+  background: rgba(7, 9, 14, 0.85);
+  border: 1px solid rgba(197, 160, 89, 0.18);
+  border-radius: 4px;
+  padding: 8px 4px;
+  text-align: center;
+}
+
+.vsheet-codex-attr-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.vsheet-codex-attr-lbl {
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #9e9a91;
+}
+.vsheet-codex-attr-num {
+  font-family: 'Cinzel', serif;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #ede8dc;
+}
+.vsheet-codex-attr-mod {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: #c5a059;
+}
+
+/* Mini Barras de Vida e Mana */
+.vsheet-codex-bars-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vsheet-codex-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.vsheet-codex-bar-lbl {
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  color: #9e9a91;
+  width: 42px;
+}
+.vsheet-codex-bar-val {
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  color: #ded9cc;
+  width: 52px;
+  text-align: right;
+}
+
+/* Botão de Inspecionar */
+.vsheet-codex-inspect-btn {
+  background: rgba(14, 18, 28, 0.95);
+  border: 1px solid rgba(197, 160, 89, 0.35);
+  color: #ede8dc;
+  font-family: 'Cinzel', serif;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 8px 16px;
+  border-radius: 4px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+.vsheet-codex-inspect-btn:hover {
+  background: rgba(197, 160, 89, 0.18);
+  border-color: #c5a059;
+  color: #fff;
+  box-shadow: 0 0 12px rgba(197, 160, 89, 0.25);
+}
+
