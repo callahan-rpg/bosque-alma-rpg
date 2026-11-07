@@ -499,15 +499,36 @@
 
 .vsheet-page {
   min-height: 100vh;
-  background-color: #07090e;
-  background-image: 
-    radial-gradient(ellipse 90% 60% at 50% 0%, rgba(20, 26, 38, 0.85) 0%, rgba(7, 9, 14, 0.98) 80%),
-    radial-gradient(circle at 85% 10%, rgba(30, 42, 65, 0.25) 0%, transparent 40%);
+  background-color: #05070b;
   color: #ded9cc;
   font-family: 'Cinzel', 'Georgia', serif;
-  padding: 30px 20px 80px;
+  padding: 24px 20px 80px;
   position: relative;
   overflow-x: hidden;
+}
+
+/* Imagem de Fundo Sutil Gótica (Fixed Backdrop) */
+.vsheet-bg-layer {
+  position: fixed;
+  inset: 0;
+  background-image: url('/assets/veu/castle-moon-banner.jpg');
+  background-size: cover;
+  background-position: center 15%;
+  background-repeat: no-repeat;
+  opacity: 0.13;
+  filter: blur(1.5px) saturate(0.85);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.vsheet-bg-overlay {
+  position: fixed;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 50% 15%, rgba(14, 18, 28, 0.4) 0%, rgba(5, 7, 11, 0.94) 75%),
+    linear-gradient(180deg, rgba(5, 7, 11, 0.65) 0%, #05070b 100%);
+  pointer-events: none;
+  z-index: 1;
 }
 
 .vsheet-container {
@@ -517,53 +538,203 @@
   z-index: 2;
 }
 
-/* ── Top Bar de Ações Discretas (Voltar, Editar) ── */
-.vsheet-topbar {
+/* ── Barra Superior Integrada e Gótica (Topbar Strip) ── */
+.vsheet-topbar-strip {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(197, 160, 89, 0.15);
+  padding: 10px 18px;
+  background: linear-gradient(90deg, rgba(14, 18, 28, 0.95) 0%, rgba(10, 13, 20, 0.92) 50%, rgba(14, 18, 28, 0.95) 100%);
+  border: 1px solid rgba(197, 160, 89, 0.35);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), inset 0 0 16px rgba(197, 160, 89, 0.05);
+  position: relative;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
-.vsheet-back-btn {
-  background: transparent;
+.vsheet-topbar-strip::before,
+.vsheet-topbar-strip::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  pointer-events: none;
+}
+.vsheet-topbar-strip::before {
+  top: 2px;
+  left: 2px;
+  border-top: 2px solid #c5a059;
+  border-left: 2px solid #c5a059;
+}
+.vsheet-topbar-strip::after {
+  bottom: 2px;
+  right: 2px;
+  border-bottom: 2px solid #c5a059;
+  border-right: 2px solid #c5a059;
+}
+
+.vsheet-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vsheet-topbar-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vsheet-universe-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  color: #c5a059;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px rgba(197, 160, 89, 0.35);
+}
+.vsheet-universe-gem {
+  color: #c5a059;
+  font-size: 0.7rem;
+  opacity: 0.8;
+}
+
+.vsheet-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Botões de Ação de Navegação (Voltar, Códice) */
+.vsheet-nav-action-btn {
+  background: rgba(9, 12, 18, 0.9);
   border: 1px solid rgba(197, 160, 89, 0.3);
+  color: #c8c0b0;
+  font-family: 'Cinzel', serif;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 7px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+.vsheet-nav-action-btn:hover {
+  background: rgba(22, 28, 42, 0.95);
+  border-color: #c5a059;
+  color: #f5f0e6;
+  box-shadow: 0 0 14px rgba(197, 160, 89, 0.25);
+  transform: translateY(-1px);
+}
+.vsheet-nav-action-btn .vsheet-btn-icon {
+  color: #c5a059;
+  font-size: 0.85rem;
+  transition: transform 0.2s ease;
+}
+.vsheet-nav-action-btn:hover .vsheet-btn-icon {
+  transform: translateX(-2px);
+}
+
+/* Botão "Editar Ficha" em Destaque Gótico Dourado/Carmim */
+.vsheet-edit-trigger-btn {
+  background: linear-gradient(135deg, rgba(140, 29, 29, 0.95) 0%, rgba(185, 28, 28, 1) 50%, rgba(120, 20, 20, 0.95) 100%);
+  border: 1px solid #dc2626;
+  color: #fff;
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 8px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 0 18px rgba(220, 38, 38, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+.vsheet-edit-trigger-btn:hover {
+  background: linear-gradient(135deg, rgba(185, 28, 28, 1) 0%, rgba(220, 38, 38, 1) 50%, rgba(160, 24, 24, 1) 100%);
+  border-color: #ef4444;
+  box-shadow: 0 0 26px rgba(220, 38, 38, 0.75), 0 0 12px rgba(197, 160, 89, 0.4);
+  transform: translateY(-1px);
+}
+.vsheet-edit-trigger-btn .btn-sparkle {
+  color: #fde047;
+  font-size: 0.8rem;
+  animation: pulseSparkle 2s infinite ease-in-out;
+}
+.vsheet-edit-trigger-btn .btn-icon {
+  font-size: 0.9rem;
+}
+
+/* Badge de Modo Observador */
+.vsheet-view-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(197, 160, 89, 0.1);
+  border: 1px solid rgba(197, 160, 89, 0.4);
   color: #c5a059;
   font-family: 'Cinzel', serif;
-  font-size: 0.75rem;
+  font-size: 0.74rem;
   letter-spacing: 0.08em;
   padding: 6px 14px;
   border-radius: 4px;
+}
+
+/* Micro Botões de Ajuste Rápido (HP, Mana) */
+.vsheet-micro-btn {
+  background: rgba(14, 18, 26, 0.85);
+  border: 1px solid rgba(197, 160, 89, 0.25);
+  color: #c8c0b0;
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.vsheet-micro-btn:hover {
+  background: rgba(197, 160, 89, 0.2);
+  border-color: #c5a059;
+  color: #fff;
+  box-shadow: 0 0 8px rgba(197, 160, 89, 0.25);
+}
+
+/* Botões pílula de ação nas caixas (Adicionar Item, Editar Notas) */
+.vsheet-box-action-btn {
+  background: rgba(197, 160, 89, 0.1);
+  border: 1px solid rgba(197, 160, 89, 0.35);
+  color: #ede8dc;
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  padding: 3px 12px;
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
 }
-.vsheet-back-btn:hover {
-  background: rgba(197, 160, 89, 0.1);
+.vsheet-box-action-btn:hover {
+  background: rgba(197, 160, 89, 0.25);
   border-color: #c5a059;
-  color: #f0ece1;
-}
-
-.vsheet-edit-btn {
-  background: linear-gradient(135deg, rgba(197, 160, 89, 0.2) 0%, rgba(139, 105, 45, 0.3) 100%);
-  border: 1px solid #c5a059;
-  color: #f5f0e6;
-  font-family: 'Cinzel', serif;
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  padding: 6px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 0 12px rgba(197, 160, 89, 0.2);
-}
-.vsheet-edit-btn:hover {
-  background: linear-gradient(135deg, rgba(197, 160, 89, 0.35) 0%, rgba(139, 105, 45, 0.45) 100%);
-  box-shadow: 0 0 18px rgba(197, 160, 89, 0.4);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(197, 160, 89, 0.25);
 }
 
 /* ── Grid Principal: 3 Colunas ── */
@@ -1650,6 +1821,23 @@
 }
 
 @media (max-width: 680px) {
+  .vsheet-topbar-strip {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+    padding: 12px;
+  }
+  .vsheet-topbar-left, .vsheet-topbar-right {
+    justify-content: center;
+    width: 100%;
+  }
+  .vsheet-topbar-center {
+    display: none;
+  }
+  .vsheet-edit-trigger-btn {
+    width: 100%;
+    justify-content: center;
+  }
   .vsheet-attr-grid {
     grid-template-columns: repeat(2, 1fr);
   }

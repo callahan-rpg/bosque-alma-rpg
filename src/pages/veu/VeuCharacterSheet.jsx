@@ -328,32 +328,67 @@ export default function VeuCharacterSheet() {
   return (
     <div className="vsheet-page">
 
-      {/* ── BARRA DE TOPO ───────────────────────────────────────────────────── */}
-      <div className="vsheet-topbar">
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button className="veu-btn veu-btn-ghost" style={{ fontSize: '0.78rem', padding: '5px 12px' }} onClick={() => navigate('/veu')}>
-            ← Voltar
-          </button>
-          <button className="veu-btn veu-btn-ghost" style={{ fontSize: '0.78rem', padding: '5px 12px' }} onClick={() => navigate('/veu/personagens')}>
-            👥 Personagens
-          </button>
-        </div>
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          {!isMySheet && (
-            <span style={{ fontSize: '0.72rem', color: '#c5a059', background: 'rgba(197,160,89,0.1)', border: '1px solid rgba(197,160,89,0.3)', padding: '4px 10px', borderRadius: '4px' }}>
-              👁️ Modo Visualização
-            </span>
-          )}
-          {isMySheet && (
-            <button className="veu-btn veu-btn-blood" style={{ fontSize: '0.78rem', padding: '5px 14px' }} onClick={handleOpenEdit}>
-              ✍️ Editar Ficha
-            </button>
-          )}
-        </div>
-      </div>
+      {/* ── IMAGEM DE FUNDO SUTIL GÓTICA ── */}
+      <div className="vsheet-bg-layer" />
+      <div className="vsheet-bg-overlay" />
 
-      {/* ── GRADE PRINCIPAL 3 COLUNAS ───────────────────────────────────────── */}
+      {/* ── CONTAINER PRINCIPAL CENTRALIZADO (1220px) ───────────────────────── */}
       <div className="vsheet-container">
+
+        {/* ── BARRA DE TOPO INTEGRADA E GÓTICA ─────────────────────────────────── */}
+        <div className="vsheet-topbar-strip">
+          <div className="vsheet-topbar-left">
+            <button
+              type="button"
+              className="vsheet-nav-action-btn"
+              onClick={() => navigate('/veu')}
+              title="Voltar ao Limiar do Véu Sombrio"
+            >
+              <span className="vsheet-btn-icon">←</span>
+              <span>Voltar ao Limiar</span>
+            </button>
+            <button
+              type="button"
+              className="vsheet-nav-action-btn"
+              onClick={() => navigate('/veu/personagens')}
+              title="Consultar Códice de Habitantes"
+            >
+              <span className="vsheet-btn-icon">👥</span>
+              <span>Códice</span>
+            </button>
+          </div>
+
+          <div className="vsheet-topbar-center">
+            <div className="vsheet-universe-badge">
+              <span className="vsheet-universe-gem">✦</span>
+              <span>O Véu Sombrio</span>
+              <span className="vsheet-universe-gem">✦</span>
+            </div>
+          </div>
+
+          <div className="vsheet-topbar-right">
+            {!isMySheet && (
+              <span className="vsheet-view-badge">
+                <span>👁️</span>
+                <span>Modo Observador</span>
+              </span>
+            )}
+            {isMySheet && (
+              <button
+                type="button"
+                className="vsheet-edit-trigger-btn"
+                onClick={handleOpenEdit}
+                title="Editar informações, atributos e histórico"
+              >
+                <span className="btn-sparkle">✦</span>
+                <span className="btn-icon">✍️</span>
+                <span className="btn-text">Editar Ficha</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* ── GRADE PRINCIPAL 3 COLUNAS ───────────────────────────────────────── */}
         <div className="vsheet-main-grid">
 
           {/* ══ COLUNA ESQUERDA: PERFIL ══════════════════════════════════════════ */}
@@ -514,9 +549,9 @@ export default function VeuCharacterSheet() {
                       <div className="vsheet-bar-fill-life" style={{ width: `${hpPct}%` }} />
                     </div>
                     {isMySheet && (
-                      <div style={{ display: 'flex', gap: '4px', marginTop: '5px', justifyContent: 'flex-end' }}>
+                      <div style={{ display: 'flex', gap: '5px', marginTop: '6px', justifyContent: 'flex-end' }}>
                         {[-5, -1, +1, +5].map(d => (
-                          <button key={d} className="veu-btn veu-btn-ghost" style={{ padding: '1px 7px', fontSize: '0.68rem' }} onClick={() => handleAdjustHp(d)}>
+                          <button key={d} type="button" className="vsheet-micro-btn" onClick={() => handleAdjustHp(d)}>
                             {d > 0 ? `+${d}` : d}
                           </button>
                         ))}
@@ -534,9 +569,9 @@ export default function VeuCharacterSheet() {
                       <div className="vsheet-bar-fill-mana" style={{ width: `${manaPct}%` }} />
                     </div>
                     {isMySheet && (
-                      <div style={{ display: 'flex', gap: '4px', marginTop: '5px', justifyContent: 'flex-end' }}>
+                      <div style={{ display: 'flex', gap: '5px', marginTop: '6px', justifyContent: 'flex-end' }}>
                         {[-5, -1, +1, +5].map(d => (
-                          <button key={d} className="veu-btn veu-btn-ghost" style={{ padding: '1px 7px', fontSize: '0.68rem' }} onClick={() => handleAdjustMana(d)}>
+                          <button key={d} type="button" className="vsheet-micro-btn" onClick={() => handleAdjustMana(d)}>
                             {d > 0 ? `+${d}` : d}
                           </button>
                         ))}
@@ -576,11 +611,12 @@ export default function VeuCharacterSheet() {
                     </span>
                     {isMySheet && (
                       <button
-                        className="veu-btn veu-btn-ghost"
-                        style={{ fontSize: '0.68rem', padding: '2px 8px' }}
+                        type="button"
+                        className="vsheet-box-action-btn"
                         onClick={() => setShowAddItemModal(true)}
                       >
-                        + Item
+                        <span>+</span>
+                        <span>Item</span>
                       </button>
                     )}
                   </div>
@@ -626,17 +662,17 @@ export default function VeuCharacterSheet() {
                     </span>
                     {isMySheet && !editingNotes && (
                       <button
-                        className="veu-btn veu-btn-ghost"
-                        style={{ fontSize: '0.68rem', padding: '2px 8px' }}
+                        type="button"
+                        className="vsheet-box-action-btn"
                         onClick={() => { setNotesText(charData.notes || ''); setEditingNotes(true) }}
                       >
                         Editar
                       </button>
                     )}
                     {isMySheet && editingNotes && (
-                      <div style={{ display: 'flex', gap: '4px' }}>
-                        <button className="veu-btn veu-btn-ghost" style={{ fontSize: '0.68rem', padding: '2px 8px' }} onClick={handleSaveNotes}>Salvar</button>
-                        <button className="veu-btn veu-btn-ghost" style={{ fontSize: '0.68rem', padding: '2px 8px', color: '#94a3b8' }} onClick={() => setEditingNotes(false)}>✕</button>
+                      <div style={{ display: 'flex', gap: '5px' }}>
+                        <button type="button" className="vsheet-box-action-btn" onClick={handleSaveNotes}>Salvar</button>
+                        <button type="button" className="vsheet-micro-btn" style={{ color: '#94a3b8' }} onClick={() => setEditingNotes(false)}>✕</button>
                       </div>
                     )}
                   </div>
