@@ -110,7 +110,7 @@ export function createDefaultVeuCharacter(uid, displayName = 'Ester Exposito') {
     bio: 'Determinada, observadora e teimosa. Ester sempre buscou fazer o que é certo, mesmo quando isso significa ir contra o que os outros dizem. Em uma cidade onde o sobrenatural esconde-se entre os humanos, ela prefere manter os pés no chão e a arma por perto.',
     history: 'Filha de uma família tradicional, Ester viu sua vida mudar quando o sobrenatural se revelou ao seu redor. Hoje, serve na polícia da cidade, determinada a proteger o que ainda resta de normalidade em meio ao caos.',
     notes: 'Nada digno de nota por enquanto.',
-    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80',
+    avatarUrl: '/assets/veu/ester-exposito.jpg',
     level: 1,
     hpMax: 70,
     hpCurrent: 70,
@@ -126,13 +126,13 @@ export function createDefaultVeuCharacter(uid, displayName = 'Ester Exposito') {
       carisma: 14
     },
     inventory: [
-      { id: 'inv_1', name: 'Distintivo Policial', icon: '🛡️', image: '', type: 'Acessório', desc: 'Identificação oficial da polícia civil de Vesprália.' },
-      { id: 'inv_2', name: 'Pistola 9mm', icon: '🔫', image: '', type: 'Arma de Fogo', desc: 'Arma de serviço padrão, confiável e letal contra ameaças mundanas e vulneráveis.' },
-      { id: 'inv_3', name: 'Algemas de Aço', icon: '⛓️', image: '', type: 'Contenção', desc: 'Feitas de liga reforçada para conter suspeitos e criaturas de força moderada.' },
-      { id: 'inv_4', name: 'Kit Médico', icon: '🧰', image: '', type: 'Primeiros Socorros', desc: 'Bandagens estéreis, hemostáticos e antisséptico para tratar ferimentos de combate.' },
-      { id: 'inv_5', name: 'Faca Tática', icon: '🗡️', image: '', type: 'Arma Branca', desc: 'Lâmina de combate em aço fosco, excelente para defesa a curta distância.' },
-      { id: 'inv_6', name: 'Lanterna Tática', icon: '🔦', image: '', type: 'Equipamento', desc: 'Feixe de alta intensidade capaz de iluminar becos e desorientar alvos na escuridão.' },
-      { id: 'inv_7', name: 'Rádio Comunicador', icon: '📻', image: '', type: 'Comunicação', desc: 'Sintonizado na frequência tática do departamento de polícia.' }
+      { id: 'inv_1', name: 'Distintivo Policial', icon: '🛡️', image: '/assets/veu/item_badge.jpg', type: 'Acessório', desc: 'Identificação oficial da polícia civil de Vesprália.' },
+      { id: 'inv_2', name: 'Pistola 9mm', icon: '🔫', image: '/assets/veu/item_gun.jpg', type: 'Arma de Fogo', desc: 'Arma de serviço padrão, confiável e letal contra ameaças mundanas e vulneráveis.' },
+      { id: 'inv_3', name: 'Algemas de Aço', icon: '⛓️', image: '/assets/veu/item_handcuffs.jpg', type: 'Contenção', desc: 'Feitas de liga reforçada para conter suspeitos e criaturas de força moderada.' },
+      { id: 'inv_4', name: 'Kit Médico', icon: '🧰', image: '/assets/veu/item_medkit.jpg', type: 'Primeiros Socorros', desc: 'Bandagens estéreis, hemostáticos e antisséptico para tratar ferimentos de combate.' },
+      { id: 'inv_5', name: 'Faca Tática', icon: '🗡️', image: '/assets/veu/item_knife.jpg', type: 'Arma Branca', desc: 'Lâmina de combate em aço fosco, excelente para defesa a curta distância.' },
+      { id: 'inv_6', name: 'Lanterna Tática', icon: '🔦', image: '/assets/veu/item_flashlight.jpg', type: 'Equipamento', desc: 'Feixe de alta intensidade capaz de iluminar becos e desorientar alvos na escuridão.' },
+      { id: 'inv_7', name: 'Rádio Comunicador', icon: '📻', image: '/assets/veu/item_radio.jpg', type: 'Comunicação', desc: 'Sintonizado na frequência tática do departamento de polícia.' }
     ],
     achievements: [
       { id: 'ach_1', title: 'Bem-vindo à cidade', desc: 'Complete sua primeira missão.', icon: '✦', unlocked: true },

@@ -22,6 +22,17 @@ const ATTR_ICONS = {
   carisma: '🎭'
 }
 
+// Mapa de imagens padrão para os itens oficiais da ficha
+const ITEM_IMG_MAP = {
+  'Distintivo Policial': '/assets/veu/item_badge.jpg',
+  'Pistola 9mm': '/assets/veu/item_gun.jpg',
+  'Algemas de Aço': '/assets/veu/item_handcuffs.jpg',
+  'Kit Médico': '/assets/veu/item_medkit.jpg',
+  'Faca Tática': '/assets/veu/item_knife.jpg',
+  'Lanterna Tática': '/assets/veu/item_flashlight.jpg',
+  'Rádio Comunicador': '/assets/veu/item_radio.jpg'
+}
+
 export default function VeuCharacterSheet() {
   const { targetUid } = useParams()
   const navigate = useNavigate()
@@ -35,6 +46,7 @@ export default function VeuCharacterSheet() {
 
   // Estados do modal de edição
   const [showEditModal, setShowEditModal] = useState(false)
+  const [activeEditTab, setActiveEditTab] = useState('identity') // 'identity' | 'attributes' | 'chronicles' | 'portrait'
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const [savingEdit, setSavingEdit] = useState(false)
   const [editForm, setEditForm] = useState({
@@ -55,7 +67,7 @@ export default function VeuCharacterSheet() {
     manaMax: 40,
     manaCurrent: 40,
     avatarUrl: '',
-    attributes: { forca: 10, destreza: 10, poder: 10, sabedoria: 10, constituicao: 10, carisma: 10 }
+    attributes: { forca: 14, destreza: 17, poder: 13, sabedoria: 12, constituicao: 15, carisma: 14 }
   })
 
   // Estados de rolagem de dados
@@ -85,7 +97,7 @@ export default function VeuCharacterSheet() {
         if (isMySheet) {
           await getOrCreateVeuCharacter(
             user.uid,
-            profile?.characterName || profile?.nick || user.displayName || 'Viajante da Noite'
+            profile?.characterName || profile?.nick || user.displayName || 'Ester Exposito'
           )
         }
       } catch (err) {
@@ -132,16 +144,17 @@ export default function VeuCharacterSheet() {
       hpCurrent: charData.hpCurrent ?? 70,
       manaMax: charData.manaMax ?? 40,
       manaCurrent: charData.manaCurrent ?? 40,
-      avatarUrl: charData.avatarUrl || '',
+      avatarUrl: charData.avatarUrl || '/assets/veu/ester-exposito.jpg',
       attributes: {
-        forca: attrs.forca ?? 10,
-        destreza: attrs.destreza ?? 10,
-        poder: attrs.poder ?? 10,
-        sabedoria: attrs.sabedoria ?? 10,
-        constituicao: attrs.constituicao ?? attrs.vitalidade ?? 10,
-        carisma: attrs.carisma ?? 10
+        forca: attrs.forca ?? 14,
+        destreza: attrs.destreza ?? 17,
+        poder: attrs.poder ?? 13,
+        sabedoria: attrs.sabedoria ?? 12,
+        constituicao: attrs.constituicao ?? attrs.vitalidade ?? 15,
+        carisma: attrs.carisma ?? 14
       }
     })
+    setActiveEditTab('identity')
     setShowEditModal(true)
   }
 
@@ -167,8 +180,8 @@ export default function VeuCharacterSheet() {
     setSavingEdit(true)
     try {
       await updateVeuCharacter(activeUid, {
-        name: editForm.name.trim() || 'Viajante da Noite',
-        handle: editForm.name.trim() || 'Viajante da Noite',
+        name: editForm.name.trim() || 'Ester Exposito',
+        handle: editForm.name.trim() || 'Ester Exposito',
         occupation: editForm.occupation.trim(),
         lineage: editForm.lineage,
         age: editForm.age.trim(),
@@ -184,7 +197,7 @@ export default function VeuCharacterSheet() {
         hpCurrent: Number(editForm.hpCurrent) || 70,
         manaMax: Number(editForm.manaMax) || 40,
         manaCurrent: Number(editForm.manaCurrent) || 40,
-        avatarUrl: editForm.avatarUrl.trim(),
+        avatarUrl: editForm.avatarUrl.trim() || '/assets/veu/ester-exposito.jpg',
         attributes: editForm.attributes
       })
       setShowEditModal(false)
@@ -245,6 +258,7 @@ export default function VeuCharacterSheet() {
         id: `item_${Date.now()}`,
         name: itemForm.name.trim(),
         icon: itemForm.icon.trim() || '🗡️',
+        image: ITEM_IMG_MAP[itemForm.name.trim()] || '',
         type: itemForm.type.trim(),
         desc: itemForm.desc.trim()
       }
@@ -309,6 +323,7 @@ export default function VeuCharacterSheet() {
   const manaPct = Math.max(0, Math.min(100, (manaCurrent / manaMax) * 100)).toFixed(1)
 
   const lineageObj = VEU_LINEAGES.find(l => l.name === charData.lineage) || { icon: '🩸' }
+  const currentAvatar = charData.avatarUrl || '/assets/veu/ester-exposito.jpg'
 
   return (
     <div className="vsheet-page">
@@ -344,23 +359,27 @@ export default function VeuCharacterSheet() {
           {/* ══ COLUNA ESQUERDA: PERFIL ══════════════════════════════════════════ */}
           <div className="vsheet-left-card">
 
-            {/* Retrato */}
+            {/* Retrato com Brasão Superior Esquerdo */}
             <div className="vsheet-portrait-frame">
-              {charData.avatarUrl ? (
-                <img src={charData.avatarUrl} alt={charData.name} className="vsheet-portrait-img" />
-              ) : (
-                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '4rem', background: '#0a0c14' }}>
-                  {lineageObj.icon}
-                </div>
-              )}
+              <div className="vsheet-crest-topleft">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="rgba(197, 160, 89, 0.4)" stroke="#c5a059" strokeWidth="1.5" />
+                </svg>
+              </div>
+              <img
+                src={currentAvatar}
+                alt={charData.name}
+                className="vsheet-portrait-img"
+                onError={(e) => { e.currentTarget.src = '/assets/veu/ester-exposito.jpg' }}
+              />
             </div>
 
             {/* Citação */}
             {charData.quote && (
               <div className="vsheet-quote-box">
-                <span style={{ color: 'var(--veu-gold)', fontSize: '1rem', lineHeight: 1 }}>"</span>
+                <span style={{ color: 'var(--veu-gold)', fontSize: '1.1rem', lineHeight: 1 }}>"</span>
                 <em style={{ flex: 1 }}>{charData.quote}</em>
-                <span style={{ color: 'var(--veu-gold)', fontSize: '1rem', lineHeight: 1, alignSelf: 'flex-end' }}>"</span>
+                <span style={{ color: 'var(--veu-gold)', fontSize: '1.1rem', lineHeight: 1, alignSelf: 'flex-end' }}>"</span>
               </div>
             )}
 
@@ -408,16 +427,16 @@ export default function VeuCharacterSheet() {
           {/* ══ COLUNAS DIREITA: HEADER + SPLIT ══════════════════════════════════ */}
           <div className="vsheet-right-section">
 
-            {/* Banner do personagem */}
+            {/* Banner do personagem com silhueta do castelo e lua cheia autêntica */}
             <div className="vsheet-header-banner">
-              <div className="vsheet-full-moon" />
+              <div className="vsheet-header-bg" />
               <div className="vsheet-header-content">
                 <h1 className="vsheet-name">
-                  {charData.name || 'Viajante da Noite'}
-                  <span style={{ marginLeft: '10px', fontSize: '0.6em', color: 'var(--veu-gold)', verticalAlign: 'super' }}>✦</span>
+                  {charData.name || 'Ester Exposito'}
+                  <span className="vsheet-name-sparkle">✦</span>
                 </h1>
                 <div className="vsheet-char-subline">
-                  {[charData.occupation, charData.lineage, charData.age].filter(Boolean).join(' • ')}
+                  {[charData.occupation || 'Policial', charData.lineage || 'Humana', charData.age || '28 anos'].filter(Boolean).join(' • ')}
                 </div>
               </div>
             </div>
@@ -549,7 +568,7 @@ export default function VeuCharacterSheet() {
               {/* ── COLUNA DIREITA ───────────────────────────────────────────── */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
-                {/* INVENTÁRIO */}
+                {/* INVENTÁRIO COM ÍCONES REAIS */}
                 <div className="vsheet-box">
                   <div className="vsheet-box-title" style={{ justifyContent: 'space-between' }}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -566,17 +585,33 @@ export default function VeuCharacterSheet() {
                     )}
                   </div>
                   <div className="vsheet-inv-grid">
-                    {(charData.inventory || []).map((item) => (
-                      <div
-                        key={item.id}
-                        className="vsheet-inv-slot"
-                        title={`${item.name}${item.desc ? '\n' + item.desc : ''}`}
-                        onClick={() => setSelectedInvItem(item)}
-                      >
-                        <span className="vsheet-inv-slot-icon">{item.icon || '📦'}</span>
-                      </div>
-                    ))}
-                    {/* Slots vazios para completar a grade */}
+                    {(charData.inventory || []).map((item) => {
+                      const itemImg = item.image || ITEM_IMG_MAP[item.name]
+                      return (
+                        <div
+                          key={item.id}
+                          className="vsheet-inv-slot"
+                          title={`${item.name}${item.desc ? '\n' + item.desc : ''}`}
+                          onClick={() => setSelectedInvItem(item)}
+                        >
+                          {itemImg ? (
+                            <img
+                              src={itemImg}
+                              alt={item.name}
+                              className="vsheet-inv-slot-img"
+                              onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextSibling) e.currentTarget.nextSibling.style.display = 'block' }}
+                            />
+                          ) : null}
+                          <span
+                            className="vsheet-inv-slot-icon"
+                            style={{ display: itemImg ? 'none' : 'block' }}
+                          >
+                            {item.icon || '📦'}
+                          </span>
+                        </div>
+                      )
+                    })}
+                    {/* Slots vazios para completar a grade 3x3 */}
                     {Array.from({ length: Math.max(0, 9 - (charData.inventory || []).length) }).map((_, i) => (
                       <div key={`empty-${i}`} className="vsheet-inv-slot vsheet-inv-slot-empty" />
                     ))}
@@ -620,7 +655,7 @@ export default function VeuCharacterSheet() {
                   )}
                 </div>
 
-                {/* CONQUISTAS */}
+                {/* CONQUISTAS COM ESTRELAS DE 8 PONTAS DOURADAS */}
                 <div className="vsheet-box" style={{ flex: 1 }}>
                   <div className="vsheet-box-title" style={{ justifyContent: 'space-between' }}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -636,14 +671,17 @@ export default function VeuCharacterSheet() {
                     ) : (
                       (charData.achievements || []).slice(0, 5).map((ach) => (
                         <div key={ach.id} className="vsheet-achieve-item">
-                          <span style={{ fontSize: '1rem', color: ach.unlocked ? 'var(--veu-gold)' : '#635030' }}>
-                            {ach.icon || '✦'}
-                          </span>
-                          <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: '0.78rem', fontWeight: '600', color: ach.unlocked ? '#e8d5a0' : '#635030' }}>
+                          <div className="vsheet-achieve-star">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                              <path d="M12 2L14.2 9.8L22 12L14.2 14.2L12 22L9.8 14.2L2 12L9.8 9.8L12 2Z" fill="rgba(197,160,89,0.3)" stroke="#c5a059" strokeWidth="1.5" />
+                              <circle cx="12" cy="12" r="2.5" fill="#c5a059" />
+                            </svg>
+                          </div>
+                          <div className="vsheet-achieve-info">
+                            <div className="vsheet-achieve-title">
                               {ach.title}
                             </div>
-                            <div style={{ fontSize: '0.68rem', color: '#a89060' }}>{ach.desc}</div>
+                            <div className="vsheet-achieve-desc">{ach.desc}</div>
                           </div>
                         </div>
                       ))
@@ -656,165 +694,439 @@ export default function VeuCharacterSheet() {
         </div>
       </div>
 
-      {/* ══ MODAL DE EDIÇÃO ═══════════════════════════════════════════════════ */}
+      {/* ══ MODAL DE EDIÇÃO GÓTICO SOFISTICADO ═══════════════════════════════ */}
       {showEditModal && (
         <div className="vsheet-modal-overlay" onClick={e => { if (e.target === e.currentTarget) setShowEditModal(false) }}>
           <div className="vsheet-modal-card">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h3 style={{ margin: 0, fontFamily: 'var(--veu-font-title)', color: 'var(--veu-gold)', fontSize: '1.1rem', letterSpacing: '0.08em' }}>
-                ✍️ Editar Ficha de Personagem
-              </h3>
-              <button className="veu-btn veu-btn-ghost" style={{ padding: '3px 10px', fontSize: '0.8rem' }} onClick={() => setShowEditModal(false)}>✕</button>
+            
+            {/* Cabeçalho */}
+            <div className="vsheet-modal-header">
+              <div className="vsheet-modal-title-wrap">
+                <h3 className="vsheet-modal-title">
+                  <span className="gold-icon">📜</span>
+                  <span>Registros do Véu • Edição de Personagem</span>
+                </h3>
+                <p className="vsheet-modal-subtitle">
+                  Configure atributos, recursos vitais, narrativa e aparência nos códices sombrios.
+                </p>
+              </div>
+              <button
+                type="button"
+                className="vsheet-modal-close-btn"
+                onClick={() => setShowEditModal(false)}
+                title="Fechar"
+              >
+                ✕
+              </button>
             </div>
 
-            <form onSubmit={handleSaveEdit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {/* Abas */}
+            <div className="vsheet-modal-tabs">
+              <button
+                type="button"
+                className={`vsheet-modal-tab-btn ${activeEditTab === 'identity' ? 'active' : ''}`}
+                onClick={() => setActiveEditTab('identity')}
+              >
+                <span>🛡️</span> Identidade & Origem
+              </button>
+              <button
+                type="button"
+                className={`vsheet-modal-tab-btn ${activeEditTab === 'attributes' ? 'active' : ''}`}
+                onClick={() => setActiveEditTab('attributes')}
+              >
+                <span>⚔️</span> Atributos & Recursos
+              </button>
+              <button
+                type="button"
+                className={`vsheet-modal-tab-btn ${activeEditTab === 'chronicles' ? 'active' : ''}`}
+                onClick={() => setActiveEditTab('chronicles')}
+              >
+                <span>📖</span> Narrativa & Notas
+              </button>
+              <button
+                type="button"
+                className={`vsheet-modal-tab-btn ${activeEditTab === 'portrait' ? 'active' : ''}`}
+                onClick={() => setActiveEditTab('portrait')}
+              >
+                <span>🖼️</span> Retrato
+              </button>
+            </div>
 
-              {/* Avatar */}
-              <div>
-                <label className="veu-label">Foto / Retrato</label>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <input
-                    type="text"
-                    className="veu-input"
-                    placeholder="https://..."
-                    value={editForm.avatarUrl}
-                    onChange={e => setEditForm(p => ({ ...p, avatarUrl: e.target.value }))}
-                  />
-                  <label className="veu-btn veu-btn-ghost" style={{ cursor: 'pointer', whiteSpace: 'nowrap', fontSize: '0.75rem', padding: '8px 12px' }}>
-                    {uploadingAvatar ? '⏳' : '📷 Upload'}
-                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleAvatarFile} disabled={uploadingAvatar} />
-                  </label>
-                </div>
-              </div>
+            {/* Formulário */}
+            <form onSubmit={handleSaveEdit} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+              <div className="vsheet-modal-body">
+                
+                {/* ABA 1: IDENTIDADE */}
+                {activeEditTab === 'identity' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div className="vsheet-modal-sec-box">
+                      <div className="vsheet-modal-sec-title">
+                        <span>✦</span> Dados Pessoais
+                      </div>
+                      <div className="vsheet-modal-grid-2">
+                        <div className="vsheet-modal-field">
+                          <label className="vsheet-modal-label">Nome Completo</label>
+                          <input
+                            type="text"
+                            className="vsheet-modal-input"
+                            value={editForm.name}
+                            onChange={e => setEditForm(p => ({ ...p, name: e.target.value }))}
+                            placeholder="Ex: Ester Exposito"
+                            required
+                          />
+                        </div>
+                        <div className="vsheet-modal-field">
+                          <label className="vsheet-modal-label">Linhagem Sobrenatural</label>
+                          <select
+                            className="vsheet-modal-select"
+                            value={editForm.lineage}
+                            onChange={e => setEditForm(p => ({ ...p, lineage: e.target.value }))}
+                          >
+                            {VEU_LINEAGES.map(l => (
+                              <option key={l.id} value={l.name}>{l.icon} {l.name}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
 
-              {/* Nome + Linhagem */}
-              <div className="vsheet-form-grid">
-                <div>
-                  <label className="veu-label">Nome do Personagem</label>
-                  <input type="text" className="veu-input" value={editForm.name} onChange={e => setEditForm(p => ({ ...p, name: e.target.value }))} required />
-                </div>
-                <div>
-                  <label className="veu-label">Linhagem / Raça</label>
-                  <select className="veu-select" value={editForm.lineage} onChange={e => setEditForm(p => ({ ...p, lineage: e.target.value }))}>
-                    {VEU_LINEAGES.map(l => (
-                      <option key={l.id} value={l.name}>{l.icon} {l.name}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+                      <div className="vsheet-modal-grid-2" style={{ marginTop: '12px' }}>
+                        <div className="vsheet-modal-field">
+                          <label className="vsheet-modal-label">Ocupação / Cargo</label>
+                          <input
+                            type="text"
+                            className="vsheet-modal-input"
+                            value={editForm.occupation}
+                            onChange={e => setEditForm(p => ({ ...p, occupation: e.target.value }))}
+                            placeholder="Ex: Policial, Detetive do Oculto..."
+                          />
+                        </div>
+                        <div className="vsheet-modal-field">
+                          <label className="vsheet-modal-label">Idade</label>
+                          <input
+                            type="text"
+                            className="vsheet-modal-input"
+                            value={editForm.age}
+                            onChange={e => setEditForm(p => ({ ...p, age: e.target.value }))}
+                            placeholder="Ex: 28 anos"
+                          />
+                        </div>
+                      </div>
 
-              {/* Ocupação + Idade */}
-              <div className="vsheet-form-grid">
-                <div>
-                  <label className="veu-label">Ocupação</label>
-                  <input type="text" className="veu-input" value={editForm.occupation} onChange={e => setEditForm(p => ({ ...p, occupation: e.target.value }))} />
-                </div>
-                <div>
-                  <label className="veu-label">Idade</label>
-                  <input type="text" className="veu-input" value={editForm.age} onChange={e => setEditForm(p => ({ ...p, age: e.target.value }))} />
-                </div>
-              </div>
-
-              {/* Altura + Nacionalidade */}
-              <div className="vsheet-form-grid">
-                <div>
-                  <label className="veu-label">Altura</label>
-                  <input type="text" className="veu-input" value={editForm.height} onChange={e => setEditForm(p => ({ ...p, height: e.target.value }))} />
-                </div>
-                <div>
-                  <label className="veu-label">Nacionalidade</label>
-                  <input type="text" className="veu-input" value={editForm.nationality} onChange={e => setEditForm(p => ({ ...p, nationality: e.target.value }))} />
-                </div>
-              </div>
-
-              {/* Residência + Movimento */}
-              <div className="vsheet-form-grid">
-                <div>
-                  <label className="veu-label">Residência</label>
-                  <input type="text" className="veu-input" value={editForm.residence} onChange={e => setEditForm(p => ({ ...p, residence: e.target.value }))} />
-                </div>
-                <div>
-                  <label className="veu-label">Movimento</label>
-                  <input type="text" className="veu-input" value={editForm.movement} onChange={e => setEditForm(p => ({ ...p, movement: e.target.value }))} />
-                </div>
-              </div>
-
-              {/* Citação */}
-              <div>
-                <label className="veu-label">Citação / Frase Pessoal</label>
-                <input type="text" className="veu-input" value={editForm.quote} onChange={e => setEditForm(p => ({ ...p, quote: e.target.value }))} />
-              </div>
-
-              {/* HP + Mana */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '10px' }}>
-                <div>
-                  <label className="veu-label">HP Máx</label>
-                  <input type="number" min="1" max="999" className="veu-input" value={editForm.hpMax} onChange={e => setEditForm(p => ({ ...p, hpMax: e.target.value }))} />
-                </div>
-                <div>
-                  <label className="veu-label">HP Atual</label>
-                  <input type="number" min="0" max="999" className="veu-input" value={editForm.hpCurrent} onChange={e => setEditForm(p => ({ ...p, hpCurrent: e.target.value }))} />
-                </div>
-                <div>
-                  <label className="veu-label">Mana Máx</label>
-                  <input type="number" min="1" max="999" className="veu-input" value={editForm.manaMax} onChange={e => setEditForm(p => ({ ...p, manaMax: e.target.value }))} />
-                </div>
-                <div>
-                  <label className="veu-label">Mana Atual</label>
-                  <input type="number" min="0" max="999" className="veu-input" value={editForm.manaCurrent} onChange={e => setEditForm(p => ({ ...p, manaCurrent: e.target.value }))} />
-                </div>
-              </div>
-
-              {/* Atributos */}
-              <div style={{ background: 'rgba(10,8,16,0.6)', border: '1px solid rgba(197,160,89,0.2)', borderRadius: '6px', padding: '14px' }}>
-                <div style={{ fontFamily: 'var(--veu-font-title)', fontSize: '0.78rem', color: 'var(--veu-gold)', marginBottom: '10px', letterSpacing: '0.08em' }}>
-                  ⚔️ ATRIBUTOS
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '10px' }}>
-                  {VEU_ATTRIBUTES_LIST.map(attr => (
-                    <div key={attr.key}>
-                      <label style={{ fontSize: '0.68rem', color: '#a89060', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '3px' }}>
-                        {ATTR_ICONS[attr.key]} {attr.label}
-                      </label>
-                      <input
-                        type="number"
-                        min="1"
-                        max="30"
-                        className="veu-input"
-                        value={editForm.attributes[attr.key] ?? 10}
-                        onChange={e => setEditForm(p => ({
-                          ...p,
-                          attributes: { ...p.attributes, [attr.key]: Number(e.target.value) }
-                        }))}
-                      />
+                      <div className="vsheet-modal-grid-3" style={{ marginTop: '12px' }}>
+                        <div className="vsheet-modal-field">
+                          <label className="vsheet-modal-label">Altura</label>
+                          <input
+                            type="text"
+                            className="vsheet-modal-input"
+                            value={editForm.height}
+                            onChange={e => setEditForm(p => ({ ...p, height: e.target.value }))}
+                            placeholder="Ex: 1,68 m"
+                          />
+                        </div>
+                        <div className="vsheet-modal-field">
+                          <label className="vsheet-modal-label">Nacionalidade</label>
+                          <input
+                            type="text"
+                            className="vsheet-modal-input"
+                            value={editForm.nationality}
+                            onChange={e => setEditForm(p => ({ ...p, nationality: e.target.value }))}
+                            placeholder="Ex: Brasileira"
+                          />
+                        </div>
+                        <div className="vsheet-modal-field">
+                          <label className="vsheet-modal-label">Residência / Domínio</label>
+                          <input
+                            type="text"
+                            className="vsheet-modal-input"
+                            value={editForm.residence}
+                            onChange={e => setEditForm(p => ({ ...p, residence: e.target.value }))}
+                            placeholder="Ex: Vesprália"
+                          />
+                        </div>
+                      </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                )}
+
+                {/* ABA 2: ATRIBUTOS & RECURSOS */}
+                {activeEditTab === 'attributes' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    
+                    {/* Recursos Vitais com Live Bar */}
+                    <div className="vsheet-modal-sec-box">
+                      <div className="vsheet-modal-sec-title">
+                        <span>❤️</span> Recursos Vitais & Movimento
+                      </div>
+                      <div className="vsheet-modal-grid-4">
+                        <div className="vsheet-modal-field">
+                          <label className="vsheet-modal-label">Vida Atual</label>
+                          <input
+                            type="number"
+                            min="0"
+                            max="999"
+                            className="vsheet-modal-input"
+                            value={editForm.hpCurrent}
+                            onChange={e => setEditForm(p => ({ ...p, hpCurrent: Number(e.target.value) }))}
+                          />
+                        </div>
+                        <div className="vsheet-modal-field">
+                          <label className="vsheet-modal-label">Vida Máxima</label>
+                          <input
+                            type="number"
+                            min="1"
+                            max="999"
+                            className="vsheet-modal-input"
+                            value={editForm.hpMax}
+                            onChange={e => setEditForm(p => ({ ...p, hpMax: Number(e.target.value) }))}
+                          />
+                        </div>
+                        <div className="vsheet-modal-field">
+                          <label className="vsheet-modal-label">Mana Atual</label>
+                          <input
+                            type="number"
+                            min="0"
+                            max="999"
+                            className="vsheet-modal-input"
+                            value={editForm.manaCurrent}
+                            onChange={e => setEditForm(p => ({ ...p, manaCurrent: Number(e.target.value) }))}
+                          />
+                        </div>
+                        <div className="vsheet-modal-field">
+                          <label className="vsheet-modal-label">Mana Máxima</label>
+                          <input
+                            type="number"
+                            min="1"
+                            max="999"
+                            className="vsheet-modal-input"
+                            value={editForm.manaMax}
+                            onChange={e => setEditForm(p => ({ ...p, manaMax: Number(e.target.value) }))}
+                          />
+                        </div>
+                      </div>
+
+                      <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div className="vsheet-modal-field" style={{ width: '160px' }}>
+                          <label className="vsheet-modal-label">👟 Movimento</label>
+                          <input
+                            type="text"
+                            className="vsheet-modal-input"
+                            value={editForm.movement}
+                            onChange={e => setEditForm(p => ({ ...p, movement: e.target.value }))}
+                            placeholder="Ex: 9 m"
+                          />
+                        </div>
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', paddingTop: '18px' }}>
+                          <div className="vsheet-bar-track">
+                            <div className="vsheet-bar-fill-life" style={{ width: `${Math.min(100, Math.max(0, (editForm.hpCurrent / (editForm.hpMax || 1)) * 100))}%` }} />
+                          </div>
+                          <div className="vsheet-bar-track">
+                            <div className="vsheet-bar-fill-mana" style={{ width: `${Math.min(100, Math.max(0, (editForm.manaCurrent / (editForm.manaMax || 1)) * 100))}%` }} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Os 6 Atributos em Grade 3x2 com Steppers */}
+                    <div className="vsheet-modal-sec-box">
+                      <div className="vsheet-modal-sec-title">
+                        <span>⚔️</span> Os 6 Atributos Principais (com modificador d20)
+                      </div>
+                      <div className="vsheet-modal-attr-grid">
+                        {VEU_ATTRIBUTES_LIST.map((attr) => {
+                          const val = editForm.attributes[attr.key] ?? 10
+                          const mod = calculateModifier(val)
+                          return (
+                            <div key={attr.key} className="vsheet-modal-attr-card">
+                              <div className="vsheet-modal-attr-head">
+                                <span>{ATTR_ICONS[attr.key] || '⚔️'}</span>
+                                <span>{attr.label}</span>
+                              </div>
+                              <div className="vsheet-modal-attr-control">
+                                <button
+                                  type="button"
+                                  className="vsheet-modal-attr-btn"
+                                  onClick={() => setEditForm(p => ({
+                                    ...p,
+                                    attributes: { ...p.attributes, [attr.key]: Math.max(1, val - 1) }
+                                  }))}
+                                >
+                                  −
+                                </button>
+                                <input
+                                  type="number"
+                                  min="1"
+                                  max="30"
+                                  className="vsheet-modal-attr-val-input"
+                                  value={val}
+                                  onChange={e => {
+                                    const next = Math.max(1, Math.min(30, Number(e.target.value) || 10))
+                                    setEditForm(p => ({
+                                      ...p,
+                                      attributes: { ...p.attributes, [attr.key]: next }
+                                    }))
+                                  }}
+                                />
+                                <button
+                                  type="button"
+                                  className="vsheet-modal-attr-btn"
+                                  onClick={() => setEditForm(p => ({
+                                    ...p,
+                                    attributes: { ...p.attributes, [attr.key]: Math.min(30, val + 1) }
+                                  }))}
+                                >
+                                  +
+                                </button>
+                              </div>
+                              <div className="vsheet-modal-attr-mod">
+                                Modificador: {mod}
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* ABA 3: NARRATIVA & NOTAS */}
+                {activeEditTab === 'chronicles' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div className="vsheet-modal-sec-box">
+                      <div className="vsheet-modal-sec-title">
+                        <span>💬</span> Citação / Frase de Efeito
+                      </div>
+                      <div className="vsheet-modal-field">
+                        <input
+                          type="text"
+                          className="vsheet-modal-input"
+                          value={editForm.quote}
+                          onChange={e => setEditForm(p => ({ ...p, quote: e.target.value }))}
+                          placeholder="Ex: Algumas coisas precisam ser mantidas em segredo."
+                        />
+                      </div>
+                    </div>
+
+                    <div className="vsheet-modal-sec-box">
+                      <div className="vsheet-modal-sec-title">
+                        <span>👤</span> Sobre o Personagem (Bio Breve)
+                      </div>
+                      <div className="vsheet-modal-field">
+                        <textarea
+                          rows={3}
+                          className="vsheet-modal-textarea"
+                          value={editForm.bio}
+                          onChange={e => setEditForm(p => ({ ...p, bio: e.target.value }))}
+                          placeholder="Descrição de personalidade, convicções e postura..."
+                        />
+                      </div>
+                    </div>
+
+                    <div className="vsheet-modal-sec-box">
+                      <div className="vsheet-modal-sec-title">
+                        <span>📜</span> Histórico & Origem Detalhada
+                      </div>
+                      <div className="vsheet-modal-field">
+                        <textarea
+                          rows={4}
+                          className="vsheet-modal-textarea"
+                          value={editForm.history}
+                          onChange={e => setEditForm(p => ({ ...p, history: e.target.value }))}
+                          placeholder="Eventos marcantes do passado, revelação do sobrenatural..."
+                        />
+                      </div>
+                    </div>
+
+                    <div className="vsheet-modal-sec-box">
+                      <div className="vsheet-modal-sec-title">
+                        <span>📋</span> Notas de Investigação
+                      </div>
+                      <div className="vsheet-modal-field">
+                        <textarea
+                          rows={3}
+                          className="vsheet-modal-textarea"
+                          value={editForm.notes}
+                          onChange={e => setEditForm(p => ({ ...p, notes: e.target.value }))}
+                          placeholder="Anotações e lembretes para as sessões..."
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* ABA 4: RETRATO */}
+                {activeEditTab === 'portrait' && (
+                  <div className="vsheet-modal-sec-box">
+                    <div className="vsheet-modal-sec-title">
+                      <span>🖼️</span> Retrato do Personagem
+                    </div>
+                    <div className="vsheet-modal-avatar-row">
+                      <div className="vsheet-modal-avatar-preview">
+                        <img
+                          src={editForm.avatarUrl || '/assets/veu/ester-exposito.jpg'}
+                          alt="Preview"
+                          onError={e => { e.currentTarget.src = '/assets/veu/ester-exposito.jpg' }}
+                        />
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        <div className="vsheet-modal-field">
+                          <label className="vsheet-modal-label">URL da Imagem</label>
+                          <input
+                            type="text"
+                            className="vsheet-modal-input"
+                            value={editForm.avatarUrl}
+                            onChange={e => setEditForm(p => ({ ...p, avatarUrl: e.target.value }))}
+                            placeholder="/assets/veu/ester-exposito.jpg ou https://..."
+                          />
+                        </div>
+                        <div>
+                          <label
+                            className="veu-btn veu-btn-ghost"
+                            style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', padding: '7px 14px' }}
+                          >
+                            <span>📷</span>
+                            <span>{uploadingAvatar ? 'Enviando imagem...' : 'Fazer Upload de Foto do Dispositivo'}</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              style={{ display: 'none' }}
+                              onChange={handleAvatarFile}
+                              disabled={uploadingAvatar}
+                            />
+                          </label>
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            type="button"
+                            className="veu-btn veu-btn-ghost"
+                            style={{ fontSize: '0.72rem', padding: '4px 10px' }}
+                            onClick={() => setEditForm(p => ({ ...p, avatarUrl: '/assets/veu/ester-exposito.jpg' }))}
+                          >
+                            Usar Foto Oficial Ester Exposito
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
               </div>
 
-              {/* Bio */}
-              <div>
-                <label className="veu-label">Sobre (Bio)</label>
-                <textarea className="veu-input" rows={3} style={{ resize: 'vertical' }} value={editForm.bio} onChange={e => setEditForm(p => ({ ...p, bio: e.target.value }))} />
-              </div>
-
-              {/* Histórico */}
-              <div>
-                <label className="veu-label">Histórico</label>
-                <textarea className="veu-input" rows={3} style={{ resize: 'vertical' }} value={editForm.history} onChange={e => setEditForm(p => ({ ...p, history: e.target.value }))} />
-              </div>
-
-              {/* Notas */}
-              <div>
-                <label className="veu-label">Notas</label>
-                <textarea className="veu-input" rows={2} style={{ resize: 'vertical' }} value={editForm.notes} onChange={e => setEditForm(p => ({ ...p, notes: e.target.value }))} />
-              </div>
-
-              {/* Botões */}
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '4px' }}>
-                <button type="button" className="veu-btn veu-btn-ghost" onClick={() => setShowEditModal(false)}>Cancelar</button>
-                <button type="submit" className="veu-btn veu-btn-blood" disabled={savingEdit}>
-                  {savingEdit ? 'Salvando...' : '💾 Salvar Ficha'}
+              {/* Rodapé do Modal com Ações */}
+              <div className="vsheet-modal-footer">
+                <button
+                  type="button"
+                  className="vsheet-modal-cancel-btn"
+                  onClick={() => setShowEditModal(false)}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="vsheet-modal-save-btn"
+                  disabled={savingEdit}
+                >
+                  <span>💾</span>
+                  <span>{savingEdit ? 'Gravando no Véu...' : 'Salvar Alterações'}</span>
                 </button>
               </div>
             </form>
@@ -825,27 +1137,37 @@ export default function VeuCharacterSheet() {
       {/* ══ MODAL DE ITEM DO INVENTÁRIO ══════════════════════════════════════ */}
       {selectedInvItem && (
         <div className="vsheet-modal-overlay" onClick={e => { if (e.target === e.currentTarget) setSelectedInvItem(null) }}>
-          <div className="vsheet-modal-card" style={{ maxWidth: '380px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '2rem' }}>{selectedInvItem.icon || '📦'}</span>
+          <div className="vsheet-modal-card" style={{ maxWidth: '420px' }}>
+            <div className="vsheet-modal-header" style={{ padding: '14px 18px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                {selectedInvItem.image || ITEM_IMG_MAP[selectedInvItem.name] ? (
+                  <img
+                    src={selectedInvItem.image || ITEM_IMG_MAP[selectedInvItem.name]}
+                    alt={selectedInvItem.name}
+                    style={{ width: '48px', height: '48px', objectFit: 'contain', borderRadius: '4px', background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(197,160,89,0.3)' }}
+                  />
+                ) : (
+                  <span style={{ fontSize: '2rem' }}>{selectedInvItem.icon || '📦'}</span>
+                )}
                 <div>
-                  <div style={{ fontFamily: 'var(--veu-font-title)', color: 'var(--veu-gold)', fontSize: '0.95rem' }}>{selectedInvItem.name}</div>
-                  {selectedInvItem.type && <div style={{ fontSize: '0.68rem', color: '#a89060' }}>{selectedInvItem.type}</div>}
+                  <div style={{ fontFamily: 'var(--veu-font-title)', color: 'var(--veu-gold)', fontSize: '0.98rem', fontWeight: '700' }}>{selectedInvItem.name}</div>
+                  {selectedInvItem.type && <div style={{ fontSize: '0.7rem', color: '#a89060' }}>{selectedInvItem.type}</div>}
                 </div>
               </div>
-              <button className="veu-btn veu-btn-ghost" style={{ padding: '2px 8px' }} onClick={() => setSelectedInvItem(null)}>✕</button>
+              <button className="vsheet-modal-close-btn" style={{ width: '28px', height: '28px' }} onClick={() => setSelectedInvItem(null)}>✕</button>
             </div>
-            <p style={{ margin: '0 0 16px', fontSize: '0.8rem', color: '#c8c0b0', lineHeight: '1.6' }}>
-              {selectedInvItem.desc || selectedInvItem.description || 'Sem descrição.'}
-            </p>
-            {isMySheet && (
-              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <button className="veu-btn veu-btn-ghost" style={{ fontSize: '0.72rem', color: '#ef4444' }} onClick={() => handleRemoveItem(selectedInvItem.id)}>
-                  🗑️ Remover
-                </button>
-              </div>
-            )}
+            <div style={{ padding: '18px 20px' }}>
+              <p style={{ margin: '0 0 16px', fontSize: '0.82rem', color: '#c8c0b0', lineHeight: '1.6' }}>
+                {selectedInvItem.desc || selectedInvItem.description || 'Sem descrição.'}
+              </p>
+              {isMySheet && (
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <button className="veu-btn veu-btn-ghost" style={{ fontSize: '0.74rem', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)' }} onClick={() => handleRemoveItem(selectedInvItem.id)}>
+                    🗑️ Remover do Inventário
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -853,33 +1175,35 @@ export default function VeuCharacterSheet() {
       {/* ══ MODAL DE ADICIONAR ITEM ══════════════════════════════════════════ */}
       {showAddItemModal && (
         <div className="vsheet-modal-overlay" onClick={e => { if (e.target === e.currentTarget) setShowAddItemModal(false) }}>
-          <div className="vsheet-modal-card" style={{ maxWidth: '420px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h3 style={{ margin: 0, fontFamily: 'var(--veu-font-title)', color: 'var(--veu-gold)', fontSize: '1rem' }}>+ Novo Item</h3>
-              <button className="veu-btn veu-btn-ghost" style={{ padding: '2px 8px' }} onClick={() => setShowAddItemModal(false)}>✕</button>
+          <div className="vsheet-modal-card" style={{ maxWidth: '440px' }}>
+            <div className="vsheet-modal-header" style={{ padding: '14px 18px' }}>
+              <h3 className="vsheet-modal-title" style={{ fontSize: '1rem' }}>+ Novo Item no Inventário</h3>
+              <button className="vsheet-modal-close-btn" style={{ width: '28px', height: '28px' }} onClick={() => setShowAddItemModal(false)}>✕</button>
             </div>
-            <form onSubmit={handleAddItem} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div className="vsheet-form-grid">
-                <div>
-                  <label className="veu-label">Nome *</label>
-                  <input type="text" className="veu-input" required value={itemForm.name} onChange={e => setItemForm(p => ({ ...p, name: e.target.value }))} />
+            <form onSubmit={handleAddItem} style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div className="vsheet-modal-grid-2">
+                  <div className="vsheet-modal-field">
+                    <label className="vsheet-modal-label">Nome do Item *</label>
+                    <input type="text" className="vsheet-modal-input" required value={itemForm.name} onChange={e => setItemForm(p => ({ ...p, name: e.target.value }))} />
+                  </div>
+                  <div className="vsheet-modal-field">
+                    <label className="vsheet-modal-label">Ícone (emoji)</label>
+                    <input type="text" className="vsheet-modal-input" value={itemForm.icon} onChange={e => setItemForm(p => ({ ...p, icon: e.target.value }))} />
+                  </div>
                 </div>
-                <div>
-                  <label className="veu-label">Ícone (emoji)</label>
-                  <input type="text" className="veu-input" value={itemForm.icon} onChange={e => setItemForm(p => ({ ...p, icon: e.target.value }))} />
+                <div className="vsheet-modal-field">
+                  <label className="vsheet-modal-label">Tipo</label>
+                  <input type="text" className="vsheet-modal-input" placeholder="Ex: Arma, Contenção, Relíquia..." value={itemForm.type} onChange={e => setItemForm(p => ({ ...p, type: e.target.value }))} />
+                </div>
+                <div className="vsheet-modal-field">
+                  <label className="vsheet-modal-label">Descrição</label>
+                  <textarea className="vsheet-modal-textarea" rows={3} value={itemForm.desc} onChange={e => setItemForm(p => ({ ...p, desc: e.target.value }))} />
                 </div>
               </div>
-              <div>
-                <label className="veu-label">Tipo</label>
-                <input type="text" className="veu-input" placeholder="Ex: Arma, Poção, Relíquia..." value={itemForm.type} onChange={e => setItemForm(p => ({ ...p, type: e.target.value }))} />
-              </div>
-              <div>
-                <label className="veu-label">Descrição</label>
-                <textarea className="veu-input" rows={3} value={itemForm.desc} onChange={e => setItemForm(p => ({ ...p, desc: e.target.value }))} />
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-                <button type="button" className="veu-btn veu-btn-ghost" onClick={() => setShowAddItemModal(false)}>Cancelar</button>
-                <button type="submit" className="veu-btn veu-btn-blood" disabled={savingItem}>{savingItem ? 'Salvando...' : '+ Adicionar'}</button>
+              <div className="vsheet-modal-footer" style={{ padding: '12px 20px' }}>
+                <button type="button" className="vsheet-modal-cancel-btn" onClick={() => setShowAddItemModal(false)}>Cancelar</button>
+                <button type="submit" className="vsheet-modal-save-btn" disabled={savingItem}>{savingItem ? 'Salvando...' : '+ Adicionar'}</button>
               </div>
             </form>
           </div>
