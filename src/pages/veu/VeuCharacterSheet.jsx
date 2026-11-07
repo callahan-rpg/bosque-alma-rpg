@@ -152,6 +152,7 @@ export default function VeuCharacterSheet() {
 
       await updateVeuCharacter(activeUid, {
         name: editForm.name.trim() || 'Viajante da Noite',
+        handle: editForm.name.trim() || 'Viajante da Noite',
         lineage: editForm.lineage,
         coven: editForm.coven.trim() || 'Linhagem Independente',
         origin: editForm.origin.trim() || 'Desconhecida',

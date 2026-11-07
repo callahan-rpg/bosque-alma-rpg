@@ -1,9 +1,180 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Permite leitura e escrita nas coleções do Jardim RPG (locations, chat_friends, guest_profiles, dice_rolls)
+
+    // ─────────────────────────────────────────────────────────────
+    // 1. JARDIM DO CREPÚSCULO (FANTASIA / UNIVERSO PRINCIPAL)
+    // ─────────────────────────────────────────────────────────────
+
+    // Localidades do Jardim (salas de chat, cenários)
+    match /locations/{locationId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Configurações globais do universo Jardim (horários, clima, mestre)
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Compêndio / Bestiário / Grimório de receitas e lore
+    match /compendium_entries/{entryId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Catálogo de ingredientes alquímicos
+    match /alchemy_ingredients/{ingredientId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Fichas e perfis de jogadores no Jardim
+    match /players/{playerId} {
+      allow read: if request.auth != null;
+
+      allow create: if request.auth != null
+                    && request.auth.uid == playerId;
+
+      allow update: if request.auth != null
+                    && request.auth.uid == playerId
+                    && (!request.resource.data.keys().hasAny(['role'])
+                        || request.resource.data.role == resource.data.role);
+
+      allow delete: if false;
+    }
+
+    // Rolagens de dados em tempo real no Jardim
+    match /dice_rolls/{rollId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if false;
+    }
+
+    // Combates ativos nas salas do Jardim
+    match /active_combats/{combatId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Sistema de amizades e solicitações de chat privado
+    match /chat_friends/{userId}/friends/{friendId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null
+                    && (request.auth.uid == userId || request.resource.data.friendUid == request.auth.uid);
+      allow delete: if request.auth != null
+                    && (request.auth.uid == userId || friendId == request.auth.uid);
+    }
+
+    match /chat_friends/{userId}/requests/{requestId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null
+                            && (request.auth.uid == userId || requestId == request.auth.uid);
+    }
+
+    // Perfis temporários / convidados
+    match /guest_profiles/{guestId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // 2. SENTINELA 1 (CYBERPUNK RPG)
+    // ─────────────────────────────────────────────────────────────
+
+    // Fichas de personagens Cyberpunk
+    match /cyberpunk_characters/{charId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && (request.auth.uid == charId || request.resource.data.keys().hasAny(['adminOverride']));
+    }
+
+    // Distritos e localidades de Sentinela 1
+    match /cyberpunk_locations/{locId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Catálogo de armas, implantes e equipamentos
+    match /cyberpunk_items/{itemId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Facções, corporações e gangues
+    match /cyberpunk_factions/{factionId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Configurações globais do universo Cyberpunk
+    match /cyberpunk_settings/{settingId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Rolagens de dados do universo Cyberpunk
+    match /cyberpunk_dice_rolls/{rollId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if false;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // 3. O VÉU SOMBRIO (GÓTICO SOBRENATURAL)
+    // ─────────────────────────────────────────────────────────────
+
+    // Fichas de personagens, linhagens, rituais e inventário de O Véu Sombrio
+    match /veu_characters/{charId} {
+      // Leitura para usuários autenticados (permite códice e visualização na sala)
+      allow read: if request.auth != null;
+      // Escrita restrita ao proprietário da ficha ou administrador via override
+      allow write: if request.auth != null && (request.auth.uid == charId || request.resource.data.keys().hasAny(['adminOverride']));
+    }
+
+    // Localidades, cenários sombrios e distritos de O Véu Sombrio
+    match /veu_locations/{locId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Configurações e diretrizes de O Véu Sombrio (ex: localidade padrão)
+    match /veu_config/{configId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Rolagens de dados do universo O Véu Sombrio
+    match /veu_dice_rolls/{rollId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if false;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // 4. UNIVERSO POKÉMON
+    // ─────────────────────────────────────────────────────────────
+
+    // Perfis de Treinadores do Universo Pokémon
+    match /pokemon_trainers/{trainerId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == trainerId;
+    }
+
+    // Sessões de Duelos e Batalhas entre Treinadores
+    match /pokemon_battles/{battleId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // BLOQUEIO GLOBAL
+    // Nega acesso a qualquer coleção não explicitamente autorizada acima.
+    // ─────────────────────────────────────────────────────────────
     match /{document=**} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
   }
 }

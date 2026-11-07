@@ -231,8 +231,14 @@ export default function LocationChat({ slug, locationName, universe = 'jardim' }
       if (user?.uid) {
         await updateVeuCharacter(user.uid, {
           name: updates.name,
+          handle: updates.name,
           avatarUrl: updates.avatarUrl || ''
         })
+        setUniverseCharacter(prev => ({
+          ...(prev || {}),
+          name: updates.name,
+          avatarUrl: updates.avatarUrl || ''
+        }))
       }
     } else {
       await updateProfile({
