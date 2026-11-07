@@ -26,15 +26,24 @@ export const VEU_LINEAGES = [
   { id: 'vampiros', name: 'Vampiros', icon: '🩸', desc: 'Predadores noturnos imortais dotados de velocidade sobrenatural, hipnose e sede de sangue.' }
 ]
 
-// 6 Atributos Oficiais de O Véu Sombrio
+// 6 Atributos Oficiais de O Véu Sombrio (com suporte a modificador d20)
 export const VEU_ATTRIBUTES_LIST = [
-  { key: 'forca', label: 'Força', icon: '⚔️', desc: 'Poder físico bruto, dano corpo-a-corpo e resistência mecânica.' },
-  { key: 'destreza', label: 'Destreza', icon: '🏹', desc: 'Agilidade, esquiva, furtividade e precisão de movimentos.' },
-  { key: 'sabedoria', label: 'Sabedoria', icon: '📖', desc: 'Percepção sobrenatural, intuição, vontade mental e conhecimento oculto.' },
-  { key: 'poder', label: 'Poder', icon: '⚡', desc: 'Potência mágica bruta, rituais, canalização de energia e feitiçaria.' },
-  { key: 'vitalidade', label: 'Vitalidade', icon: '💖', desc: 'Saúde física, vigor biológico e tolerância a venenos e ferimentos.' },
-  { key: 'carisma', label: 'Carisma', icon: '👑', desc: 'Sedução, liderança, presença intimidadora e manipulação de mortais e espíritos.' }
+  { key: 'forca', label: 'FORÇA', altKey: 'forca', icon: 'muscle', desc: 'Poder físico bruto, impacto e capacidade de carga.' },
+  { key: 'destreza', label: 'DESTREZA', altKey: 'destreza', icon: 'running', desc: 'Agilidade, reflexos, precisão e velocidade de reação.' },
+  { key: 'poder', label: 'PODER', altKey: 'poder', icon: 'star', desc: 'Potência mágica, feitiçaria, canalização de energia primordial.' },
+  { key: 'sabedoria', label: 'SABEDORIA', altKey: 'sabedoria', icon: 'book', desc: 'Percepção sobrenatural, intuição, vontade mental e raciocínio.' },
+  { key: 'constituicao', label: 'CONSTITUIÇÃO', altKey: 'vitalidade', icon: 'shield', desc: 'Saúde física, vigor biológico, resistência a ferimentos e toxinas.' },
+  { key: 'carisma', label: 'CARISMA', altKey: 'carisma', icon: 'masks', desc: 'Presença magnética, persuasão, liderança e autoridade.' }
 ]
+
+/**
+ * Calcula o modificador clássico de RPG d20: floor((valor - 10) / 2)
+ */
+export function calculateModifier(val) {
+  const num = Number(val) || 10
+  const mod = Math.floor((num - 10) / 2)
+  return mod >= 0 ? `(+${mod})` : `(${mod})`
+}
 
 // Opções de Clima e Atmosfera Sobrenatural
 export const VEU_WEATHER_OPTIONS = [
@@ -86,73 +95,48 @@ export function calculateVeuMaxEssence(poder = 10, sabedoria = 10) {
 /**
  * Cria a ficha padrão para um jogador em O Véu Sombrio
  */
-export function createDefaultVeuCharacter(uid, displayName = 'Viajante da Noite') {
-  const defaultVit = 10
-  const defaultPod = 10
-  const defaultSab = 10
-  const hpMax = calculateVeuMaxHp(defaultVit)
-  const essenceMax = calculateVeuMaxEssence(defaultPod, defaultSab)
-
+export function createDefaultVeuCharacter(uid, displayName = 'Ester Exposito') {
   return {
     uid,
-    name: displayName || 'Viajante da Noite',
-    handle: displayName || 'Viajante da Noite',
-    lineage: 'Vampiros',
-    coven: 'Linhagem Independente',
-    origin: 'Desconhecida',
-    avatarUrl: '',
+    name: displayName || 'Ester Exposito',
+    handle: displayName || 'Ester Exposito',
+    occupation: 'Policial',
+    lineage: 'Humanos',
+    age: '28 anos',
+    height: '1,68 m',
+    nationality: 'Brasileira',
+    residence: 'Vesprália',
+    quote: 'Algumas coisas precisam ser mantidas em segredo.',
+    bio: 'Determinada, observadora e teimosa. Ester sempre buscou fazer o que é certo, mesmo quando isso significa ir contra o que os outros dizem. Em uma cidade onde o sobrenatural esconde-se entre os humanos, ela prefere manter os pés no chão e a arma por perto.',
+    history: 'Filha de uma família tradicional, Ester viu sua vida mudar quando o sobrenatural se revelou ao seu redor. Hoje, serve na polícia da cidade, determinada a proteger o que ainda resta de normalidade em meio ao caos.',
+    notes: 'Nada digno de nota por enquanto.',
+    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80',
     level: 1,
-    hpMax,
-    hpCurrent: hpMax,
-    essenceMax,
-    essenceCurrent: essenceMax,
-    bio: 'Uma alma envolta pelas sombras do Véu que busca seu próprio destino entre as criaturas da noite.',
+    hpMax: 70,
+    hpCurrent: 70,
+    manaMax: 40,
+    manaCurrent: 40,
+    movement: '9 m',
     attributes: {
-      forca: 10,
-      destreza: 10,
-      sabedoria: defaultSab,
-      poder: defaultPod,
-      vitalidade: defaultVit,
-      carisma: 10
+      forca: 14,
+      destreza: 17,
+      poder: 13,
+      sabedoria: 12,
+      constituicao: 15,
+      carisma: 14
     },
-    rituals: [
-      {
-        id: 'rit_1',
-        name: 'Olhar do Predador Noturno',
-        type: 'Percepção',
-        cost: '5 Essência',
-        description: 'Permite enxergar no escuro absoluto e detectar batimentos cardíacos a 50 metros.'
-      },
-      {
-        id: 'rit_2',
-        name: 'Manto de Névoa',
-        type: 'Sobrenatural',
-        cost: '10 Essência',
-        description: 'Dissolve parcialmente o corpo em névoa espectral, esquivando-se de ataques físicos.'
-      }
-    ],
     inventory: [
-      {
-        id: 'item_1',
-        name: 'Adaga de Prata Lunar',
-        qty: 1,
-        description: 'Lâmina abençoada forjada para ferir criaturas sobrenaturais.',
-        icon: '🗡️'
-      },
-      {
-        id: 'item_2',
-        name: 'Frasco de Sangue Puro',
-        qty: 2,
-        description: 'Restaura vigor e sacia a sede primordial.',
-        icon: '🩸'
-      },
-      {
-        id: 'item_3',
-        name: 'Talismã Protetor de Cinzas',
-        qty: 1,
-        description: 'Protege contra possessões e espíritos menores.',
-        icon: '🧿'
-      }
+      { id: 'inv_1', name: 'Distintivo Policial', icon: '🛡️', image: '', type: 'Acessório', desc: 'Identificação oficial da polícia civil de Vesprália.' },
+      { id: 'inv_2', name: 'Pistola 9mm', icon: '🔫', image: '', type: 'Arma de Fogo', desc: 'Arma de serviço padrão, confiável e letal contra ameaças mundanas e vulneráveis.' },
+      { id: 'inv_3', name: 'Algemas de Aço', icon: '⛓️', image: '', type: 'Contenção', desc: 'Feitas de liga reforçada para conter suspeitos e criaturas de força moderada.' },
+      { id: 'inv_4', name: 'Kit Médico', icon: '🧰', image: '', type: 'Primeiros Socorros', desc: 'Bandagens estéreis, hemostáticos e antisséptico para tratar ferimentos de combate.' },
+      { id: 'inv_5', name: 'Faca Tática', icon: '🗡️', image: '', type: 'Arma Branca', desc: 'Lâmina de combate em aço fosco, excelente para defesa a curta distância.' },
+      { id: 'inv_6', name: 'Lanterna Tática', icon: '🔦', image: '', type: 'Equipamento', desc: 'Feixe de alta intensidade capaz de iluminar becos e desorientar alvos na escuridão.' },
+      { id: 'inv_7', name: 'Rádio Comunicador', icon: '📻', image: '', type: 'Comunicação', desc: 'Sintonizado na frequência tática do departamento de polícia.' }
+    ],
+    achievements: [
+      { id: 'ach_1', title: 'Bem-vindo à cidade', desc: 'Complete sua primeira missão.', icon: '✦', unlocked: true },
+      { id: 'ach_2', title: 'Parceira de Confiança', desc: 'Construa um vínculo com um aliado.', icon: '✦', unlocked: true }
     ],
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp()

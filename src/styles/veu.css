@@ -491,3 +491,958 @@
   margin-top: 4px;
 }
 
+
+/* ============================================================
+   FICHA DE PERSONAGEM DEFINITIVA — DESIGN GÓTICO SOFISTICADO
+   (Baseado na referência visual oficial: Ester Exposito)
+   ============================================================ */
+
+.vsheet-page {
+  min-height: 100vh;
+  background-color: #07090e;
+  background-image: 
+    radial-gradient(ellipse 90% 60% at 50% 0%, rgba(20, 26, 38, 0.85) 0%, rgba(7, 9, 14, 0.98) 80%),
+    radial-gradient(circle at 85% 10%, rgba(30, 42, 65, 0.25) 0%, transparent 40%);
+  color: #ded9cc;
+  font-family: 'Cinzel', 'Georgia', serif;
+  padding: 30px 20px 80px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.vsheet-container {
+  max-width: 1220px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+/* ── Top Bar de Ações Discretas (Voltar, Editar) ── */
+.vsheet-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(197, 160, 89, 0.15);
+}
+
+.vsheet-back-btn {
+  background: transparent;
+  border: 1px solid rgba(197, 160, 89, 0.3);
+  color: #c5a059;
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  padding: 6px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.vsheet-back-btn:hover {
+  background: rgba(197, 160, 89, 0.1);
+  border-color: #c5a059;
+  color: #f0ece1;
+}
+
+.vsheet-edit-btn {
+  background: linear-gradient(135deg, rgba(197, 160, 89, 0.2) 0%, rgba(139, 105, 45, 0.3) 100%);
+  border: 1px solid #c5a059;
+  color: #f5f0e6;
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  padding: 6px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 0 12px rgba(197, 160, 89, 0.2);
+}
+.vsheet-edit-btn:hover {
+  background: linear-gradient(135deg, rgba(197, 160, 89, 0.35) 0%, rgba(139, 105, 45, 0.45) 100%);
+  box-shadow: 0 0 18px rgba(197, 160, 89, 0.4);
+}
+
+/* ── Grid Principal: 3 Colunas ── */
+.vsheet-main-grid {
+  display: grid;
+  grid-template-columns: 31% 69%;
+  gap: 22px;
+  align-items: start;
+}
+
+.vsheet-right-section {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ── Header da Direita: Nome + Silhueta do Castelo & Lua ── */
+.vsheet-header-banner {
+  position: relative;
+  min-height: 110px;
+  padding: 18px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-radius: 6px;
+  overflow: hidden;
+  background: linear-gradient(90deg, rgba(10, 13, 20, 0.95) 0%, rgba(12, 16, 26, 0.75) 50%, rgba(14, 18, 30, 0.5) 100%);
+  border: 1px solid rgba(197, 160, 89, 0.2);
+}
+
+.vsheet-header-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.45;
+  background-size: cover;
+  background-position: right center;
+  background-repeat: no-repeat;
+}
+
+/* Lua e Castelo no topo direito */
+.vsheet-header-moon-silhouette {
+  position: absolute;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.vsheet-full-moon {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fffef7 0%, #d8d3c5 55%, #a5a092 100%);
+  box-shadow: 0 0 28px rgba(255, 254, 240, 0.65), 0 0 60px rgba(212, 175, 55, 0.25);
+  position: relative;
+}
+
+.vsheet-header-content {
+  position: relative;
+  z-index: 3;
+}
+
+.vsheet-char-name-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vsheet-name {
+  font-family: 'Cinzel', serif;
+  font-size: 2.3rem;
+  font-weight: 600;
+  color: #ede8dc;
+  letter-spacing: 0.04em;
+  margin: 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+}
+
+.vsheet-name-sparkle {
+  color: #c5a059;
+  font-size: 1.5rem;
+  line-height: 1;
+  text-shadow: 0 0 10px rgba(197, 160, 89, 0.6);
+  animation: pulseSparkle 3s ease-in-out infinite;
+}
+
+@keyframes pulseSparkle {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+.vsheet-char-subline {
+  font-family: 'Cinzel', serif;
+  font-size: 0.92rem;
+  letter-spacing: 0.08em;
+  color: #9e9a91;
+  margin-top: 6px;
+}
+.vsheet-char-subline span {
+  color: #ded9cc;
+}
+
+/* ── Split Central e Direito ── */
+.vsheet-split-cols {
+  display: grid;
+  grid-template-columns: 57% 43%;
+  gap: 18px;
+  align-items: start;
+}
+
+/* ── Caixas e Painéis Escuros Translúcidos com Cantoneiras ── */
+.vsheet-box {
+  background: rgba(12, 15, 22, 0.85);
+  border: 1px solid rgba(197, 160, 89, 0.22);
+  border-radius: 4px;
+  padding: 16px;
+  position: relative;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65);
+}
+
+/* Cantoneiras ornamentadas finas */
+.vsheet-box::before,
+.vsheet-box::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  pointer-events: none;
+}
+.vsheet-box::before {
+  top: 2px;
+  left: 2px;
+  border-top: 2px solid rgba(197, 160, 89, 0.5);
+  border-left: 2px solid rgba(197, 160, 89, 0.5);
+}
+.vsheet-box::after {
+  bottom: 2px;
+  right: 2px;
+  border-bottom: 2px solid rgba(197, 160, 89, 0.5);
+  border-right: 2px solid rgba(197, 160, 89, 0.5);
+}
+
+/* Títulos de Seção */
+.vsheet-sec-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: #ded9cc;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px 0;
+}
+.vsheet-sec-title .title-icon {
+  color: #c5a059;
+  font-size: 0.95rem;
+}
+
+/* ── COLUNA ESQUERDA (PERFIL COMPLETO) ── */
+.vsheet-left-card {
+  background: linear-gradient(180deg, rgba(14, 18, 26, 0.94) 0%, rgba(9, 12, 18, 0.98) 100%);
+  border: 1px solid rgba(197, 160, 89, 0.28);
+  border-radius: 6px;
+  padding: 16px;
+  position: relative;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.85);
+}
+
+/* Brasão / Garra no canto superior esquerdo da moldura */
+.vsheet-crest-topleft {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: #c5a059;
+  font-size: 1.1rem;
+  z-index: 10;
+  opacity: 0.85;
+}
+
+/* Moldura e Foto do Personagem */
+.vsheet-portrait-frame {
+  width: 100%;
+  aspect-ratio: 4 / 4.8;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(197, 160, 89, 0.35);
+  background: #090c12;
+  position: relative;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9), 0 4px 16px rgba(0, 0, 0, 0.7);
+}
+
+.vsheet-portrait-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  display: block;
+}
+
+/* Frase / Citação Pessoal */
+.vsheet-quote-box {
+  margin: 14px 0 12px;
+  text-align: center;
+  font-family: 'Cinzel', 'Georgia', serif;
+  font-style: italic;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: #b8b3a7;
+  padding: 0 8px;
+}
+
+/* Linha Divisória Clássica */
+.vsheet-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 12px 0;
+  opacity: 0.6;
+}
+.vsheet-divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(197, 160, 89, 0.5), transparent);
+}
+.vsheet-divider-knot {
+  color: #c5a059;
+  font-size: 0.65rem;
+}
+
+/* Tabela de Informações Pessoais */
+.vsheet-info-table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.vsheet-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  padding: 2px 4px;
+}
+
+.vsheet-info-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #9e9a91;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.04em;
+}
+.vsheet-info-left .info-icon {
+  color: #c5a059;
+  font-size: 0.85rem;
+  width: 16px;
+  text-align: center;
+}
+
+.vsheet-info-val {
+  color: #ede8dc;
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  text-align: right;
+}
+
+/* Seção SOBRE */
+.vsheet-about-section {
+  margin-top: 10px;
+}
+.vsheet-about-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #c5a059;
+  margin: 0 0 6px 0;
+}
+.vsheet-about-text {
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 0.76rem;
+  line-height: 1.55;
+  color: #a6a297;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+/* ── ATRIBUTOS (GRADE 3x2) ── */
+.vsheet-attr-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.vsheet-attr-card {
+  background: rgba(9, 12, 18, 0.85);
+  border: 1px solid rgba(197, 160, 89, 0.22);
+  border-radius: 4px;
+  padding: 12px 6px 10px;
+  text-align: center;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.vsheet-attr-card:hover {
+  border-color: #c5a059;
+  box-shadow: 0 0 16px rgba(197, 160, 89, 0.3), inset 0 0 12px rgba(197, 160, 89, 0.08);
+  transform: translateY(-2px);
+}
+
+.vsheet-attr-card::before,
+.vsheet-attr-card::after {
+  content: '';
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  pointer-events: none;
+}
+.vsheet-attr-card::before {
+  top: 2px;
+  left: 2px;
+  border-top: 1px solid #c5a059;
+  border-left: 1px solid #c5a059;
+}
+.vsheet-attr-card::after {
+  bottom: 2px;
+  right: 2px;
+  border-bottom: 1px solid #c5a059;
+  border-right: 1px solid #c5a059;
+}
+
+.vsheet-attr-icon {
+  font-size: 1.25rem;
+  color: #c5a059;
+  line-height: 1;
+}
+
+.vsheet-attr-name {
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #9e9a91;
+  text-transform: uppercase;
+}
+
+.vsheet-attr-val {
+  font-family: 'Cinzel', serif;
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: #ede8dc;
+  line-height: 1.05;
+  margin-top: 1px;
+}
+
+.vsheet-attr-mod {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #c5a059;
+  letter-spacing: 0.04em;
+}
+
+/* ── VIDA E RECURSOS ── */
+.vsheet-resources-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.vsheet-resource-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vsheet-resource-label {
+  width: 70px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  color: #ded9cc;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vsheet-bar-track {
+  flex: 1;
+  height: 11px;
+  background: rgba(7, 9, 14, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+
+.vsheet-bar-fill-life {
+  height: 100%;
+  background: linear-gradient(90deg, #7f1d1d 0%, #b91c1c 50%, #dc2626 100%);
+  box-shadow: 0 0 10px rgba(220, 38, 38, 0.4);
+  transition: width 0.3s ease;
+}
+
+.vsheet-bar-fill-mana {
+  height: 100%;
+  background: linear-gradient(90deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+  transition: width 0.3s ease;
+}
+
+.vsheet-resource-val {
+  width: 65px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #ded9cc;
+  text-align: right;
+}
+
+.vsheet-movement-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 4px;
+}
+
+.vsheet-movement-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  color: #ded9cc;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vsheet-movement-val {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ded9cc;
+}
+
+/* ── HISTÓRICO ── */
+.vsheet-history-text {
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 0.77rem;
+  line-height: 1.6;
+  color: #a6a297;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+/* ── INVENTÁRIO (GRADE 3x3) ── */
+.vsheet-inv-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.vsheet-inv-slot {
+  aspect-ratio: 1;
+  background: rgba(9, 12, 18, 0.9);
+  border: 1px solid rgba(197, 160, 89, 0.2);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 4px;
+}
+.vsheet-inv-slot:hover {
+  border-color: #c5a059;
+  background: rgba(22, 28, 40, 0.9);
+  box-shadow: 0 0 14px rgba(197, 160, 89, 0.25);
+}
+.vsheet-inv-slot.empty {
+  border-style: dashed;
+  border-color: rgba(255, 255, 255, 0.08);
+  opacity: 0.6;
+}
+.vsheet-inv-slot.empty:hover {
+  opacity: 1;
+  border-color: #c5a059;
+}
+
+.vsheet-inv-slot-icon {
+  font-size: 1.8rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.9));
+  transition: transform 0.2s;
+}
+.vsheet-inv-slot:hover .vsheet-inv-slot-icon {
+  transform: scale(1.1);
+}
+
+.vsheet-inv-slot-img {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.95));
+}
+
+.vsheet-inv-slot-badge {
+  position: absolute;
+  bottom: 2px;
+  right: 4px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #c5a059;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+/* ── NOTAS ── */
+.vsheet-card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.vsheet-pill-btn {
+  background: transparent;
+  border: 1px solid rgba(197, 160, 89, 0.35);
+  color: #ded9cc;
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  padding: 3px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.vsheet-pill-btn:hover {
+  border-color: #c5a059;
+  background: rgba(197, 160, 89, 0.15);
+  color: #fff;
+}
+
+.vsheet-notes-text {
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 0.77rem;
+  line-height: 1.5;
+  color: #a6a297;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+/* ── CONQUISTAS ── */
+.vsheet-achieve-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.vsheet-achieve-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vsheet-achieve-star {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(197, 160, 89, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #c5a059;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+  background: rgba(197, 160, 89, 0.06);
+}
+
+.vsheet-achieve-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.vsheet-achieve-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #ded9cc;
+}
+
+.vsheet-achieve-desc {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.7rem;
+  color: #8c887f;
+}
+
+/* ── Modais Flutuantes de Edição e Detalhes ── */
+.vsheet-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 7, 11, 0.88);
+  backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn 0.2s ease;
+}
+
+.vsheet-modal-card {
+  background: #0b0e15;
+  border: 1px solid rgba(197, 160, 89, 0.35);
+  border-radius: 6px;
+  max-width: 680px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 24px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9), 0 0 32px rgba(197, 160, 89, 0.15);
+  position: relative;
+}
+
+.vsheet-modal-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #ede8dc;
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vsheet-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.vsheet-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.vsheet-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: #c5a059;
+  text-transform: uppercase;
+}
+
+.vsheet-input,
+.vsheet-textarea,
+.vsheet-select {
+  background: rgba(6, 8, 12, 0.9);
+  border: 1px solid rgba(197, 160, 89, 0.25);
+  border-radius: 4px;
+  padding: 8px 10px;
+  color: #f0ece1;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.84rem;
+  outline: none;
+  transition: all 0.2s;
+}
+.vsheet-input:focus,
+.vsheet-textarea:focus,
+.vsheet-select:focus {
+  border-color: #c5a059;
+  box-shadow: 0 0 10px rgba(197, 160, 89, 0.25);
+}
+
+/* ── Banner de Resultado de Rolagem de Atributo ── */
+.vsheet-roll-banner {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(11, 14, 22, 0.96);
+  border: 1px solid #c5a059;
+  border-radius: 6px;
+  padding: 14px 28px;
+  z-index: 2100;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.9), 0 0 24px rgba(197, 160, 89, 0.35);
+  text-align: center;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translate(-50%, 20px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* ── Responsividade ── */
+@media (max-width: 1024px) {
+  .vsheet-main-grid {
+    grid-template-columns: 1fr;
+  }
+  .vsheet-split-cols {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .vsheet-attr-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .vsheet-name {
+    font-size: 1.8rem;
+  }
+  .vsheet-form-grid {
+    grid-template-columns: 1fr;
+  }
+  .vsheet-full-moon {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* ── Complementos extras para ficha definitiva ── */
+
+/* Título de cada box/painel */
+.vsheet-box-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: #ded9cc;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px 0;
+}
+
+/* Título de seção (SOBRE, etc.) */
+.vsheet-section-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #c5a059;
+  text-transform: uppercase;
+  margin: 0 0 6px 0;
+}
+
+/* Citação com ícones laterais */
+.vsheet-quote-box {
+  margin: 14px 0 12px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-family: 'Cinzel', 'Georgia', serif;
+  font-style: italic;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: #b8b3a7;
+  border-left: 2px solid rgba(197,160,89,0.3);
+}
+
+/* Tabela de info pessoal como <table> */
+.vsheet-info-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.77rem;
+}
+.vsheet-info-table td {
+  padding: 4px 2px;
+  vertical-align: middle;
+  color: #9e9a91;
+}
+.vsheet-info-table td:first-child {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.03em;
+}
+.vsheet-info-table td:last-child {
+  text-align: right;
+  color: #ede8dc;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+}
+.vsheet-info-icon {
+  color: #c5a059;
+  font-size: 0.82rem;
+  width: 16px;
+  display: inline-flex;
+  justify-content: center;
+}
+
+/* Divisor ornamental simples */
+.vsheet-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 12px 0;
+  opacity: 0.6;
+}
+.vsheet-divider::before,
+.vsheet-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(197, 160, 89, 0.5), transparent);
+}
+.vsheet-divider::after {
+  content: '✦';
+  flex: none;
+  color: #c5a059;
+  font-size: 0.6rem;
+  line-height: 1;
+  opacity: 0.9;
+}
+
+/* Slot vazio no inventário */
+.vsheet-inv-slot-empty {
+  border-style: dashed !important;
+  border-color: rgba(255,255,255,0.07) !important;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* Notas textarea */
+.vsheet-notes-text {
+  width: 100%;
+  background: rgba(6, 8, 12, 0.85);
+  border: 1px solid rgba(197, 160, 89, 0.22);
+  border-radius: 4px;
+  padding: 8px 10px;
+  color: #c8c0b0;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.77rem;
+  line-height: 1.55;
+  outline: none;
+  box-sizing: border-box;
+}
+.vsheet-notes-text:focus {
+  border-color: rgba(197,160,89,0.5);
+  box-shadow: 0 0 8px rgba(197,160,89,0.15);
+}
+
+/* Posição da lua no header */
+.vsheet-full-moon {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fffef7 0%, #d8d3c5 55%, #a5a092 100%);
+  box-shadow: 0 0 28px rgba(255,254,240,0.65), 0 0 60px rgba(212,175,55,0.25);
+  pointer-events: none;
+  z-index: 1;
+}
+
