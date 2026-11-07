@@ -32,7 +32,7 @@ export default function VeuCharacterSheet() {
   // Form states
   const [editForm, setEditForm] = useState({
     name: '',
-    lineage: 'Vampiro',
+    lineage: 'Vampiros',
     coven: '',
     origin: '',
     avatarUrl: '',
@@ -107,7 +107,7 @@ export default function VeuCharacterSheet() {
     if (!charData) return
     setEditForm({
       name: charData.name || '',
-      lineage: charData.lineage || 'Vampiro',
+      lineage: charData.lineage || 'Vampiros',
       coven: charData.coven || '',
       origin: charData.origin || '',
       avatarUrl: charData.avatarUrl || '',
@@ -977,3 +977,4 @@ export default function VeuCharacterSheet() {
     </div>
   )
 }
+

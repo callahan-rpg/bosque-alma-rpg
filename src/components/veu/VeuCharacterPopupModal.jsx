@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { doc, getDoc } from 'firebase/firestore'
 import { db } from '../../firebase/config'
-import { calculateVeuMaxHp, calculateVeuMaxEssence, VEU_ATTRIBUTES_LIST } from '../../firebase/veuService'
+import { calculateVeuMaxHp, calculateVeuMaxEssence, VEU_ATTRIBUTES_LIST, VEU_LINEAGES } from '../../firebase/veuService'
 
 export default function VeuCharacterPopupModal({ targetUser, currentUser, onClose }) {
   const uid = targetUser?.uid
@@ -46,7 +46,8 @@ export default function VeuCharacterPopupModal({ targetUser, currentUser, onClos
 
   const name = charData?.name || charData?.handle || targetUser?.characterName || 'Viajante da Noite'
   const avatarUrl = charData?.avatarUrl || targetUser?.avatarUrl || ''
-  const lineage = charData?.lineage || 'Sobrenatural'
+  const lineage = charData?.lineage || 'Vampiros'
+  const linObj = VEU_LINEAGES.find(l => l.name === lineage)
   const coven = charData?.coven || 'Independente'
   const level = charData?.level || 1
 
@@ -101,7 +102,9 @@ export default function VeuCharacterPopupModal({ targetUser, currentUser, onClos
                   {name}
                 </h3>
                 <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '6px' }}>
-                  <span className="veu-badge lineage">{lineage}</span>
+                  <span className="veu-badge lineage">
+                    {linObj?.icon ? `${linObj.icon} ` : ''}{lineage}
+                  </span>
                   <span className="veu-badge level">Nv. {level}</span>
                 </div>
                 <div style={{ fontSize: '11px', color: '#d8b4fe', marginTop: '4px' }}>
@@ -166,3 +169,4 @@ export default function VeuCharacterPopupModal({ targetUser, currentUser, onClos
     </div>
   )
 }
+

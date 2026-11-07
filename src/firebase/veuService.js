@@ -12,14 +12,18 @@ import { db } from './config'
 
 // Raças e Linhagens Sobrenaturais do universo O Véu Sombrio
 export const VEU_LINEAGES = [
-  { id: 'vampire', name: 'Vampiro', icon: '🩸', desc: 'Ser imortal da noite, mestre da persuasão, velocidade sobre-humana e sede de sangue.' },
-  { id: 'werewolf', name: 'Lobisomem', icon: '🐺', desc: 'Guerreiro metamorfo lunar, detentor de força bestial, sentidos aguçados e regeneração.' },
-  { id: 'witch', name: 'Bruxa / Feiticeiro', icon: '🔮', desc: 'Conjurador de feitiços arcanos, rituais ancestrais, alquimia negra e maldições.' },
-  { id: 'djinn', name: 'Gin / Djinn', icon: '🌪️', desc: 'Espírito ancestral do fogo sem fumaça e dos desejos, dotado de poderes arcanos primordiais.' },
-  { id: 'spirit', name: 'Espírito / Espectro', icon: '👻', desc: 'Alma errante que transcendeu o plano carnal, capaz de atravessar paredes e manipular energias.' },
-  { id: 'hunter', name: 'Caçador do Oculto', icon: '🗡️', desc: 'Humano treinado nas artes proibidas para rastrear, banir e combater o sobrenatural.' },
-  { id: 'occultist', name: 'Ocultista Acadêmico', icon: '📜', desc: 'Estudioso de tomos arcanos, pactos demoníacos e mistérios herméticos proibidos.' },
-  { id: 'ghoul', name: 'Carniçal / Ghoul', icon: '⚰️', desc: 'Criatura necrótica resistente, habitante de cemitérios e criptas com garras venenosas.' }
+  { id: 'banshees', name: 'Banshes', icon: '👻', desc: 'Espíritos arautos da morte cujo lamento espectral abala a alma e prenuncia desgraças.' },
+  { id: 'bruxos', name: 'Bruxos', icon: '🔮', desc: 'Conjuradores arcanos de feitiços proibidos, poções alquímicas e rituais ancestrais.' },
+  { id: 'djinns', name: 'Djinns', icon: '🌪️', desc: 'Seres de fogo sem fumaça e ar primordial, capazes de dobrar desejos e manipular energias arcanas.' },
+  { id: 'dragoes', name: 'Dragões', icon: '🐉', desc: 'Seres dracônicos milenares dotados de sopro destrutivo, escamas impenetráveis e poder ancestral.' },
+  { id: 'elfos', name: 'Elfos', icon: '🏹', desc: 'Seres esguios e imortais com afinidade mística natural, sentidos aguçados e passos silenciosos.' },
+  { id: 'fadas', name: 'Fadas', icon: '🧚', desc: 'Criaturas etéreas do plano feérico com magia ilusória, encantos sutis e asas brilhantes.' },
+  { id: 'hibridos', name: 'Híbridos', icon: '🧬', desc: 'Seres nascidos do cruzamento de duas naturezas sobrenaturais distintas, combinando dons raros.' },
+  { id: 'humanos', name: 'Humanos', icon: '🗡️', desc: 'Mortais determinados, caçadores do oculto e estudiosos capazes de desafiar o impossível.' },
+  { id: 'lobisomens', name: 'Lobisomens', icon: '🐺', desc: 'Guerreiros bestiais ligados à lua cheia, detentores de regeneração, força titânica e instintos ferozes.' },
+  { id: 'metamorfos', name: 'Metamorfos', icon: '🦊', desc: 'Mestres da transmutação capazes de assumir formas de diferentes feras e pessoas à vontade.' },
+  { id: 'povo-do-mar', name: 'Povo do Mar', icon: '🧜', desc: 'Habitantes dos abismos oceânicos com controle sobre marés, cantos hipnóticos e respiração aquática.' },
+  { id: 'vampiros', name: 'Vampiros', icon: '🩸', desc: 'Predadores noturnos imortais dotados de velocidade sobrenatural, hipnose e sede de sangue.' }
 ]
 
 // 6 Atributos Oficiais de O Véu Sombrio
@@ -93,7 +97,7 @@ export function createDefaultVeuCharacter(uid, displayName = 'Viajante da Noite'
     uid,
     name: displayName || 'Viajante da Noite',
     handle: displayName || 'Viajante da Noite',
-    lineage: 'Vampiro',
+    lineage: 'Vampiros',
     coven: 'Linhagem Independente',
     origin: 'Desconhecida',
     avatarUrl: '',

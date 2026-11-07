@@ -12,3 +12,4 @@ export default function VeuNavButton({ label, onClick, position = 'right' }) {
     </button>
   )
 }
+
