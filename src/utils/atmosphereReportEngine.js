@@ -168,3 +168,4 @@ export function generateAtmosphereReport(atmosphereData, locationName = 'Setor D
     stability
   }
 }
+

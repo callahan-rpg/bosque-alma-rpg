@@ -28,6 +28,12 @@ const CyberpunkLocation = lazy(() => import('./pages/cyberpunk/CyberpunkLocation
 const CyberpunkCharacterSheet = lazy(() => import('./pages/cyberpunk/CyberpunkCharacterSheet.jsx'))
 const CyberpunkPublicCharacters = lazy(() => import('./pages/cyberpunk/CyberpunkPublicCharacters.jsx'))
 
+// Universo O Véu Sombrio (Mistério, Sobrenatural, Criaturas da Noite)
+const VeuLocation = lazy(() => import('./pages/veu/VeuLocation.jsx'))
+const VeuAdmin = lazy(() => import('./pages/veu/VeuAdmin.jsx'))
+const VeuCharacterSheet = lazy(() => import('./pages/veu/VeuCharacterSheet.jsx'))
+const VeuPublicCharacters = lazy(() => import('./pages/veu/VeuPublicCharacters.jsx'))
+
 function DynamicDefaultRedirect() {
   const { defaultSlug } = useDefaultLocation()
   return <Navigate to={`/location/${defaultSlug}`} replace />
@@ -139,6 +145,25 @@ export default function App() {
                 {/* Universo Cyberpunk 2099 — Galeria Pública de Mercenários */}
                 <Route path="/cyberpunk/personagens" element={<CyberpunkPublicCharacters />} />
                 <Route path="/cyberpunk/mercenarios" element={<CyberpunkPublicCharacters />} />
+
+                {/* Universo O Véu Sombrio — Localidades e Ermos Sobrenaturais com Chat */}
+                <Route path="/veu" element={<VeuLocation />} />
+                <Route path="/veu/location/:slug" element={<VeuLocation />} />
+
+                {/* Universo O Véu Sombrio — Painel de Administração / Criação de Lugares e Climas */}
+                <Route path="/veu/admin" element={<VeuAdmin />} />
+                <Route path="/veu-admin" element={<VeuAdmin />} />
+
+                {/* Universo O Véu Sombrio — Ficha de Personagem & Atributos Sobrenaturais */}
+                <Route path="/veu/personagem" element={<VeuCharacterSheet />} />
+                <Route path="/veu/personagem/:targetUid" element={<VeuCharacterSheet />} />
+                <Route path="/veu/ficha" element={<VeuCharacterSheet />} />
+                <Route path="/veu/character" element={<VeuCharacterSheet />} />
+                <Route path="/veu/character/:targetUid" element={<VeuCharacterSheet />} />
+
+                {/* Universo O Véu Sombrio — Códice Público de Criaturas e Habitantes */}
+                <Route path="/veu/personagens" element={<VeuPublicCharacters />} />
+                <Route path="/veu/criaturas" element={<VeuPublicCharacters />} />
 
                 {/* Fallback de rotas */}
                 <Route path="*" element={<DynamicDefaultRedirect />} />

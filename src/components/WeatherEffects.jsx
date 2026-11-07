@@ -49,15 +49,15 @@ export default function WeatherEffects({ condition = 'none', enabled = true }) {
   const normalizedCondition = (condition || 'none').toLowerCase().trim()
   const activeCondition =
     normalizedCondition === 'none' || normalizedCondition === 'disabled' || normalizedCondition === 'off' || normalizedCondition === 'sem_efeito' || normalizedCondition === 'sem_efeitos' || normalizedCondition === 'nenhum' ? 'none' :
-    normalizedCondition === 'calm' || normalizedCondition === 'calmo' || normalizedCondition === 'spores' || normalizedCondition === 'polen' ? 'calm' :
-    normalizedCondition === 'lava' || normalizedCondition === 'fire' || normalizedCondition === 'fogo' || normalizedCondition === 'magma' ? 'lava' :
-    normalizedCondition === 'aurora' || normalizedCondition === 'aurora_storm' ? 'aurora' :
-    normalizedCondition === 'fireflies' || normalizedCondition === 'embers' ? 'fireflies' :
-    normalizedCondition === 'snowy' ? 'snowy' :
-    normalizedCondition === 'rainy' || normalizedCondition === 'cyber_rain' ? 'rainy' :
-    normalizedCondition === 'storm' || normalizedCondition === 'emp_storm' ? 'storm' :
-    normalizedCondition === 'foggy' || normalizedCondition === 'cloudy' || normalizedCondition === 'acid_fog' ? 'foggy' :
-    'none'
+      normalizedCondition === 'calm' || normalizedCondition === 'calmo' || normalizedCondition === 'spores' || normalizedCondition === 'polen' ? 'calm' :
+        normalizedCondition === 'lava' || normalizedCondition === 'fire' || normalizedCondition === 'fogo' || normalizedCondition === 'magma' ? 'lava' :
+          normalizedCondition === 'aurora' || normalizedCondition === 'aurora_storm' ? 'aurora' :
+            normalizedCondition === 'fireflies' || normalizedCondition === 'embers' ? 'fireflies' :
+              normalizedCondition === 'snowy' ? 'snowy' :
+                normalizedCondition === 'rainy' || normalizedCondition === 'cyber_rain' ? 'rainy' :
+                  normalizedCondition === 'storm' || normalizedCondition === 'emp_storm' ? 'storm' :
+                    normalizedCondition === 'foggy' || normalizedCondition === 'cloudy' || normalizedCondition === 'acid_fog' ? 'foggy' :
+                      'none'
 
   useEffect(() => {
     if (!enabled || !fxEnabled || activeCondition === 'none') return

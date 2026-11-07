@@ -1,0 +1,492 @@
+/* ============================================================
+   O VÉU SOMBRIO — ESTÉTICA GÓTICA, SOBRENATURAL & OCULTISTA
+   ============================================================ */
+
+:root {
+  --veu-bg-dark: #07060a;
+  --veu-bg-card: rgba(13, 10, 20, 0.92);
+  --veu-bg-card-hover: rgba(22, 17, 34, 0.95);
+  --veu-blood: #dc2626;
+  --veu-blood-glow: rgba(220, 38, 38, 0.45);
+  --veu-blood-dark: #7f1d1d;
+  --veu-silver: #e2e8f0;
+  --veu-gold: #d4af37;
+  --veu-gold-glow: rgba(212, 175, 55, 0.35);
+  --veu-purple: #7e22ce;
+  --veu-purple-glow: rgba(126, 34, 206, 0.4);
+  --veu-border: rgba(126, 34, 206, 0.35);
+  --veu-border-blood: rgba(220, 38, 38, 0.4);
+  --veu-text: #f1f5f9;
+  --veu-text-dim: #94a3b8;
+  --veu-font-title: 'Cinzel', 'Cinzel Decorative', serif;
+  --veu-font-body: 'Inter', -apple-system, sans-serif;
+}
+
+/* ── HUD de O Véu Sombrio ── */
+.veu-hud {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: rgba(7, 6, 10, 0.92);
+  border-bottom: 1px solid var(--veu-border-blood);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.85), 0 0 16px rgba(220, 38, 38, 0.15);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 100;
+}
+
+.veu-hud-logo {
+  font-family: var(--veu-font-title);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: #f87171;
+  text-shadow: 0 0 12px var(--veu-blood-glow);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+.veu-hud-logo:hover {
+  color: #fca5a5;
+  text-shadow: 0 0 20px var(--veu-blood);
+}
+
+.veu-hud-location-name {
+  font-family: var(--veu-font-title);
+  font-size: 0.85rem;
+  color: var(--veu-silver);
+  padding: 4px 12px;
+  background: rgba(126, 34, 206, 0.15);
+  border: 1px solid var(--veu-border);
+  border-radius: 4px;
+}
+
+.veu-hud-clock {
+  font-family: var(--veu-font-title);
+  font-size: 0.78rem;
+  color: #fbbf24;
+  letter-spacing: 0.08em;
+}
+
+.veu-hud-btn {
+  background: rgba(220, 38, 38, 0.12) !important;
+  border: 1px solid rgba(220, 38, 38, 0.35) !important;
+  color: #fca5a5 !important;
+  border-radius: 6px !important;
+  transition: all 0.2s !important;
+}
+.veu-hud-btn:hover,
+.veu-hud-btn.active {
+  background: rgba(220, 38, 38, 0.3) !important;
+  border-color: var(--veu-blood) !important;
+  box-shadow: 0 0 14px var(--veu-blood-glow) !important;
+  color: #fff !important;
+}
+
+.veu-profile-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  background: rgba(13, 10, 20, 0.85);
+  border: 1px solid var(--veu-border-blood);
+  border-radius: 20px;
+  color: var(--veu-text);
+  font-family: var(--veu-font-title);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.veu-profile-pill:hover,
+.veu-profile-pill.active {
+  border-color: var(--veu-blood);
+  box-shadow: 0 0 16px var(--veu-blood-glow);
+}
+
+/* ── Botão de Navegação Gótico ── */
+.veu-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  background: rgba(13, 10, 20, 0.88);
+  border: 1px solid var(--veu-border-blood);
+  border-radius: 6px;
+  color: #fecaca;
+  font-family: var(--veu-font-title);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), inset 0 0 12px rgba(220, 38, 38, 0.1);
+  transition: all 0.25s ease;
+  backdrop-filter: blur(8px);
+}
+.veu-nav-btn:hover {
+  background: rgba(35, 15, 25, 0.95);
+  border-color: var(--veu-blood);
+  box-shadow: 0 0 20px var(--veu-blood-glow), inset 0 0 16px rgba(220, 38, 38, 0.25);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* ── Rolador de Dados Gótico ── */
+.veu-dice-modal {
+  position: fixed;
+  z-index: 9999;
+  width: 320px;
+  background: #09070f;
+  border: 1px solid var(--veu-border-blood);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.95), 0 0 28px var(--veu-blood-glow);
+  border-radius: 8px;
+  font-family: var(--veu-font-title);
+  color: var(--veu-text);
+  overflow: hidden;
+  animation: veuFadeIn 0.25s ease-out;
+}
+
+@keyframes veuFadeIn {
+  from { opacity: 0; transform: scale(0.95) translateY(-8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.veu-dice-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: linear-gradient(90deg, #180d1e 0%, #100814 100%);
+  border-bottom: 1px solid var(--veu-border-blood);
+  cursor: grab;
+}
+.veu-dice-header:active {
+  cursor: grabbing;
+}
+.veu-dice-title {
+  font-size: 0.82rem;
+  letter-spacing: 0.14em;
+  color: #f87171;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.veu-dice-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.veu-dice-close:hover {
+  color: #ef4444;
+}
+
+.veu-dice-body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.veu-dice-types-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.veu-dice-type-btn {
+  padding: 8px 4px;
+  background: rgba(20, 14, 30, 0.7);
+  border: 1px solid rgba(126, 34, 206, 0.3);
+  border-radius: 4px;
+  color: #cbd5e1;
+  font-family: var(--veu-font-title);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.veu-dice-type-btn:hover {
+  border-color: #f87171;
+  color: #fff;
+}
+.veu-dice-type-btn.active {
+  background: rgba(220, 38, 38, 0.25);
+  border-color: var(--veu-blood);
+  box-shadow: 0 0 12px var(--veu-blood-glow);
+  color: #fca5a5;
+}
+
+.veu-dice-roll-action-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(90deg, #991b1b 0%, #dc2626 100%);
+  border: 1px solid #ef4444;
+  border-radius: 6px;
+  color: #fff;
+  font-family: var(--veu-font-title);
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  box-shadow: 0 0 18px var(--veu-blood-glow);
+  transition: all 0.2s;
+}
+.veu-dice-roll-action-btn:hover {
+  background: linear-gradient(90deg, #b91c1c 0%, #ef4444 100%);
+  box-shadow: 0 0 28px rgba(220, 38, 38, 0.7);
+  transform: translateY(-1px);
+}
+
+.veu-dice-result-banner {
+  background: rgba(20, 10, 25, 0.9);
+  border: 1px solid var(--veu-blood);
+  border-radius: 6px;
+  padding: 14px;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.25);
+}
+.veu-dice-result-number {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #fca5a5;
+  text-shadow: 0 0 14px var(--veu-blood);
+}
+
+/* ── Ficha de Personagem de O Véu Sombrio ── */
+.veu-sheet-container {
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 50% 15%, #180f28 0%, #06050a 75%);
+  color: var(--veu-text);
+  font-family: var(--veu-font-body);
+  padding: 24px 20px 60px;
+}
+
+.veu-sheet-grid {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 24px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+@media (max-width: 960px) {
+  .veu-sheet-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.veu-card {
+  background: var(--veu-bg-card);
+  border: 1px solid var(--veu-border);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), inset 0 0 16px rgba(126, 34, 206, 0.08);
+  padding: 20px;
+}
+.veu-card.blood-border {
+  border-color: var(--veu-border-blood);
+}
+
+.veu-identity-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+}
+
+.veu-avatar-frame {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 3px solid var(--veu-blood);
+  box-shadow: 0 0 24px var(--veu-blood-glow);
+  overflow: hidden;
+  position: relative;
+}
+.veu-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.veu-char-name {
+  font-family: var(--veu-font-title);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fecaca;
+  margin: 0;
+  text-shadow: 0 0 16px var(--veu-blood-glow);
+}
+
+.veu-badge-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.veu-badge {
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-family: var(--veu-font-title);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  border: 1px solid;
+}
+.veu-badge.lineage {
+  background: rgba(220, 38, 38, 0.15);
+  border-color: var(--veu-blood);
+  color: #fca5a5;
+}
+.veu-badge.coven {
+  background: rgba(126, 34, 206, 0.2);
+  border-color: var(--veu-purple);
+  color: #d8b4fe;
+}
+.veu-badge.level {
+  background: rgba(212, 175, 55, 0.15);
+  border-color: var(--veu-gold);
+  color: #fde047;
+}
+
+/* 6 Atributos */
+.veu-attr-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 14px;
+}
+.veu-attr-card {
+  background: rgba(15, 10, 24, 0.8);
+  border: 1px solid rgba(126, 34, 206, 0.25);
+  border-radius: 6px;
+  padding: 10px 8px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.veu-attr-card:hover {
+  border-color: var(--veu-blood);
+  box-shadow: 0 0 14px var(--veu-blood-glow);
+  transform: translateY(-2px);
+}
+.veu-attr-label {
+  font-family: var(--veu-font-title);
+  font-size: 0.68rem;
+  color: #cbd5e1;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+.veu-attr-val {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #fca5a5;
+  line-height: 1;
+}
+
+/* Barras de HP e Sangue/Essência */
+.veu-bar-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 10px;
+}
+.veu-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--veu-font-title);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.veu-bar-track {
+  height: 12px;
+  background: rgba(20, 15, 30, 0.9);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+.veu-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.3s ease;
+}
+.veu-bar-fill.hp {
+  background: linear-gradient(90deg, #991b1b, #ef4444);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+}
+.veu-bar-fill.essence {
+  background: linear-gradient(90deg, #6b21a8, #a855f7);
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+}
+
+/* Abas da Ficha */
+.veu-tabs-header {
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid var(--veu-border);
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+}
+.veu-tab-btn {
+  padding: 8px 14px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: #94a3b8;
+  font-family: var(--veu-font-title);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.veu-tab-btn:hover {
+  color: #f1f5f9;
+}
+.veu-tab-btn.active {
+  background: rgba(220, 38, 38, 0.15);
+  border-color: var(--veu-blood);
+  color: #fca5a5;
+  box-shadow: 0 0 12px var(--veu-blood-glow);
+}
+
+/* ── Painel de Administração Gótico ── */
+.veu-admin-container {
+  min-height: 100vh;
+  background: #06050a;
+  color: var(--veu-text);
+  font-family: var(--veu-font-body);
+  padding: 24px 20px 80px;
+}
+.veu-admin-title {
+  font-family: var(--veu-font-title);
+  font-size: 1.6rem;
+  letter-spacing: 0.12em;
+  color: #f87171;
+  text-shadow: 0 0 16px var(--veu-blood-glow);
+  margin: 0;
+}
+.veu-admin-subtitle {
+  font-size: 0.85rem;
+  color: var(--veu-text-dim);
+  margin-top: 4px;
+}

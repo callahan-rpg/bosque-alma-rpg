@@ -5,6 +5,11 @@ import {
   getOrCreateCyberpunkCharacter,
   updateCyberpunkCharacter
 } from '../../firebase/cyberpunkService.js'
+import {
+  subscribeVeuCharacter,
+  getOrCreateVeuCharacter,
+  updateVeuCharacter
+} from '../../firebase/veuService.js'
 import ChatPresenceSync from './ChatPresenceSync.jsx'
 import ChatMessageList from './ChatMessageList.jsx'
 import ChatSidebar from './ChatSidebar.jsx'
@@ -12,6 +17,7 @@ import ChatEmojiBar from './ChatEmojiBar.jsx'
 import ChatInputBar from './ChatInputBar.jsx'
 import CharacterPopupModal from '../character/CharacterPopupModal.jsx'
 import CyberpunkCharacterPopupModal from '../cyberpunk/CyberpunkCharacterPopupModal.jsx'
+import VeuCharacterPopupModal from '../veu/VeuCharacterPopupModal.jsx'
 import EditProfileModal from './EditProfileModal.jsx'
 import {
   sendZoneMessage,
@@ -54,29 +60,44 @@ export default function LocationChat({ slug, locationName, universe = 'jardim' }
   const [universeCharacter, setUniverseCharacter] = useState(null)
 
   useEffect(() => {
-    if (universe !== 'cyberpunk' || !user?.uid) {
+    if (!user?.uid) {
       setUniverseCharacter(null)
       return
     }
 
-    // Garante que a ficha existe e a carrega
-    getOrCreateCyberpunkCharacter(user.uid).catch(() => {})
+    if (universe === 'cyberpunk') {
+      getOrCreateCyberpunkCharacter(user.uid).catch(() => {})
+      const unsub = subscribeCyberpunkCharacter(user.uid, (data) => {
+        if (data) {
+          setUniverseCharacter({
+            name: data.name || data.handle || 'Operador',
+            avatarUrl: data.avatarUrl || '',
+          })
+        }
+      })
+      return () => unsub()
+    }
 
-    const unsub = subscribeCyberpunkCharacter(user.uid, (data) => {
-      if (data) {
-        setUniverseCharacter({
-          name: data.name || data.handle || 'Operador',
-          avatarUrl: data.avatarUrl || '',
-        })
-      }
-    })
-    return () => unsub()
-  }, [universe, user?.uid])
+    if (universe === 'veu') {
+      getOrCreateVeuCharacter(user.uid, user.displayName || 'Viajante da Noite').catch(() => {})
+      const unsub = subscribeVeuCharacter(user.uid, (data) => {
+        if (data) {
+          setUniverseCharacter({
+            name: data.name || 'Viajante da Noite',
+            avatarUrl: data.avatarUrl || '',
+          })
+        }
+      })
+      return () => unsub()
+    }
+
+    setUniverseCharacter(null)
+  }, [universe, user?.uid, user?.displayName])
 
   // character efetivo: usa o perfil do universo se disponível, senão usa o do Jardim
-  // Se for Cyberpunk, nunca utiliza o perfil do Jardim como fallback
-  const character = universe === 'cyberpunk'
-    ? (universeCharacter || { name: 'Operador', avatarUrl: '' })
+  // Se for Cyberpunk ou O Véu Sombrio, nunca utiliza o perfil do Jardim como fallback
+  const character = (universe === 'cyberpunk' || universe === 'veu')
+    ? (universeCharacter || { name: universe === 'veu' ? 'Viajante da Noite' : 'Operador', avatarUrl: '' })
     : jardimCharacter
 
   // Mensagens da zona
@@ -203,6 +224,13 @@ export default function LocationChat({ slug, locationName, universe = 'jardim' }
         await updateCyberpunkCharacter(user.uid, {
           name: updates.name,
           handle: updates.name,
+          avatarUrl: updates.avatarUrl || ''
+        })
+      }
+    } else if (universe === 'veu') {
+      if (user?.uid) {
+        await updateVeuCharacter(user.uid, {
+          name: updates.name,
           avatarUrl: updates.avatarUrl || ''
         })
       }
@@ -780,6 +808,12 @@ export default function LocationChat({ slug, locationName, universe = 'jardim' }
 
       {modalUser && universe === 'cyberpunk' ? (
         <CyberpunkCharacterPopupModal
+          targetUser={modalUser}
+          currentUser={user}
+          onClose={() => setModalUser(null)}
+        />
+      ) : modalUser && universe === 'veu' ? (
+        <VeuCharacterPopupModal
           targetUser={modalUser}
           currentUser={user}
           onClose={() => setModalUser(null)}
