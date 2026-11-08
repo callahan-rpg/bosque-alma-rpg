@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { subscribeVeuCharacter, getOrCreateVeuCharacter } from '../../firebase/veuService'
 import VeuCharacterPopupModal from './VeuCharacterPopupModal.jsx'
-import VeuDiceRoller from './VeuDiceRoller.jsx'
+import DiceRoller from '../DiceRoller.jsx'
 import SettingsModal from '../SettingsModal.jsx'
 
 export default function VeuHUD({ locationName }) {
@@ -15,10 +15,10 @@ export default function VeuHUD({ locationName }) {
   const [showDice, setShowDice] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
 
-  // Sincroniza a ficha de O Véu Sombrio do jogador
+  // Sincroniza a ficha de Riverview do jogador
   useEffect(() => {
     if (!user?.uid) return
-    getOrCreateVeuCharacter(user.uid, 'Viajante da Noite').catch(() => {})
+    getOrCreateVeuCharacter(user.uid, 'Viajante de Riverview').catch(() => {})
     const unsub = subscribeVeuCharacter(user.uid, (data) => {
       setVeuProfile(data)
     })
@@ -60,9 +60,9 @@ export default function VeuHUD({ locationName }) {
             type="button"
             className="veu-hud-logo"
             onClick={() => navigate('/veu')}
-            title="O Véu Sombrio • Reino dos Seres Sobrenaturais"
+            title="Riverview • Reino dos Seres Sobrenaturais"
           >
-            🩸 O VÉU SOMBRIO
+            🩸 RIVERVIEW
           </button>
 
           {locationName && (
@@ -142,7 +142,7 @@ export default function VeuHUD({ locationName }) {
             type="button"
             className="hud-icon-btn veu-hud-btn"
             onClick={() => navigate('/veu/admin')}
-            title="Grimório do Mestre (Painel ADM de O Véu Sombrio)"
+            title="Grimório do Mestre (Painel ADM de Riverview)"
           >
             🕯️
           </button>
@@ -164,9 +164,13 @@ export default function VeuHUD({ locationName }) {
         <SettingsModal onClose={() => setShowSettings(false)} />
       )}
 
-      {/* Rolador de Dados Gótico */}
+      {/* Rolador de Dados idêntico ao do Jardim */}
       {showDice && (
-        <VeuDiceRoller onClose={() => setShowDice(false)} />
+        <DiceRoller
+          onClose={() => setShowDice(false)}
+          characterName={handleName}
+          uid={user?.uid}
+        />
       )}
 
       {/* Popup Flutuante do Personagem */}

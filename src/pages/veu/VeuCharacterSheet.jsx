@@ -342,10 +342,10 @@ export default function VeuCharacterSheet() {
               type="button"
               className="vsheet-nav-action-btn"
               onClick={() => navigate('/veu')}
-              title="Voltar ao Limiar do Véu Sombrio"
+              title="Voltar a Riverview"
             >
               <span className="vsheet-btn-icon">←</span>
-              <span>Voltar ao Limiar</span>
+              <span>Voltar a Riverview</span>
             </button>
             <button
               type="button"
@@ -361,7 +361,7 @@ export default function VeuCharacterSheet() {
           <div className="vsheet-topbar-center">
             <div className="vsheet-universe-badge">
               <span className="vsheet-universe-gem">✦</span>
-              <span>O Véu Sombrio</span>
+              <span>Riverview</span>
               <span className="vsheet-universe-gem">✦</span>
             </div>
           </div>
@@ -740,7 +740,7 @@ export default function VeuCharacterSheet() {
               <div className="vsheet-modal-title-wrap">
                 <h3 className="vsheet-modal-title">
                   <span className="gold-icon">📜</span>
-                  <span>Registros do Véu • Edição de Personagem</span>
+                  <span>Registros de Riverview • Edição de Personagem</span>
                 </h3>
                 <p className="vsheet-modal-subtitle">
                   Configure atributos, recursos vitais, narrativa e aparência nos códices sombrios.

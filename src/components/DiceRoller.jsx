@@ -23,8 +23,11 @@ const MIN_WIDTH  = 280
 const MAX_WIDTH  = 520
 const MIN_HEIGHT = 340
 
-export default function DiceRoller({ onClose }) {
-  const { user, character } = useGuest()
+export default function DiceRoller({ onClose, characterName, uid }) {
+  const guestCtx = useGuest ? useGuest() : {}
+  const activeUser = uid || guestCtx.user?.uid || 'anon'
+  const activeName = characterName || guestCtx.character?.name || guestCtx.user?.displayName || 'Viajante'
+
   const [selected, setSelected] = useState(DICE_TYPES[2]) // D10 padrão
   const [count, setCount]       = useState(1)
   const [rolling, setRolling]   = useState(false)
@@ -161,8 +164,8 @@ export default function DiceRoller({ onClose }) {
 
     try {
       await addDoc(collection(db, 'dice_rolls'), {
-        playerUid:  user?.uid || 'anon',
-        playerName: character?.name || 'Viajante',
+        playerUid:  activeUser,
+        playerName: activeName,
         diceType:   diceName,
         faces:      selected.faces,
         count,
@@ -284,7 +287,7 @@ export default function DiceRoller({ onClose }) {
               </div>
             )}
             <div className="dice-result-label">
-              {character?.name} · {result.diceType}
+              {activeName} · {result.diceType}
             </div>
           </>
         ) : (

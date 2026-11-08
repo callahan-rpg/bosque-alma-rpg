@@ -10,7 +10,7 @@ import {
 } from 'firebase/firestore'
 import { db } from './config'
 
-// Raças e Linhagens Sobrenaturais do universo O Véu Sombrio
+// Raças e Linhagens Sobrenaturais do universo Riverview
 export const VEU_LINEAGES = [
   { id: 'banshees', name: 'Banshes', icon: '👻', desc: 'Espíritos arautos da morte cujo lamento espectral abala a alma e prenuncia desgraças.' },
   { id: 'bruxos', name: 'Bruxos', icon: '🔮', desc: 'Conjuradores arcanos de feitiços proibidos, poções alquímicas e rituais ancestrais.' },
@@ -26,7 +26,7 @@ export const VEU_LINEAGES = [
   { id: 'vampiros', name: 'Vampiros', icon: '🩸', desc: 'Predadores noturnos imortais dotados de velocidade sobrenatural, hipnose e sede de sangue.' }
 ]
 
-// 6 Atributos Oficiais de O Véu Sombrio (com suporte a modificador d20)
+// 6 Atributos Oficiais de Riverview (com suporte a modificador d20)
 export const VEU_ATTRIBUTES_LIST = [
   { key: 'forca', label: 'FORÇA', altKey: 'forca', icon: 'muscle', desc: 'Poder físico bruto, impacto e capacidade de carga.' },
   { key: 'destreza', label: 'DESTREZA', altKey: 'destreza', icon: 'running', desc: 'Agilidade, reflexos, precisão e velocidade de reação.' },
@@ -45,37 +45,27 @@ export function calculateModifier(val) {
   return mod >= 0 ? `(+${mod})` : `(${mod})`
 }
 
-// Opções de Clima e Atmosfera Sobrenatural
+// Opções de Clima e Atmosfera Sobrenatural de Riverview
 export const VEU_WEATHER_OPTIONS = [
+  { id: 'none', icon: '🚫', label: 'Nenhum / Sem Efeito', desc: 'Ambiente sereno sem nenhum efeito visual, partículas ou clima' },
   { id: 'foggy', icon: '🌫️', label: 'Névoa Espectral', desc: 'Brumas espessas e geladas onde sussurram almas errantes' },
   { id: 'embers', icon: '🩸', label: 'Lua de Sangue', desc: 'Luar rubro que desperta os instintos selvagens e sede noturna' },
   { id: 'storm', icon: '⚡', label: 'Tempestade Fúnebre', desc: 'Chuva torrencial com ventos uivantes e relâmpagos violeta' },
   { id: 'aurora', icon: '🔮', label: 'Vórtice Etéreo', desc: 'Fendas no tecido da realidade revelando o plano astral e djinn' },
   { id: 'snowy', icon: '❄️', label: 'Geada Sepulcral', desc: 'Frio congelante que congela lágrimas e exala vapor cadavérico' },
-  { id: 'fireflies', icon: '🕯️', label: 'Chamas Fátuas', desc: 'Luzes mágicas flutuantes guiando ou enganando viajantes' },
-  { id: 'none', icon: '🌌', label: 'Noite Sombria Limpa', desc: 'Céu noturno limpo sob estrelas pálidas sem efeito visual' }
+  { id: 'fireflies', icon: '🕯️', label: 'Chamas Fátuas', desc: 'Luzes mágicas flutuantes guiando ou enganando viajantes' }
 ]
 
-// Regiões / Domínios de O Véu Sombrio
-export const VEU_REGIONS = [
-  'Terras Ermas de Ravenholde',
-  'Floresta das Brumas Eternas',
-  'Vila dos Sussurros',
-  'Cidadela dos Vampiros',
-  'Covil da Matilha Uivante',
-  'Pântano dos Feitiços',
-  'Sepulcro dos Reis Caídos'
-]
+// Mantido como array vazio por compatibilidade retroativa
+export const VEU_REGIONS = []
 
 // Localidade inicial única pré-configurada
 export const DEFAULT_VEU_LOCATIONS = [
   {
     slug: 'encruzilhada-das-brumas',
     name: 'Encruzilhada das Brumas • O Limiar',
-    district: 'Terras Ermas de Ravenholde',
-    description: 'Um ermo ancestral envolto em névoas densas, iluminado pela luz espectral de candelabros de ferro forjado e uma lua misteriosa. Dizem que aqui o Véu entre os vivos e o sobrenatural é mais tênue que o ar da meia-noite. Vampiros nobres, lobisomens errantes, bruxas de covens esquecidos, espíritos e caçadores cruzam este limiar sob o pacto da trégua sagrada.',
-    threatLevel: 3,
-    weatherCondition: 'foggy',
+    description: 'Um ermo ancestral envolto em névoas densas, iluminado pela luz espectral de candelabros de ferro forjado e uma lua misteriosa. Dizem que aqui em Riverview a linha entre os vivos e o sobrenatural é mais tênue que o ar da meia-noite. Vampiros nobres, lobisomens errantes, bruxas de covens esquecidos, espíritos e caçadores cruzam este limiar sob o pacto da trégua sagrada.',
+    weatherCondition: 'none',
     backgroundImage: 'https://images.unsplash.com/photo-1509114397022-ed747cca3f65?w=1920&auto=format&fit=crop&q=85',
     locationSound: '',
     isDefault: true,
@@ -93,7 +83,7 @@ export function calculateVeuMaxEssence(poder = 10, sabedoria = 10) {
 }
 
 /**
- * Cria a ficha padrão para um jogador em O Véu Sombrio
+ * Cria a ficha padrão para um jogador em Riverview
  */
 export function createDefaultVeuCharacter(uid, displayName = 'Ester Exposito') {
   return {
@@ -161,7 +151,7 @@ export async function getOrCreateVeuCharacter(uid, displayName) {
 }
 
 /**
- * Escuta ficha de personagem de O Véu Sombrio em tempo real
+ * Escuta ficha de personagem de Riverview em tempo real
  */
 export function subscribeVeuCharacter(uid, callback) {
   if (!uid) return () => {}
@@ -178,7 +168,7 @@ export function subscribeVeuCharacter(uid, callback) {
 }
 
 /**
- * Atualiza campos na ficha de O Véu Sombrio
+ * Atualiza campos na ficha de Riverview
  */
 export async function updateVeuCharacter(uid, updates) {
   if (!uid) return
@@ -190,7 +180,7 @@ export async function updateVeuCharacter(uid, updates) {
 }
 
 /**
- * Escuta todos os personagens públicos de O Véu Sombrio
+ * Escuta todos os personagens públicos de Riverview
  */
 export function subscribeAllVeuCharacters(callback) {
   const colRef = collection(db, 'veu_characters')
@@ -201,12 +191,12 @@ export function subscribeAllVeuCharacters(callback) {
     })
     callback(list)
   }, (err) => {
-    console.error('[veuService] Erro ao listar personagens de O Véu Sombrio:', err)
+    console.error('[veuService] Erro ao listar personagens de Riverview:', err)
   })
 }
 
 /**
- * Escuta localidades de O Véu Sombrio em tempo real
+ * Escuta localidades de Riverview em tempo real
  */
 export function subscribeVeuLocations(callback) {
   const colRef = collection(db, 'veu_locations')
@@ -255,15 +245,18 @@ export async function getVeuLocation(slug) {
 }
 
 /**
- * Salva ou atualiza uma localidade de O Véu Sombrio
+ * Salva ou atualiza uma localidade de Riverview
  */
 export async function saveVeuLocation(slug, locationData) {
   const cleanSlug = (slug || locationData.slug || '').trim().toLowerCase().replace(/[^a-z0-9_-]/g, '-')
   if (!cleanSlug) throw new Error('O slug identificador da localidade é obrigatório.')
 
+  // Remove campos depreciados (district e threatLevel)
+  const { district, threatLevel, ...cleanedData } = locationData
+
   const docRef = doc(db, 'veu_locations', cleanSlug)
   await setDoc(docRef, {
-    ...locationData,
+    ...cleanedData,
     slug: cleanSlug,
     updatedAt: serverTimestamp()
   }, { merge: true })
@@ -272,7 +265,7 @@ export async function saveVeuLocation(slug, locationData) {
 }
 
 /**
- * Exclui uma localidade de O Véu Sombrio
+ * Exclui uma localidade de Riverview
  */
 export async function deleteVeuLocation(slug) {
   if (!slug) return
@@ -280,7 +273,7 @@ export async function deleteVeuLocation(slug) {
 }
 
 /**
- * Escuta configuração global de O Véu Sombrio (ex: localidade padrão)
+ * Escuta configuração global de Riverview (ex: localidade padrão)
  */
 export function subscribeVeuConfig(callback) {
   const docRef = doc(db, 'veu_config', 'settings')
@@ -297,7 +290,7 @@ export function subscribeVeuConfig(callback) {
 }
 
 /**
- * Atualiza configuração global de O Véu Sombrio
+ * Atualiza configuração global de Riverview
  */
 export async function saveVeuConfig(config) {
   const docRef = doc(db, 'veu_config', 'settings')

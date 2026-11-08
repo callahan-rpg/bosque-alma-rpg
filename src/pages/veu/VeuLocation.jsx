@@ -88,8 +88,11 @@ export default function VeuLocation() {
         }}
       />
 
-      {/* Efeitos Climáticos Sobrenaturais (Névoa Espectral, Lua de Sangue, Tempestade Fúnebre, etc.) */}
-      <WeatherEffects condition={loc.weatherCondition || 'foggy'} enabled={true} />
+      {/* Efeitos Climáticos de Riverview (Névoa Espectral, Lua de Sangue, etc., ou Nenhum) */}
+      <WeatherEffects
+        condition={loc.weatherCondition || 'none'}
+        enabled={Boolean(loc.weatherCondition && loc.weatherCondition !== 'none')}
+      />
 
       {/* Conteúdo Principal — Botões Esquerda, Chat Central e Botões Direita */}
       <div className="location-content">

@@ -58,17 +58,17 @@ export default function VeuPublicCharacters() {
               type="button"
               className="vsheet-nav-action-btn"
               onClick={() => navigate('/veu')}
-              title="Voltar à Encruzilhada das Brumas"
+              title="Voltar a Riverview"
             >
               <span className="vsheet-btn-icon">←</span>
-              <span>Voltar ao Limiar</span>
+              <span>Voltar a Riverview</span>
             </button>
           </div>
 
           <div className="vsheet-topbar-center">
             <div className="vsheet-universe-badge">
               <span className="vsheet-universe-gem">✦</span>
-              <span>Códice das Almas • O Véu Sombrio</span>
+              <span>Códice de Habitantes • Riverview</span>
               <span className="vsheet-universe-gem">✦</span>
             </div>
           </div>
@@ -92,11 +92,11 @@ export default function VeuPublicCharacters() {
           <div className="vsheet-codex-title-row">
             <div>
               <h1 className="vsheet-codex-hero-title">
-                <span>Códice de Habitantes & Entidades</span>
+                <span>Códice de Habitantes & Entidades • Riverview</span>
                 <span style={{ color: 'var(--veu-gold)', fontSize: '0.8em' }}>✦</span>
               </h1>
               <p className="vsheet-codex-hero-sub">
-                Registros proibidos de vampiros, lobisomens, bruxos, humanos e demais criaturas sobrenaturais que habitam as sombras de Ravenholde e Vesprália.
+                Registros de vampiros, lobisomens, bruxos, humanos e demais raças que habitam as ruas e segredos de Riverview.
               </p>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#c5a059', fontFamily: 'var(--veu-font-title)', fontSize: '0.82rem' }}>

@@ -9,7 +9,6 @@ import {
   subscribeVeuConfig,
   saveVeuConfig,
   VEU_WEATHER_OPTIONS,
-  VEU_REGIONS,
   DEFAULT_VEU_LOCATIONS
 } from '../../firebase/veuService'
 import '../../styles/veu.css'
@@ -27,10 +26,8 @@ export default function VeuAdmin() {
   const [selectedLoc, setSelectedLoc] = useState(null)
   const [formSlug, setFormSlug] = useState('')
   const [formName, setFormName] = useState('')
-  const [formDistrict, setFormDistrict] = useState(VEU_REGIONS[0])
   const [formDescription, setFormDescription] = useState('')
-  const [formThreat, setFormThreat] = useState(3)
-  const [formWeather, setFormWeather] = useState('foggy')
+  const [formWeather, setFormWeather] = useState('none')
   const [formBg, setFormBg] = useState('')
   const [formSound, setFormSound] = useState('')
   const [formIsDefault, setFormIsDefault] = useState(false)
@@ -56,10 +53,8 @@ export default function VeuAdmin() {
     setSelectedLoc(null)
     setFormSlug('')
     setFormName('')
-    setFormDistrict(VEU_REGIONS[0])
     setFormDescription('')
-    setFormThreat(3)
-    setFormWeather('foggy')
+    setFormWeather('none')
     setFormBg('')
     setFormSound('')
     setFormIsDefault(false)
@@ -71,10 +66,8 @@ export default function VeuAdmin() {
     setSelectedLoc(loc)
     setFormSlug(loc.slug || loc.id)
     setFormName(loc.name || '')
-    setFormDistrict(loc.district || VEU_REGIONS[0])
     setFormDescription(loc.description || '')
-    setFormThreat(loc.threatLevel || 3)
-    setFormWeather(loc.weatherCondition || 'foggy')
+    setFormWeather(loc.weatherCondition || 'none')
     setFormBg(loc.backgroundImage || '')
     setFormSound(loc.locationSound || '')
     setFormIsDefault(config?.defaultLocation === (loc.slug || loc.id) || !!loc.isDefault)
@@ -128,13 +121,11 @@ export default function VeuAdmin() {
     }
 
     try {
-      setSaveStatus('Gravando no tomo das sombras...')
+      setSaveStatus('Gravando nos registros de Riverview...')
       const locData = {
         slug: cleanSlug,
         name: formName.trim(),
-        district: formDistrict,
         description: formDescription.trim(),
-        threatLevel: Number(formThreat) || 3,
         weatherCondition: formWeather,
         backgroundImage: formBg.trim() || 'https://images.unsplash.com/photo-1509114397022-ed747cca3f65?w=1920&auto=format&fit=crop&q=85',
         locationSound: formSound.trim(),
@@ -157,7 +148,7 @@ export default function VeuAdmin() {
   }
 
   const handleDeleteLocation = async (slug) => {
-    if (!confirm(`Deseja apagar permanentemente a localidade "${slug}" de O Véu Sombrio?`)) return
+    if (!confirm(`Deseja apagar permanentemente a localidade "${slug}" de Riverview?`)) return
     try {
       await deleteVeuLocation(slug)
       if (selectedLoc?.slug === slug) {
@@ -173,8 +164,8 @@ export default function VeuAdmin() {
       {/* Barra de Topo do Painel de Mestre */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '14px', borderBottom: '1px solid var(--veu-border-blood)', paddingBottom: '14px' }}>
         <div>
-          <h1 className="veu-admin-title">🕯️ GRIMÓRIO DO MESTRE // O VÉU SOMBRIO</h1>
-          <div className="veu-admin-subtitle">Gestão de Localidades, Climas Sobrenaturais e Conexões do Véu</div>
+          <h1 className="veu-admin-title">🕯️ GRIMÓRIO DO MESTRE // RIVERVIEW</h1>
+          <div className="veu-admin-subtitle">Gestão de Localidades, Climas e Conexões de Riverview</div>
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
           <button
@@ -182,7 +173,7 @@ export default function VeuAdmin() {
             className="veu-nav-btn"
             onClick={() => navigate('/veu')}
           >
-            ← Retornar ao Véu
+            ← Retornar a Riverview
           </button>
           <button
             type="button"
@@ -255,7 +246,7 @@ export default function VeuAdmin() {
         <div className="veu-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', borderBottom: '1px solid var(--veu-border)', paddingBottom: '10px' }}>
             <h2 style={{ margin: 0, fontFamily: 'var(--veu-font-title)', fontSize: '1.15rem', color: '#fecaca' }}>
-              {selectedLoc ? `✏️ EDITAR LOCALIDADE: ${selectedLoc.name}` : '✨ CRIAR NOVA LOCALIDADE NO VÉU'}
+              {selectedLoc ? `✏️ EDITAR LOCALIDADE: ${selectedLoc.name}` : '✨ CRIAR NOVA LOCALIDADE EM RIVERVIEW'}
             </h2>
             {selectedLoc && (
               <div style={{ display: 'flex', gap: '8px' }}>
@@ -327,55 +318,6 @@ export default function VeuAdmin() {
                     border: '1px solid rgba(126, 34, 206, 0.35)',
                     borderRadius: '4px',
                     color: '#fff',
-                    fontSize: '13px'
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Região e Grau de Ameaça */}
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '14px' }}>
-              <div>
-                <label style={{ fontSize: '12px', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>
-                  Região / Domínio Sobrenatural:
-                </label>
-                <select
-                  value={formDistrict}
-                  onChange={(e) => setFormDistrict(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    background: 'rgba(20, 15, 30, 0.8)',
-                    border: '1px solid rgba(126, 34, 206, 0.35)',
-                    borderRadius: '4px',
-                    color: '#fff',
-                    fontSize: '13px'
-                  }}
-                >
-                  {VEU_REGIONS.map(r => (
-                    <option key={r} value={r} style={{ background: '#09070f' }}>{r}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label style={{ fontSize: '12px', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>
-                  Grau de Ameaça (1 a 5):
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  max="5"
-                  value={formThreat}
-                  onChange={(e) => setFormThreat(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    background: 'rgba(20, 15, 30, 0.8)',
-                    border: '1px solid rgba(126, 34, 206, 0.35)',
-                    borderRadius: '4px',
-                    color: '#f87171',
-                    fontWeight: 700,
                     fontSize: '13px'
                   }}
                 />

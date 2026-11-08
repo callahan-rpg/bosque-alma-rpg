@@ -41,19 +41,19 @@ export const WORLDS_DATA = [
   },
   {
     id: 'veu',
-    name: 'O Véu Sombrio',
+    name: 'Riverview',
     realm: 'Mundo Oculto das Criaturas da Noite',
     tagline: 'Onde o limiar entre o plano mortal e o sobrenatural se desfaz',
-    description: 'Um domínio gótico de sombras perenes, lendas vivas e mistérios sepulcrais. Entre as névoas geladas e ruínas ancestrais caminham vampiros nobres, lobisomens de matilhas selvagens, bruxas de covens proibidos, djinn de fumaça cósmica e espíritos errantes.',
-    locationInfo: 'Encruzilhada das Brumas • O Limiar',
-    cardImage: 'https://images.unsplash.com/photo-1509114397022-ed747cca3f65?w=1600&auto=format&fit=crop&q=80',
-    bgImage: 'https://images.unsplash.com/photo-1509114397022-ed747cca3f65?w=1920&auto=format&fit=crop&q=80',
-    thumbnail: 'https://images.unsplash.com/photo-1509114397022-ed747cca3f65?w=300&auto=format&fit=crop&q=80',
-    badge: '🩸 O Véu Sombrio',
+    description: 'Um domínio gótico de sombras perenes, lendas vivas e mistérios sepulcrais. Entre as névoas geladas e ruínas ancestrais de Riverview caminham vampiros nobres, lobisomens de matilhas selvagens, bruxas de covens proibidos, djinn de fumaça cósmica e espíritos errantes.',
+    locationInfo: 'Encruzilhada das Brumas • Riverview',
+    cardImage: '/assets/veu/castle-moon-banner.jpg',
+    bgImage: '/assets/veu/castle-moon-banner.jpg',
+    thumbnail: '/assets/veu/castle-moon-banner.jpg',
+    badge: '🩸 Riverview',
     route: '/veu',
     isExternal: false,
     themeColor: '#dc2626',
-    tags: ['Sobrenatural', 'Vampiros & Lobisomens', 'Bruxaria & Espíritos', 'Mistério Gótico', 'Chat RPG']
+    tags: ['Riverview', 'Sobrenatural', 'Vampiros & Lobisomens', 'Bruxaria & Espíritos', 'Mistério Gótico', 'Chat RPG']
   },
   {
     id: 'gottlich',
