@@ -84,7 +84,7 @@ export default function VeuLocation() {
       <div
         className="location-bg-overlay"
         style={{
-          background: 'linear-gradient(180deg, rgba(7, 6, 10, 0.45) 0%, rgba(13, 10, 20, 0.8) 100%)'
+          background: 'rgba(0, 0, 0, 0.05)'
         }}
       />
 

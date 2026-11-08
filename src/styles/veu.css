@@ -269,7 +269,7 @@
 /* ── Ficha de Personagem de O Véu Sombrio ── */
 .veu-sheet-container {
   min-height: 100vh;
-  background: radial-gradient(ellipse at 50% 15%, #180f28 0%, #06050a 75%);
+  background: radial-gradient(ellipse at 50% 15%, #0d0d14 0%, #06050a 75%);
   color: var(--veu-text);
   font-family: var(--veu-font-body);
   padding: 24px 20px 60px;
@@ -525,9 +525,7 @@
 .vsheet-bg-overlay {
   position: fixed;
   inset: 0;
-  background: 
-    radial-gradient(circle at 50% 15%, rgba(14, 18, 28, 0.4) 0%, rgba(5, 7, 11, 0.94) 75%),
-    linear-gradient(180deg, rgba(5, 7, 11, 0.65) 0%, #05070b 100%);
+  background: rgba(0, 0, 0, 0.05);
   pointer-events: none;
   z-index: 1;
 }
