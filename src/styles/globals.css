@@ -1,4 +1,4 @@
-/* ==============================================
+﻿/* ==============================================
    O BOSQUE DE ALMA KOSKOVIC — ESTILOS GÓTICOS
    Paleta: Roxo Profundo, Ametista, Ardósia e Prata
    ============================================== */
@@ -269,7 +269,7 @@ html, body, #root {
 }
 
 .chat-mention-tag.is-mention-me {
-  background: var(--accent-purple);
+  background: var(--dice-accent);
   color: #fff;
 }
 
@@ -359,7 +359,7 @@ html, body, #root {
 }
 
 .chat-status-btn.active {
-  background: var(--accent-purple);
+  background: var(--dice-accent);
   color: #fff;
 }
 
@@ -1006,7 +1006,7 @@ html, body, #root {
 }
 
 .chat-settings-inline-btn.active {
-  background: var(--accent-purple);
+  background: var(--dice-accent);
   border-color: var(--accent-purple-light);
   color: #fff;
 }
@@ -1519,9 +1519,12 @@ html, body, #root {
   background: rgba(14, 10, 20, 0.96);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--accent-border);
+  --dice-accent: var(--accent-purple, #6d28d9);
+  --dice-accent-glow: rgba(109,40,217,0.35);
+  --dice-accent-muted: rgba(109,40,217,0.15);
+  border: 1px solid var(--dice-accent);
   border-radius: var(--radius-lg);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.9), 0 0 20px rgba(168, 85, 247, 0.15);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.9), 0 0 20px var(--dice-accent-muted);
   overflow: hidden;
   animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
@@ -1594,24 +1597,24 @@ html, body, #root {
 }
 
 .dice-type-btn:hover {
-  border-color: var(--accent-purple-light);
-  color: var(--accent-purple-light);
+  border-color: var(--dice-accent);
+  color: var(--dice-accent);
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(168, 85, 247, 0.15);
+  box-shadow: 0 6px 16px var(--dice-accent-muted);
 }
 
 .dice-type-btn.selected {
-  background: rgba(147, 51, 234, 0.25);
-  border-color: var(--accent-purple-light);
+  background: var(--dice-accent-muted);
+  border-color: var(--dice-accent);
   color: #fff;
-  box-shadow: 0 0 14px rgba(168, 85, 247, 0.35);
+  box-shadow: 0 0 14px var(--dice-accent-glow);
 }
 
 .dice-count-badge {
   position: absolute;
   top: -5px;
   right: -5px;
-  background: var(--accent-purple);
+  background: var(--dice-accent);
   color: #fff;
   font-size: 10px;
   font-weight: 700;
@@ -1660,9 +1663,9 @@ html, body, #root {
 }
 
 .dice-qty-btn:hover:not(:disabled) {
-  background: rgba(147, 51, 234, 0.2);
-  border-color: var(--accent-purple-light);
-  color: var(--accent-purple-light);
+  background: var(--dice-accent-muted);
+  border-color: var(--dice-accent);
+  color: var(--dice-accent);
   transform: scale(1.1);
 }
 
@@ -1674,7 +1677,7 @@ html, body, #root {
 .dice-qty-label {
   font-size: 13px;
   font-weight: 700;
-  color: var(--accent-purple-light);
+  color: var(--dice-accent);
   letter-spacing: 1px;
 }
 
@@ -1693,7 +1696,7 @@ html, body, #root {
   font-size: 48px;
   font-weight: 700;
   color: var(--text-primary);
-  text-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+  text-shadow: 0 0 20px var(--dice-accent-muted);
   line-height: 1;
   animation: resultAppear 0.3s ease;
 }
@@ -1762,7 +1765,7 @@ html, body, #root {
   font-size: 10px;
   letter-spacing: 1.5px;
   text-transform: uppercase;
-  color: var(--accent-purple-light);
+  color: var(--dice-accent);
 }
 
 /* Botão rolar */
@@ -1782,10 +1785,10 @@ html, body, #root {
 }
 
 .dice-roll-btn:hover:not(:disabled) {
-  background: rgba(147, 51, 234, 0.25);
-  border-color: var(--accent-purple-light);
+  background: var(--dice-accent-muted);
+  border-color: var(--dice-accent);
   color: #fff;
-  box-shadow: 0 0 16px rgba(168, 85, 247, 0.3);
+  box-shadow: 0 0 16px var(--dice-accent-glow);
 }
 
 .dice-roll-btn:disabled {
@@ -1992,7 +1995,7 @@ html, body, #root {
 }
 
 .jardim-icon-btn.active {
-  background: var(--accent-purple);
+  background: var(--dice-accent);
   box-shadow: var(--accent-purple-glow);
 }
 
@@ -2236,7 +2239,7 @@ html, body, #root {
 }
 
 .hud-icon-btn.active {
-  background: var(--accent-purple);
+  background: var(--dice-accent);
   box-shadow: var(--accent-purple-glow);
 }
 
@@ -2520,7 +2523,7 @@ html, body, #root {
 }
 
 .chat-theme-btn.active {
-  background: var(--accent-purple);
+  background: var(--dice-accent);
   border-color: var(--accent-purple-light);
   color: #fff;
   font-weight: 700;
@@ -2578,7 +2581,7 @@ html, body, #root {
 }
 
 .chat-sound-toggle-btn.active {
-  background: var(--accent-purple);
+  background: var(--dice-accent);
   color: #fff;
   box-shadow: var(--accent-purple-glow);
 }
@@ -2679,7 +2682,7 @@ html, body, #root {
 }
 
 .admin-login-submit-btn {
-  background: var(--accent-purple);
+  background: var(--dice-accent);
   border: none;
   color: #fff;
   font-family: var(--font-gothic);
@@ -2792,7 +2795,7 @@ html, body, #root {
 }
 
 .admin-add-btn {
-  background: var(--accent-purple);
+  background: var(--dice-accent);
   border: none;
   color: #fff;
   padding: 4px 8px;
@@ -2965,7 +2968,7 @@ html, body, #root {
 }
 
 .admin-save-btn {
-  background: var(--accent-purple);
+  background: var(--dice-accent);
   border: none;
   color: #fff;
   font-family: var(--font-gothic);
@@ -3018,7 +3021,7 @@ html, body, #root {
 }
 
 .admin-tab-nav-btn.active {
-  background: var(--accent-purple);
+  background: var(--dice-accent);
   border-color: var(--accent-purple-light);
   color: #fff;
   box-shadow: var(--accent-purple-glow);
@@ -3048,7 +3051,7 @@ html, body, #root {
 }
 
 .admin-upload-label-btn:hover {
-  background: var(--accent-purple);
+  background: var(--dice-accent);
   box-shadow: var(--accent-purple-glow);
 }
 
@@ -3949,7 +3952,7 @@ html, body, #root {
 }
 
 .admin-visit-loc-action-btn:hover {
-  background: var(--accent-purple);
+  background: var(--dice-accent);
   box-shadow: var(--accent-purple-glow);
   transform: translateY(-1px);
 }
@@ -3967,7 +3970,7 @@ html, body, #root {
 }
 
 .admin-slug-gen-btn:hover {
-  background: var(--accent-purple);
+  background: var(--dice-accent);
   color: #fff;
   border-color: var(--accent-purple-light);
 }

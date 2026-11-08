@@ -23,7 +23,7 @@ const MIN_WIDTH  = 280
 const MAX_WIDTH  = 520
 const MIN_HEIGHT = 340
 
-export default function DiceRoller({ onClose, characterName, uid }) {
+export default function DiceRoller({ onClose, characterName, uid, collection: collectionName = 'dice_rolls', theme = 'default' }) {
   const guestCtx = useGuest ? useGuest() : {}
   const activeUser = uid || guestCtx.user?.uid || 'anon'
   const activeName = characterName || guestCtx.character?.name || guestCtx.user?.displayName || 'Viajante'
@@ -37,6 +37,12 @@ export default function DiceRoller({ onClose, characterName, uid }) {
   const [pos, setPos]         = useState({ x: Math.max(20, window.innerWidth - 340), y: 90 })
   const [size, setSize]       = useState({ w: 300, h: null })
 
+  // Cores do tema: 'crimson' para Riverview, 'default' para Jardim/Cyberpunk
+  const accent = theme === 'crimson' ? '#dc2626' : 'var(--accent, #6d28d9)'
+  const accentHover = theme === 'crimson' ? '#b91c1c' : 'var(--accent-hover, #7c3aed)'
+  const accentGlow  = theme === 'crimson' ? 'rgba(220,38,38,0.35)' : 'rgba(109,40,217,0.35)'
+  const accentMuted = theme === 'crimson' ? 'rgba(220,38,38,0.15)' : 'rgba(109,40,217,0.15)'
+
   const dragging    = useRef(false)
   const resizing    = useRef(false)
   const resizeEdge  = useRef(null)
@@ -46,14 +52,14 @@ export default function DiceRoller({ onClose, characterName, uid }) {
 
   useEffect(() => {
     const q = query(
-      collection(db, 'dice_rolls'),
+      collection(db, collectionName),
       orderBy('timestamp', 'desc'),
       limit(20)
     )
     return onSnapshot(q, (snap) =>
       setHistory(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
     )
-  }, [])
+  }, [collectionName])
 
   const onHeaderMouseDown = useCallback((e) => {
     if (e.target.closest('button')) return
@@ -163,7 +169,7 @@ export default function DiceRoller({ onClose, characterName, uid }) {
     setRolling(false)
 
     try {
-      await addDoc(collection(db, 'dice_rolls'), {
+      await addDoc(collection(db, collectionName), {
         playerUid:  activeUser,
         playerName: activeName,
         diceType:   diceName,
@@ -198,7 +204,7 @@ export default function DiceRoller({ onClose, characterName, uid }) {
   }
 
   return (
-    <div ref={panelRef} className="dice-float-panel" style={panelStyle}>
+    <div ref={panelRef} className="dice-float-panel" style={{ ...panelStyle, '--dice-accent': accent, '--dice-accent-hover': accentHover, '--dice-accent-glow': accentGlow, '--dice-accent-muted': accentMuted }}>
       <div className="resize-handle resize-right"       onMouseDown={onResizeMouseDown('right')} />
       <div className="resize-handle resize-left"        onMouseDown={onResizeMouseDown('left')} />
       <div className="resize-handle resize-bottom"      onMouseDown={onResizeMouseDown('bottom')} />

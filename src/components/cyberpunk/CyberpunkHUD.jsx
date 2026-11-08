@@ -87,7 +87,7 @@ export default function CyberpunkHUD({ locationName }) {
           <button
             type="button"
             className="hud-icon-btn hud-multiverse-btn"
-            onClick={() => navigate('/mundos')}
+            onClick={() => window.open('/mundos', '_blank')}
             title="Portais do Multiverso — Explorador de Mundos"
           >
             🌐
@@ -97,7 +97,7 @@ export default function CyberpunkHUD({ locationName }) {
           <button
             type="button"
             className="hud-icon-btn cb-hud-btn"
-            onClick={() => navigate('/cyberpunk/personagens')}
+            onClick={() => window.open('/cyberpunk/personagens', '_blank')}
             title="Galeria de Mercenários & Habitantes da Sentinela 1"
           >
             👥

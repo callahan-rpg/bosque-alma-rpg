@@ -63,7 +63,7 @@ export default function HUD({ locationName, weatherCondition }) {
           <button
             type="button"
             className="hud-icon-btn hud-multiverse-btn"
-            onClick={() => navigate('/mundos')}
+            onClick={() => window.open('/mundos', '_blank')}
             title="Portais do Multiverso — Explorador de Mundos"
           >
             🌐
@@ -73,7 +73,7 @@ export default function HUD({ locationName, weatherCondition }) {
           <button
             type="button"
             className="hud-icon-btn"
-            onClick={() => navigate('/personagens')}
+            onClick={() => window.open('/personagens', '_blank')}
             title="Galeria Pública de Personagens & Viajantes"
           >
             👥

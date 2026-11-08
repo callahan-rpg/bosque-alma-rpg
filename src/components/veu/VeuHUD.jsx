@@ -82,7 +82,7 @@ export default function VeuHUD({ locationName }) {
           <button
             type="button"
             className="hud-icon-btn hud-multiverse-btn"
-            onClick={() => navigate('/mundos')}
+            onClick={() => window.open('/mundos', '_blank')}
             title="Portais do Multiverso — Explorador de Mundos"
           >
             🌐
@@ -92,7 +92,7 @@ export default function VeuHUD({ locationName }) {
           <button
             type="button"
             className="hud-icon-btn veu-hud-btn"
-            onClick={() => navigate('/veu/personagens')}
+            onClick={() => window.open('/veu/personagens', '_blank')}
             title="Galeria de Habitantes da Noite"
           >
             👥
@@ -164,12 +164,14 @@ export default function VeuHUD({ locationName }) {
         <SettingsModal onClose={() => setShowSettings(false)} />
       )}
 
-      {/* Rolador de Dados idêntico ao do Jardim */}
+      {/* Rolador de Dados — coleção e tema exclusivos do Riverview */}
       {showDice && (
         <DiceRoller
           onClose={() => setShowDice(false)}
           characterName={handleName}
           uid={user?.uid}
+          collection="veu_dice_rolls"
+          theme="crimson"
         />
       )}
 
