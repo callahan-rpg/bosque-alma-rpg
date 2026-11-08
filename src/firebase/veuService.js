@@ -28,12 +28,12 @@ export const VEU_LINEAGES = [
 
 // 6 Atributos Oficiais de Riverview (com suporte a modificador d20)
 export const VEU_ATTRIBUTES_LIST = [
-  { key: 'forca', label: 'FORÇA', altKey: 'forca', icon: 'muscle', desc: 'Poder físico bruto, impacto e capacidade de carga.' },
-  { key: 'destreza', label: 'DESTREZA', altKey: 'destreza', icon: 'running', desc: 'Agilidade, reflexos, precisão e velocidade de reação.' },
-  { key: 'poder', label: 'PODER', altKey: 'poder', icon: 'star', desc: 'Potência mágica, feitiçaria, canalização de energia primordial.' },
-  { key: 'sabedoria', label: 'SABEDORIA', altKey: 'sabedoria', icon: 'book', desc: 'Percepção sobrenatural, intuição, vontade mental e raciocínio.' },
-  { key: 'constituicao', label: 'CONSTITUIÇÃO', altKey: 'vitalidade', icon: 'shield', desc: 'Saúde física, vigor biológico, resistência a ferimentos e toxinas.' },
-  { key: 'carisma', label: 'CARISMA', altKey: 'carisma', icon: 'masks', desc: 'Presença magnética, persuasão, liderança e autoridade.' }
+  { key: 'forca', label: 'FORÇA', altKey: 'forca', icon: '💪', desc: 'Poder físico bruto, impacto e capacidade de carga.' },
+  { key: 'destreza', label: 'DESTREZA', altKey: 'destreza', icon: '🏃', desc: 'Agilidade, reflexos, precisão e velocidade de reação.' },
+  { key: 'poder', label: 'PODER', altKey: 'poder', icon: '✦', desc: 'Potência mágica, feitiçaria, canalização de energia primordial.' },
+  { key: 'sabedoria', label: 'SABEDORIA', altKey: 'sabedoria', icon: '📖', desc: 'Percepção sobrenatural, intuição, vontade mental e raciocínio.' },
+  { key: 'constituicao', label: 'CONSTITUIÇÃO', altKey: 'vitalidade', icon: '🛡️', desc: 'Saúde física, vigor biológico, resistência a ferimentos e toxinas.' },
+  { key: 'carisma', label: 'CARISMA', altKey: 'carisma', icon: '🎭', desc: 'Presença magnética, persuasão, liderança e autoridade.' }
 ]
 
 /**
@@ -78,9 +78,15 @@ export function calculateVeuMaxHp(vitalidade = 10) {
   return 60 + (Number(vitalidade) * 5)
 }
 
-export function calculateVeuMaxEssence(poder = 10, sabedoria = 10) {
-  return 20 + (Number(poder) * 4) + (Number(sabedoria) * 2)
+/**
+ * Cálculo de Mana idêntico ao cálculo de Vigor no Jardim: 10 + Math.floor(vitalidade / 2)
+ */
+export function calculateVeuMaxMana(vitalidade = 10) {
+  const vit = Math.max(0, parseInt(vitalidade, 10) || 0)
+  return 10 + Math.floor(vit / 2)
 }
+
+export const calculateVeuMaxEssence = calculateVeuMaxMana
 
 /**
  * Cria a ficha padrão para um jogador em Riverview

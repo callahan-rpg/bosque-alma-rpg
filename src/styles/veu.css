@@ -432,9 +432,10 @@
   background: linear-gradient(90deg, #991b1b, #ef4444);
   box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
 }
-.veu-bar-fill.essence {
-  background: linear-gradient(90deg, #6b21a8, #a855f7);
-  box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+.veu-bar-fill.essence,
+.veu-bar-fill.mana {
+  background: linear-gradient(90deg, #1d4ed8, #38bdf8);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
 }
 
 /* Abas da Ficha */
