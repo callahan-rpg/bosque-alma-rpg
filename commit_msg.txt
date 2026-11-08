@@ -1,1 +1,0 @@
-feat: historico de dados isolado por universo, tema crimson no Riverview, mundos e personagens abrem em nova aba
