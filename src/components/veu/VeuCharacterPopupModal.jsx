@@ -19,8 +19,8 @@ const ATTR_ICONS = {
   carisma: '🎭'
 }
 
-export default function VeuCharacterPopupModal({ targetUser, currentUser, onClose }) {
-  const uid = targetUser?.uid
+export default function VeuCharacterPopupModal({ targetUser, currentUser, onClose, onOpenPrivateChat }) {
+  const uid = targetUser?.uid || targetUser?.id
   const isSelf = currentUser?.uid && uid === currentUser.uid
 
   const [charData, setCharData] = useState(null)
@@ -151,6 +151,17 @@ export default function VeuCharacterPopupModal({ targetUser, currentUser, onClos
   const manaMax = charData?.manaMax ?? calculateVeuMaxMana(vitStat)
   const manaCurrent = Math.min(manaMax, charData?.manaCurrent ?? charData?.essenceCurrent ?? manaMax)
   const manaPercent = Math.min(100, Math.max(0, (manaCurrent / Math.max(1, manaMax)) * 100))
+
+  const handlePrivateChat = () => {
+    if (onOpenPrivateChat) {
+      onOpenPrivateChat({
+        uid,
+        characterName: name,
+        avatarUrl
+      })
+    }
+    if (onClose) onClose()
+  }
 
   return (
     <div
@@ -328,8 +339,36 @@ export default function VeuCharacterPopupModal({ targetUser, currentUser, onClos
             </div>
           </div>
 
-          {/* Botão para abrir ficha em nova guia */}
-          <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+          {/* Botões de Ação */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '6px' }}>
+            {!isSelf && onOpenPrivateChat && (
+              <button
+                type="button"
+                className="veu-dice-roll-action-btn"
+                style={{
+                  width: '100%',
+                  padding: '9px',
+                  fontSize: '0.82rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.45) 0%, rgba(147, 51, 234, 0.4) 100%)',
+                  border: '1px solid var(--veu-blood)',
+                  color: '#fff',
+                  fontWeight: 600,
+                  boxShadow: '0 0 12px rgba(220, 38, 38, 0.25)',
+                  transition: 'all 0.2s ease'
+                }}
+                onClick={handlePrivateChat}
+                title={`Iniciar conversa privada com ${name}`}
+              >
+                <span>💬</span>
+                <span>Iniciar Conversa Privada</span>
+              </button>
+            )}
+
             <button
               type="button"
               className="veu-dice-roll-action-btn"

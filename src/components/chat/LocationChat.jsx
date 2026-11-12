@@ -816,12 +816,14 @@ export default function LocationChat({ slug, locationName, universe = 'jardim' }
         <CyberpunkCharacterPopupModal
           targetUser={modalUser}
           currentUser={user}
+          onOpenPrivateChat={handleOpenPrivateChat}
           onClose={() => setModalUser(null)}
         />
       ) : modalUser && universe === 'veu' ? (
         <VeuCharacterPopupModal
           targetUser={modalUser}
           currentUser={user}
+          onOpenPrivateChat={handleOpenPrivateChat}
           onClose={() => setModalUser(null)}
         />
       ) : modalUser ? (
