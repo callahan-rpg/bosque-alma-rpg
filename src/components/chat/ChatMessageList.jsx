@@ -81,6 +81,7 @@ export default function ChatMessageList({
   ignoredUids = [],
   isPrivateChat = false,
   onSelectUser,
+  onEditMessage,
   onDeleteMessage,
   onPinMessage,
   onToggleReaction,
@@ -299,6 +300,14 @@ export default function ChatMessageList({
 
                 <div className="chat-msg-body-wrapper">
                   <span className="chat-msg-body">{formatText(msg.text, myCharacterName)}</span>
+                  {msg.edited && (
+                    <span
+                      className="chat-msg-edited-badge"
+                      title={msg.editedAt ? `Editada em ${formatFullDateTime(msg.editedAt)}` : 'Mensagem editada'}
+                    >
+                      (editada)
+                    </span>
+                  )}
                 </div>
 
                 {hasReactions && (
@@ -386,6 +395,19 @@ export default function ChatMessageList({
               }}
             >
               <span>💬 Citar mensagem</span>
+            </button>
+          )}
+
+          {((currentUser?.uid && contextMenu.msg.uid === currentUser.uid) || isAdmin) && onEditMessage && (
+            <button
+              type="button"
+              className="chat-context-menu-item"
+              onClick={() => {
+                onEditMessage(contextMenu.msg)
+                setContextMenu(null)
+              }}
+            >
+              <span>✏️ Editar mensagem</span>
             </button>
           )}
 

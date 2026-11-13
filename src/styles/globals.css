@@ -4164,6 +4164,44 @@ html, body, #root {
   transition: color 0.15s ease;
 }
 
+/* Prévia de Edição */
+.chat-edit-preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: rgba(234, 179, 8, 0.12);
+  border-left: 2.5px solid #eab308;
+  border-radius: 0 4px 4px 0;
+  padding: 4px 8px;
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+  animation: fadeIn 0.12s ease-out;
+}
+.chat-edit-preview-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #fbbf24;
+  flex-shrink: 0;
+}
+.chat-edit-preview-text {
+  font-size: 11px;
+  color: rgba(254, 243, 199, 0.85);
+  font-style: italic;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chat-msg-edited-badge {
+  font-size: 10px;
+  color: #94a3b8;
+  opacity: 0.65;
+  font-style: italic;
+  margin-left: 6px;
+  user-select: none;
+}
+
 .chat-quote-preview-clear:hover {
   color: #f87171;
 }

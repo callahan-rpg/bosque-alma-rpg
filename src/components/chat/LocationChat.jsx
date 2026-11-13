@@ -22,6 +22,8 @@ import EditProfileModal from './EditProfileModal.jsx'
 import {
   sendZoneMessage,
   sendPrivateMessage,
+  updateZoneMessage,
+  updatePrivateMessage,
   subscribeZoneChat,
   subscribePrivateChat,
   subscribeUserInbox,
@@ -119,6 +121,7 @@ export default function LocationChat({ slug, locationName, universe = 'jardim' }
   // Modais
   const [modalUser, setModalUser] = useState(null)
   const [showEditProfile, setShowEditProfile] = useState(false)
+  const [editingMessage, setEditingMessage] = useState(null)
 
   // Usuários ignorados (salvo no localStorage)
   const [ignoredUids, setIgnoredUids] = useState(() => {
@@ -481,6 +484,27 @@ export default function LocationChat({ slug, locationName, universe = 'jardim' }
     }
   }
 
+  const handleEditMessage = (msg) => {
+    if (!msg) return
+    setEditingMessage(msg)
+  }
+
+  const handleSaveEditMessage = async (messageId, newText) => {
+    if (!messageId || !newText?.trim()) return
+    try {
+      if (activeTab === 'zone') {
+        await updateZoneMessage(slug, messageId, newText)
+      } else if (activeTab.startsWith('dm_')) {
+        const targetUid = activeTab.replace('dm_', '')
+        await updatePrivateMessage(user.uid, targetUid, messageId, newText)
+      }
+      setEditingMessage(null)
+    } catch (err) {
+      console.error('[LocationChat] Erro ao editar mensagem:', err)
+      alert('Não foi possível editar a mensagem: ' + (err.message || 'Erro'))
+    }
+  }
+
   const handleOpenPrivateChat = (targetUser) => {
     if (!targetUser?.uid || targetUser.uid === user?.uid) return
 
@@ -624,6 +648,7 @@ export default function LocationChat({ slug, locationName, universe = 'jardim' }
                   ignoredUids={ignoredUids}
                   isPrivateChat={activeTab.startsWith('dm_')}
                   onSelectUser={(u) => setModalUser(u)}
+                  onEditMessage={handleEditMessage}
                   onDeleteMessage={handleDeleteMessage}
                   onPinMessage={handlePinMessage}
                   onToggleReaction={handleToggleReaction}
@@ -808,6 +833,9 @@ export default function LocationChat({ slug, locationName, universe = 'jardim' }
             onSendMessage={handleSendMessage}
             onlineUsers={activeTab.startsWith('dm_') ? (currentDmTarget ? [currentDmTarget] : []) : currentRoomVisitors}
             placeholder={activeTab === 'zone' ? `Falar em ${locationName || 'este local'}...` : `Sussurrar para ${currentDmTarget?.characterName || '...'}`}
+            editingMessage={editingMessage}
+            onCancelEdit={() => setEditingMessage(null)}
+            onSaveEdit={handleSaveEditMessage}
           />
         )}
       </div>

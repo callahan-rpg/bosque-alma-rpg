@@ -2,6 +2,7 @@ import {
   ref,
   push,
   set,
+  update,
   remove,
   onValue,
   off,
@@ -223,6 +224,36 @@ export async function deleteZoneMessage(zoneSlug, messageId) {
   if (!rtdb || !zoneSlug || !messageId) return
   const msgRef = ref(rtdb, `chat/zones/${zoneSlug}/messages/${messageId}`)
   await remove(msgRef)
+}
+
+/**
+ * Atualiza o texto de uma mensagem enviada na zona
+ */
+export async function updateZoneMessage(zoneSlug, messageId, newText) {
+  if (!rtdb || !zoneSlug || !messageId || !newText?.trim()) return
+  const cleanText = newText.trim().slice(0, 500)
+  const msgRef = ref(rtdb, `chat/zones/${zoneSlug}/messages/${messageId}`)
+  await update(msgRef, {
+    text: cleanText,
+    edited: true,
+    editedAt: serverTimestamp()
+  })
+}
+
+/**
+ * Atualiza o texto de uma mensagem no chat privado (DM)
+ */
+export async function updatePrivateMessage(senderUid, targetUid, messageId, newText) {
+  if (!rtdb || !senderUid || !targetUid || !messageId || !newText?.trim()) return
+  const roomId = getPrivateRoomId(senderUid, targetUid)
+  if (!roomId) return
+  const cleanText = newText.trim().slice(0, 500)
+  const msgRef = ref(rtdb, `chat/private/${roomId}/messages/${messageId}`)
+  await update(msgRef, {
+    text: cleanText,
+    edited: true,
+    editedAt: serverTimestamp()
+  })
 }
 
 /**

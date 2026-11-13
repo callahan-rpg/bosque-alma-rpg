@@ -4,7 +4,10 @@ export default function ChatInputBar({
   onSendMessage,
   disabled = false,
   placeholder = 'Digite sua mensagem...',
-  onlineUsers = []
+  onlineUsers = [],
+  editingMessage = null,
+  onCancelEdit,
+  onSaveEdit
 }) {
   const [text, setText] = useState('')
   const [isSending, setIsSending] = useState(false)
@@ -18,6 +21,20 @@ export default function ChatInputBar({
   useEffect(() => {
     inputRef.current?.focus()
   }, [])
+
+  // Carrega texto da mensagem que está sendo editada
+  useEffect(() => {
+    if (editingMessage) {
+      setText(editingMessage.text || '')
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus()
+          const len = (editingMessage.text || '').length
+          inputRef.current.setSelectionRange(len, len)
+        }
+      }, 30)
+    }
+  }, [editingMessage])
 
   const handleTextChange = (e) => {
     const val = e.target.value.slice(0, 280)
@@ -66,6 +83,16 @@ export default function ChatInputBar({
 
     try {
       setIsSending(true)
+
+      // Se estiver editando uma mensagem já enviada
+      if (editingMessage && onSaveEdit) {
+        await onSaveEdit(editingMessage.id, trimmed)
+        setText('')
+        setMentionQuery(null)
+        if (onCancelEdit) onCancelEdit()
+        return
+      }
+
       let finalText = trimmed
       if (quotedMsg) {
         const authorLine = `[${quotedMsg.characterName}]: ${quotedMsg.text.slice(0, 80)}${quotedMsg.text.length > 80 ? '...' : ''}`
@@ -88,6 +115,18 @@ export default function ChatInputBar({
   }
 
   function handleKeyDown(e) {
+    if (e.key === 'Escape') {
+      if (mentionQuery !== null) {
+        setMentionQuery(null)
+        return
+      }
+      if (editingMessage && onCancelEdit) {
+        onCancelEdit()
+        setText('')
+        return
+      }
+    }
+
     if (filteredUsers.length > 0) {
       if (e.key === 'ArrowDown') {
         e.preventDefault()
@@ -102,10 +141,6 @@ export default function ChatInputBar({
       if (e.key === 'Enter' || e.key === 'Tab') {
         e.preventDefault()
         insertMention(filteredUsers[mentionIndex]?.characterName)
-        return
-      }
-      if (e.key === 'Escape') {
-        setMentionQuery(null)
         return
       }
     }
@@ -170,6 +205,29 @@ export default function ChatInputBar({
 
   return (
     <div className="chat-input-bar">
+      {editingMessage && (
+        <div className="chat-edit-preview">
+          <div className="chat-quote-preview-body">
+            <span className="chat-edit-preview-label">✏️ Editando mensagem:</span>
+            <span className="chat-edit-preview-text">
+              {editingMessage.text}
+            </span>
+          </div>
+          <button
+            type="button"
+            className="chat-quote-preview-clear"
+            onClick={() => {
+              setText('')
+              onCancelEdit && onCancelEdit()
+              inputRef.current?.focus()
+            }}
+            title="Cancelar edição (Esc)"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       {quotedMsg && (
         <div className="chat-quote-preview">
           <div className="chat-quote-preview-body">
@@ -221,7 +279,7 @@ export default function ChatInputBar({
             value={text}
             onChange={handleTextChange}
             onKeyDown={handleKeyDown}
-            placeholder={placeholder}
+            placeholder={editingMessage ? 'Editando mensagem... (Enter para salvar, Esc para cancelar)' : placeholder}
             rows={4}
             maxLength={280}
             disabled={disabled || isSending}
@@ -235,12 +293,12 @@ export default function ChatInputBar({
 
         <button
           type="button"
-          className="chat-send-btn"
+          className={`chat-send-btn ${editingMessage ? 'is-editing' : ''}`}
           onClick={handleSend}
           disabled={!text.trim() || isSending || cooldown || disabled}
-          title="Enviar mensagem (Enter)"
+          title={editingMessage ? 'Salvar edição (Enter)' : 'Enviar mensagem (Enter)'}
         >
-          <span className="chat-send-icon">↵</span>
+          <span className="chat-send-icon">{editingMessage ? '✓' : '↵'}</span>
         </button>
       </div>
     </div>
